@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
-import { formatDate, getPackageStatusLabel, daysRemaining } from '@/lib/utils'
+import { formatDate, getPackageStatusLabel, daysRemaining, formatPrice } from '@/lib/utils'
 
 export default async function PackagesPage() {
   const supabase = await createClient()
@@ -40,6 +40,19 @@ export default async function PackagesPage() {
               <Badge variant="success">Aktif</Badge>
             </div>
           </CardHeader>
+
+          {/* Fiyat + Ödeme */}
+          {activePackage.price !== null && (
+            <div className="flex items-center justify-between mb-4 p-3 rounded-lg bg-background">
+              <div>
+                <div className="text-sm text-text-secondary">Paket Tutarı</div>
+                <div className="text-lg font-bold">{formatPrice(activePackage.price)}</div>
+              </div>
+              <Badge variant={activePackage.payment_status === 'paid' ? 'success' : 'danger'}>
+                {activePackage.payment_status === 'paid' ? 'Ödendi' : 'Ödenmedi'}
+              </Badge>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
             <div>
@@ -112,8 +125,18 @@ export default async function PackagesPage() {
                     {getPackageStatusLabel(pkg.status)}
                   </Badge>
                 </div>
-                <div className="text-sm text-text-secondary mt-2">
-                  {pkg.used_lessons}/{pkg.total_lessons} ders tamamlandı
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-sm text-text-secondary">
+                    {pkg.used_lessons}/{pkg.total_lessons} ders tamamlandı
+                  </span>
+                  {pkg.price !== null && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{formatPrice(pkg.price)}</span>
+                      <Badge variant={pkg.payment_status === 'paid' ? 'success' : 'danger'}>
+                        {pkg.payment_status === 'paid' ? 'Ödendi' : 'Ödenmedi'}
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </Card>
             ))}

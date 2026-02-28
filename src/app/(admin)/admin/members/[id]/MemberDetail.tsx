@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import Input from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
-import { formatDate, formatDateShort, getPackageStatusLabel } from '@/lib/utils'
+import { formatDate, formatDateShort, getPackageStatusLabel, formatPrice } from '@/lib/utils'
 import ProgressChart from '@/app/(member)/dashboard/progress/ProgressChart'
 import Select from '@/components/ui/Select'
 import type { User, Package, Measurement, Lesson, Gender, MealLog, MemberMeal } from '@/lib/types'
@@ -43,6 +43,7 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
   const [pdfLoading, setPdfLoading] = useState(false)
   const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null)
   const [deletingPackageId, setDeletingPackageId] = useState<string | null>(null)
+  const [togglingPaymentId, setTogglingPaymentId] = useState<string | null>(null)
   const [editingMealLog, setEditingMealLog] = useState<(MealLog & { member_meal?: { id: string; name: string } | null }) | null>(null)
   const [mealLogForm, setMealLogForm] = useState({ status: '' as string, note: '' })
   const [savingMealLog, setSavingMealLog] = useState(false)
@@ -93,6 +94,19 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
       router.refresh()
     }
     setDeletingPackageId(null)
+  }
+
+  async function handleTogglePayment(packageId: string, currentStatus: string) {
+    setTogglingPaymentId(packageId)
+    const supabase = createClient()
+    const newStatus = currentStatus === 'paid' ? 'unpaid' : 'paid'
+    const { error } = await supabase.from('packages').update({ payment_status: newStatus }).eq('id', packageId)
+    if (error) {
+      alert('Güncellenemedi: ' + error.message)
+    } else {
+      router.refresh()
+    }
+    setTogglingPaymentId(null)
   }
 
   async function handleDeleteLesson(lessonId: string) {
@@ -559,6 +573,21 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
                       </button>
                     </div>
                   </div>
+                  {/* Fiyat + Ödeme durumu */}
+                  {pkg.price !== null && (
+                    <div className="flex items-center justify-between mb-3 p-2.5 rounded-lg bg-background">
+                      <span className="text-sm font-medium">{formatPrice(pkg.price)}</span>
+                      <button
+                        onClick={() => handleTogglePayment(pkg.id, pkg.payment_status)}
+                        disabled={togglingPaymentId === pkg.id}
+                        className="cursor-pointer disabled:opacity-50"
+                      >
+                        <Badge variant={pkg.payment_status === 'paid' ? 'success' : 'danger'}>
+                          {togglingPaymentId === pkg.id ? '...' : pkg.payment_status === 'paid' ? 'Ödendi' : 'Ödenmedi'}
+                        </Badge>
+                      </button>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs text-text-secondary">
                       <span>{pkg.used_lessons} kullanıldı</span>

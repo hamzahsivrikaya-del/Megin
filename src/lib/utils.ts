@@ -3,6 +3,12 @@ export function cn(...inputs: string[]) {
   return inputs.filter(Boolean).join(' ')
 }
 
+// Fiyat formatlama (TL)
+export function formatPrice(price: number | null): string | null {
+  if (price === null || price === undefined) return null
+  return price.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' TL'
+}
+
 // Tarih formatlama (Türkçe)
 export function formatDate(date: string | Date): string {
   return new Date(date).toLocaleDateString('tr-TR', {
