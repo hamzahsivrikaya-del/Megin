@@ -17,6 +17,7 @@ export interface User {
 }
 
 export type PackageStatus = 'active' | 'completed' | 'expired'
+export type PaymentStatus = 'paid' | 'unpaid'
 
 export interface Package {
   id: string
@@ -26,6 +27,8 @@ export interface Package {
   start_date: string
   expire_date: string
   status: PackageStatus
+  price: number | null
+  payment_status: PaymentStatus
   created_at: string
   // joined
   user?: User
@@ -142,7 +145,16 @@ export interface MealLog {
   member_meal?: MemberMeal
 }
 
-export type NotificationType = 'low_lessons' | 'weekly_report' | 'inactive' | 'manual' | 'nutrition_reminder'
+// Rozetler
+export interface MemberBadge {
+  id: string
+  user_id: string
+  badge_id: string
+  earned_at: string
+  notified: boolean
+}
+
+export type NotificationType = 'low_lessons' | 'weekly_report' | 'inactive' | 'manual' | 'nutrition_reminder' | 'badge_earned'
 
 export interface Notification {
   id: string

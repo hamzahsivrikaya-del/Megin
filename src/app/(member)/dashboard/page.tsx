@@ -7,6 +7,7 @@ import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
 import { formatDate, daysRemaining, getPackageStatusLabel, formatPrice } from '@/lib/utils'
 import type { MemberMeal, MemberGoal, Package, Measurement } from '@/lib/types'
+import BadgeStrip from '@/components/shared/BadgeStrip'
 
 function SectionSkeleton() {
   return (
@@ -177,6 +178,9 @@ export default async function MemberDashboard() {
           </div>
         )}
       </Card>
+
+      {/* Rozet Seridi */}
+      <BadgeStrip />
 
       {/* Bugünün Beslenmesi */}
       <Link href="/dashboard/beslenme" className="block">

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Teko, Oswald, Lora } from 'next/font/google'
+import { Geist, Geist_Mono, Teko, Oswald, Lora, Space_Mono, Nunito } from 'next/font/google'
 import ServiceWorkerRegistration from '@/components/shared/ServiceWorkerRegistration'
 import './globals.css'
 
@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 const teko = Teko({
   variable: '--font-display',
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   weight: ['400', '700'],
 })
 
@@ -27,6 +27,18 @@ const oswald = Oswald({
 const lora = Lora({
   variable: '--font-lora',
   subsets: ['latin'],
+})
+
+const spaceMono = Space_Mono({
+  variable: '--font-space-mono',
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '700'],
+})
+
+const nunito = Nunito({
+  variable: '--font-nunito',
+  subsets: ['latin', 'latin-ext'],
+  weight: ['600', '700', '800', '900'],
 })
 
 export const metadata: Metadata = {
@@ -56,7 +68,7 @@ export default function RootLayout({
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${teko.variable} ${oswald.variable} ${lora.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${teko.variable} ${oswald.variable} ${lora.variable} ${spaceMono.variable} ${nunito.variable} antialiased`}>
         {children}
         <ServiceWorkerRegistration />
       </body>
