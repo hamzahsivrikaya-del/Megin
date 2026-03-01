@@ -14,11 +14,11 @@ const STEPS = [
 
 const GOAL_METRICS: { key: GoalMetricType; label: string; unit: string; placeholder: string; color: string }[] = [
   { key: 'weight', label: 'Kilo', unit: 'kg', placeholder: '75', color: '#DC2626' },
-  { key: 'body_fat_pct', label: 'Vücut Yağı', unit: '%', placeholder: '15', color: '#F59E0B' },
-  { key: 'chest', label: 'Göğüs', unit: 'cm', placeholder: '100', color: '#3B82F6' },
-  { key: 'waist', label: 'Bel', unit: 'cm', placeholder: '80', color: '#22C55E' },
-  { key: 'arm', label: 'Kol', unit: 'cm', placeholder: '35', color: '#8B5CF6' },
-  { key: 'leg', label: 'Bacak', unit: 'cm', placeholder: '55', color: '#F97316' },
+  { key: 'body_fat_pct', label: 'Vücut Yağı', unit: '%', placeholder: '15', color: '#DC2626' },
+  { key: 'chest', label: 'Göğüs', unit: 'cm', placeholder: '100', color: '#DC2626' },
+  { key: 'waist', label: 'Bel', unit: 'cm', placeholder: '80', color: '#DC2626' },
+  { key: 'arm', label: 'Kol', unit: 'cm', placeholder: '35', color: '#DC2626' },
+  { key: 'leg', label: 'Bacak', unit: 'cm', placeholder: '55', color: '#DC2626' },
 ]
 
 function Confetti() {
@@ -183,41 +183,48 @@ export default function OnboardingPage() {
 
           {/* Step 0: Hosgeldin */}
           {step === 0 && (
-            <div className="text-center space-y-6 animate-fade-up">
-              {/* Animated icon */}
-              <div className="relative mx-auto w-28 h-28">
-                <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse" />
-                <div className="absolute inset-2 rounded-full bg-primary/20" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <svg className="w-14 h-14 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                      d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z" />
-                  </svg>
-                </div>
+            <div className="text-center space-y-8 animate-fade-up">
+              {/* Decorative accent */}
+              <div className="flex justify-center">
+                <div className="w-12 h-1 rounded-full bg-primary/60" />
               </div>
 
               <div>
-                <h1 className="text-3xl font-bold text-text-primary">
-                  Hoşgeldin{userName ? `, ${userName}` : ''}!
+                <h1 className="text-[2.75rem] font-extrabold text-text-primary leading-[1.1] tracking-tight">
+                  Hoşgeldin{userName ? ',' : '!'}
+                  {userName && (
+                    <>
+                      <br />
+                      <span className="text-primary">{userName}!</span>
+                    </>
+                  )}
                 </h1>
-                <p className="text-text-secondary mt-3 text-lg leading-relaxed">
-                  Fitness yolculuğun başlıyor. Seni adım adım hazırlayalım.
+                <p className="text-text-secondary mt-5 text-[1.0625rem] leading-relaxed max-w-[280px] mx-auto">
+                  Harika bir adım attın. Birkaç adımda her şeyi hazırlayalım.
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 pt-4">
-                {[
-                  { label: 'Hedef Koy', desc: 'Ne istediğini belirle' },
-                  { label: 'Takip Et', desc: 'İlerlemeni gör' },
-                  { label: 'Başarı', desc: 'Rozet kazan' },
-                ].map((item, i) => (
+              <div className="grid grid-cols-3 gap-3 pt-2">
+                {['Hedef Koy', 'Takip Et', 'Başar'].map((label, i) => (
                   <div
-                    key={item.label}
-                    className="bg-surface rounded-xl p-3 border border-border text-center animate-fade-up"
-                    style={{ animationDelay: `${(i + 1) * 150}ms` }}
+                    key={label}
+                    className="relative bg-white rounded-2xl px-3 py-5 text-center animate-fade-up overflow-hidden"
+                    style={{
+                      animationDelay: `${(i + 1) * 200}ms`,
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.03), 0 4px 16px rgba(0,0,0,0.05)',
+                    }}
                   >
-                    <div className="text-xs font-semibold text-primary">{item.label}</div>
-                    <div className="text-[10px] text-text-secondary mt-1">{item.desc}</div>
+                    <div className="flex justify-center gap-[3px] mb-3">
+                      {[0, 1, 2].map((j) => (
+                        <div
+                          key={j}
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            j <= i ? 'bg-primary' : 'bg-primary/15'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[13px] font-bold text-text-primary tracking-wide">{label}</span>
                   </div>
                 ))}
               </div>
@@ -326,7 +333,7 @@ export default function OnboardingPage() {
               <div>
                 <h2 className="text-3xl font-bold text-text-primary">Hazırsın!</h2>
                 <p className="text-text-secondary mt-3 text-lg">
-                  Yolculuğun başladı. Şimdi dashboard&apos;una gidiyorsun.
+                  Her şey tamam. Hadi başlayalım!
                 </p>
               </div>
 
