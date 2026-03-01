@@ -36,6 +36,16 @@ export default async function MemberDashboard() {
   if (!session?.user) redirect('/login')
   const user = session.user
 
+  // Onboarding kontrolu
+  const { data: onboardingCheck } = await supabase
+    .from('users')
+    .select('onboarding_completed')
+    .eq('id', user.id)
+    .single()
+  if (onboardingCheck && !onboardingCheck.onboarding_completed) {
+    redirect('/dashboard/onboarding')
+  }
+
   // Kritik veri — hemen render
   const [
     { data: profile },
