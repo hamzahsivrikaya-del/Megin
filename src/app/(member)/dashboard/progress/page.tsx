@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import ProgressChart from './ProgressChartLazy'
+import ProgressPhotos from './ProgressPhotos'
 
 export default async function ProgressPage() {
   const supabase = await createClient()
@@ -9,7 +10,7 @@ export default async function ProgressPage() {
   if (!session?.user) redirect('/login')
   const user = session.user
 
-  const [{ data: measurements }, { data: profile }, { data: goals }] = await Promise.all([
+  const [{ data: measurements }, { data: profile }, { data: goals }, { data: photos }] = await Promise.all([
     supabase
       .from('measurements')
       .select('*')
@@ -24,6 +25,11 @@ export default async function ProgressPage() {
       .from('member_goals')
       .select('*')
       .eq('user_id', user.id),
+    supabase
+      .from('progress_photos')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('taken_at', { ascending: false }),
   ])
 
   return (
@@ -36,6 +42,9 @@ export default async function ProgressPage() {
         </Link>
         <h1 className="text-2xl font-bold">İlerleme</h1>
       </div>
+      {(photos?.length ?? 0) > 0 && (
+        <ProgressPhotos photos={photos || []} measurements={measurements || []} />
+      )}
       <ProgressChart
         measurements={measurements || []}
         gender={profile?.gender}

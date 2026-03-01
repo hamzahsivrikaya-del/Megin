@@ -177,3 +177,13 @@ export interface MemberGoal {
   created_at: string
   achieved_at: string | null
 }
+
+export interface ProgressPhoto {
+  id: string
+  user_id: string
+  photo_url: string
+  angle: 'front' | 'side' | 'back'
+  taken_at: string
+  comment: string | null
+  created_at: string
+}

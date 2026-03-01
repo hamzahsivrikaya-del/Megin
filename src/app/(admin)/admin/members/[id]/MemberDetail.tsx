@@ -11,7 +11,8 @@ import Modal from '@/components/ui/Modal'
 import { formatDate, formatDateShort, getPackageStatusLabel, formatPrice } from '@/lib/utils'
 import ProgressChart from '@/app/(member)/dashboard/progress/ProgressChart'
 import Select from '@/components/ui/Select'
-import type { User, Package, Measurement, Lesson, Gender, MealLog, MemberMeal } from '@/lib/types'
+import type { User, Package, Measurement, Lesson, Gender, MealLog, MemberMeal, ProgressPhoto } from '@/lib/types'
+import Image from 'next/image'
 import MealPlanManager from './MealPlanManager'
 import Link from 'next/link'
 
@@ -27,9 +28,10 @@ interface Props {
   mealLogs: (MealLog & { member_meal?: { id: string; name: string } | null })[]
   memberMeals: MemberMeal[]
   dependents: DependentUser[]
+  progressPhotos: ProgressPhoto[]
 }
 
-export default function MemberDetail({ member, packages, measurements, lessons, mealLogs, memberMeals, dependents }: Props) {
+export default function MemberDetail({ member, packages, measurements, lessons, mealLogs, memberMeals, dependents, progressPhotos }: Props) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [editing, setEditing] = useState(false)
@@ -53,6 +55,87 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
   const [dependentForm, setDependentForm] = useState({ full_name: '', gender: '' as '' | Gender, phone: '' })
   const [addingDependent, setAddingDependent] = useState(false)
   const [dependentError, setDependentError] = useState('')
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false)
+  const [photoDate, setPhotoDate] = useState(new Date().toISOString().split('T')[0])
+  const [photoFiles, setPhotoFiles] = useState<{ front?: File; side?: File; back?: File }>({})
+  const [uploadingPhotos, setUploadingPhotos] = useState(false)
+  const [deletingPhotoGroup, setDeletingPhotoGroup] = useState<string | null>(null)
+  const [selectedPhotoDate, setSelectedPhotoDate] = useState<string | null>(null)
+  const [compareMode, setCompareMode] = useState(false)
+  const [compareDates, setCompareDates] = useState<string[]>([])
+  const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null)
+
+  const ANGLE_LABELS: Record<string, string> = { front: 'Ön', side: 'Yan', back: 'Arka' }
+
+  function toggleCompareDate(date: string) {
+    setCompareDates((prev) => {
+      if (prev.includes(date)) return prev.filter((d) => d !== date)
+      if (prev.length >= 2) return [prev[1], date]
+      return [...prev, date]
+    })
+    setSelectedPhotoDate(null)
+  }
+
+  // Fotoğrafları tarihe göre grupla
+  const photoGroups = progressPhotos.reduce<Record<string, ProgressPhoto[]>>((acc, p) => {
+    if (!acc[p.taken_at]) acc[p.taken_at] = []
+    acc[p.taken_at].push(p)
+    return acc
+  }, {})
+
+  async function handlePhotoUpload() {
+    const files = Object.entries(photoFiles).filter(([, f]) => f) as [string, File][]
+    if (files.length === 0) return
+
+    setUploadingPhotos(true)
+    const supabase = createClient()
+
+    for (const [angle, file] of files) {
+      const ext = file.name.split('.').pop()
+      const path = `${member.id}/${photoDate}_${angle}.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('progress-photos')
+        .upload(path, file, { upsert: true })
+
+      if (uploadError) continue
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('progress-photos')
+        .getPublicUrl(path)
+
+      await fetch('/api/progress-photos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: member.id,
+          photo_url: publicUrl,
+          angle,
+          taken_at: photoDate,
+        }),
+      })
+    }
+
+    setUploadingPhotos(false)
+    setShowPhotoUpload(false)
+    setPhotoFiles({})
+    router.refresh()
+  }
+
+  async function handleDeletePhotoGroup(date: string) {
+    setDeletingPhotoGroup(date)
+    const photos = photoGroups[date]
+    for (const photo of photos) {
+      await fetch('/api/progress-photos', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: photo.id }),
+      })
+    }
+    setDeletingPhotoGroup(null)
+    setSelectedPhotoDate(null)
+    router.refresh()
+  }
 
   async function handleAddDependent(e: React.FormEvent) {
     e.preventDefault()
@@ -523,7 +606,7 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
 
         {/* ÖLÇÜMLER */}
         {activeTab === 'measurements' && (
-          <div>
+          <div className="space-y-6">
             {measurements.length > 0 ? (
               <ProgressChart measurements={[...measurements].reverse()} gender={member.gender} goals={[]} />
             ) : (
@@ -531,6 +614,122 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
                 <p className="text-text-secondary">Henüz ölçüm kaydı yok</p>
               </div>
             )}
+
+            {/* İlerleme Fotoğrafları */}
+            <div className="rounded-xl border border-border bg-surface p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] text-text-secondary uppercase tracking-widest font-semibold">İlerleme Fotoğrafları</p>
+                <div className="flex gap-2">
+                  {Object.keys(photoGroups).length > 1 && (
+                    <button
+                      onClick={() => { setCompareMode(!compareMode); setCompareDates([]); setSelectedPhotoDate(null) }}
+                      className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
+                        compareMode ? 'bg-primary text-white' : 'bg-primary/10 text-primary hover:bg-primary/20'
+                      }`}
+                    >
+                      {compareMode ? 'Karşılaştırmadan Çık' : 'Karşılaştır'}
+                    </button>
+                  )}
+                  <Button onClick={() => setShowPhotoUpload(true)}>+ Fotoğraf Ekle</Button>
+                </div>
+              </div>
+
+              {Object.keys(photoGroups).length > 0 ? (
+                <div className="space-y-3">
+                  {/* Karşılaştır modu bilgi */}
+                  {compareMode && (
+                    <p className="text-xs text-primary font-medium">
+                      {compareDates.length === 0 ? 'Karşılaştırmak için 2 tarih seçin' :
+                       compareDates.length === 1 ? '1 tarih seçili, 1 tane daha seçin' :
+                       'Karşılaştırma görüntüleniyor'}
+                    </p>
+                  )}
+
+                  {/* Tarih grid */}
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(photoGroups)
+                      .sort(([a], [b]) => b.localeCompare(a))
+                      .map(([date, photos]) => {
+                        const d = new Date(date)
+                        const isSelected = compareMode ? compareDates.includes(date) : selectedPhotoDate === date
+                        return (
+                          <button
+                            key={date}
+                            onClick={() => compareMode ? toggleCompareDate(date) : setSelectedPhotoDate(selectedPhotoDate === date ? null : date)}
+                            className={`flex flex-col items-center gap-0.5 py-1.5 px-2.5 rounded-xl text-xs transition-all cursor-pointer ${
+                              isSelected ? 'ring-2 ring-primary ring-offset-1 bg-primary/5' : 'hover:bg-surface-hover'
+                            }`}
+                          >
+                            <span className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-semibold ${
+                              isSelected ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
+                            }`}>
+                              {d.getDate()}
+                            </span>
+                            <span className="text-[10px] text-text-secondary">
+                              {d.toLocaleDateString('tr-TR', { month: 'short' })}
+                            </span>
+                            <span className="text-[9px] text-text-secondary">{photos.length} foto</span>
+                          </button>
+                        )
+                      })}
+                  </div>
+
+                  {/* Tek tarih detayı */}
+                  {!compareMode && selectedPhotoDate && photoGroups[selectedPhotoDate] && (
+                    <div className="rounded-lg border border-border p-3 bg-[#FAFAFA] animate-fade-in">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-semibold text-text-primary">{formatDate(selectedPhotoDate)}</h3>
+                        <button
+                          onClick={() => handleDeletePhotoGroup(selectedPhotoDate)}
+                          disabled={deletingPhotoGroup === selectedPhotoDate}
+                          className="text-xs text-red-500 hover:text-red-700 cursor-pointer disabled:opacity-50"
+                        >
+                          {deletingPhotoGroup === selectedPhotoDate ? '...' : 'Sil'}
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {photoGroups[selectedPhotoDate].map((photo) => (
+                          <button key={photo.id} onClick={() => setLightboxPhoto(photo.photo_url)} className="aspect-[3/4] rounded-lg overflow-hidden bg-surface-hover relative cursor-pointer">
+                            <Image src={photo.photo_url} alt="" fill className="object-cover" sizes="(max-width: 768px) 33vw, 150px" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Karşılaştırma görünümü */}
+                  {compareMode && compareDates.length === 2 && (() => {
+                    const [d1, d2] = [...compareDates].sort((a, b) => a.localeCompare(b))
+                    return (
+                      <div className="rounded-lg border border-border overflow-hidden bg-[#FAFAFA] animate-fade-in">
+                        <div className="px-3 py-2 flex items-center justify-between border-b border-border">
+                          <span className="text-xs font-semibold text-text-secondary">{formatDate(d1)}</span>
+                          <span className="text-[10px] text-primary font-bold uppercase tracking-wider">Karşılaştırma</span>
+                          <span className="text-xs font-semibold text-text-secondary">{formatDate(d2)}</span>
+                        </div>
+                        {(['front', 'side', 'back'] as const).map((angle) => {
+                          const p1 = photoGroups[d1]?.find((p) => p.angle === angle)
+                          const p2 = photoGroups[d2]?.find((p) => p.angle === angle)
+                          if (!p1 && !p2) return null
+                          return (
+                            <div key={angle} className="grid grid-cols-2 gap-[1px] bg-border">
+                              <button onClick={() => p1 && setLightboxPhoto(p1.photo_url)} className="bg-surface relative aspect-[3/4] cursor-pointer">
+                                {p1 ? <Image src={p1.photo_url} alt="" fill className="object-cover" sizes="50vw" /> : <div className="flex items-center justify-center h-full text-text-secondary text-xs">-</div>}
+                              </button>
+                              <button onClick={() => p2 && setLightboxPhoto(p2.photo_url)} className="bg-surface relative aspect-[3/4] cursor-pointer">
+                                {p2 ? <Image src={p2.photo_url} alt="" fill className="object-cover" sizes="50vw" /> : <div className="flex items-center justify-center h-full text-text-secondary text-xs">-</div>}
+                              </button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()}
+                </div>
+              ) : (
+                <p className="text-sm text-text-secondary text-center py-6">Henüz ilerleme fotoğrafı yok</p>
+              )}
+            </div>
           </div>
         )}
 
@@ -835,7 +1034,55 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
             )}
           </div>
         )}
+
       </div>
+
+      {/* -- Fotoğraf Yükleme Modal -- */}
+      <Modal open={showPhotoUpload} onClose={() => setShowPhotoUpload(false)} title="İlerleme Fotoğrafı Ekle">
+        <div className="space-y-4">
+          <Input
+            label="Tarih"
+            type="date"
+            value={photoDate}
+            onChange={(e) => setPhotoDate(e.target.value)}
+          />
+          {(['front', 'side', 'back'] as const).map((angle) => (
+            <div key={angle}>
+              <label className="block text-sm font-medium text-text-primary mb-1">
+                {ANGLE_LABELS[angle]} Fotoğraf
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    if (file.size > 10 * 1024 * 1024) {
+                      alert('Dosya 10MB\'dan kucuk olmali')
+                      return
+                    }
+                    setPhotoFiles((prev) => ({ ...prev, [angle]: file }))
+                  }
+                }}
+                className="w-full text-sm text-text-secondary file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:cursor-pointer"
+              />
+              {photoFiles[angle] && (
+                <p className="text-xs text-primary mt-1">{photoFiles[angle]!.name}</p>
+              )}
+            </div>
+          ))}
+          <div className="flex gap-3 justify-end">
+            <Button variant="secondary" onClick={() => setShowPhotoUpload(false)}>İptal</Button>
+            <Button
+              loading={uploadingPhotos}
+              onClick={handlePhotoUpload}
+              disabled={!photoFiles.front && !photoFiles.side && !photoFiles.back}
+            >
+              Yükle
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* -- Düzenleme Modal -- */}
       <Modal open={editing} onClose={() => setEditing(false)} title="Üye Düzenle">
@@ -960,6 +1207,18 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
           </div>
         )}
       </Modal>
+
+      {/* Lightbox */}
+      {lightboxPhoto && (
+        <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center" onClick={() => setLightboxPhoto(null)}>
+          <button onClick={() => setLightboxPhoto(null)} className="absolute top-4 right-4 text-white/80 hover:text-white z-10 cursor-pointer">
+            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+          <div className="relative w-full h-full max-w-lg max-h-[85vh] mx-4">
+            <Image src={lightboxPhoto} alt="" fill className="object-contain" sizes="100vw" />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
