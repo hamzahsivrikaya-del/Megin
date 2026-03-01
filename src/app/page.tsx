@@ -474,11 +474,19 @@ export default function HomePage() {
 
       {/* ==================== FOOTER ==================== */}
       <footer className="py-8 px-4 border-t border-[#E5E5E5] bg-[#FAFAFA]">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-sm text-[#57534E]">© 2026 Hamza Sivrikaya. Tüm hakları saklıdır.</div>
-          <div className="flex items-center gap-6">
-            <Link href="/blog" className="text-sm text-[#57534E] hover:text-[#1A1A1A] transition-colors">Blog</Link>
-            <Link href="/login" className="text-sm text-[#57534E] hover:text-[#1A1A1A] transition-colors">Üye Girişi</Link>
+        <div className="max-w-6xl mx-auto space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-[#57534E]">© 2026 Hamza Sivrikaya. Tüm hakları saklıdır.</div>
+            <div className="flex items-center gap-6">
+              <Link href="/blog" className="text-sm text-[#57534E] hover:text-[#1A1A1A] transition-colors">Blog</Link>
+              <Link href="/login" className="text-sm text-[#57534E] hover:text-[#1A1A1A] transition-colors">Üye Girişi</Link>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-3 border-t border-[#E5E5E5]">
+            <Link href="/yasal/mesafeli-satis-sozlesmesi" className="text-xs text-[#A8A29E] hover:text-[#57534E] transition-colors">Mesafeli Satış Sözleşmesi</Link>
+            <Link href="/yasal/gizlilik-politikasi" className="text-xs text-[#A8A29E] hover:text-[#57534E] transition-colors">Gizlilik Politikası</Link>
+            <Link href="/yasal/iade-ve-iptal" className="text-xs text-[#A8A29E] hover:text-[#57534E] transition-colors">İade ve İptal</Link>
+            <Link href="/yasal/kullanim-kosullari" className="text-xs text-[#A8A29E] hover:text-[#57534E] transition-colors">Kullanım Koşulları</Link>
           </div>
         </div>
       </footer>
