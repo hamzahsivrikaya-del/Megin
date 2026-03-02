@@ -60,20 +60,21 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
   const dayLogs = useMemo(() => logs.filter(l => l.date === selectedDate), [logs, selectedDate])
   const normalLogs = useMemo(() => dayLogs.filter(l => !l.is_extra), [dayLogs])
   const extraLogs = useMemo(() => dayLogs.filter(l => l.is_extra), [dayLogs])
-  const completedCount = normalLogs.length
+  const compliantCount = normalLogs.filter(l => l.status === 'compliant').length
   const totalMeals = mealCount
-  const completionRatio = totalMeals > 0 ? completedCount / totalMeals : 0
+  const completionRatio = totalMeals > 0 ? compliantCount / totalMeals : 0
 
   // Son 14 gün
   const past14Days = useMemo(() => {
-    const days: { date: string; completed: number; total: number; hasExtra: boolean }[] = []
+    const days: { date: string; compliant: number; total: number; hasExtra: boolean }[] = []
     for (let i = 13; i >= 0; i--) {
       const d = new Date(today + 'T00:00:00')
       d.setDate(d.getDate() - i)
       const ds = toDateStr(d)
       const dayNormal = logs.filter(l => l.date === ds && !l.is_extra)
+      const dayCompliant = dayNormal.filter(l => l.status === 'compliant')
       const dayExtra = logs.filter(l => l.date === ds && l.is_extra)
-      days.push({ date: ds, completed: dayNormal.length, total: mealCount, hasExtra: dayExtra.length > 0 })
+      days.push({ date: ds, compliant: dayCompliant.length, total: mealCount, hasExtra: dayExtra.length > 0 })
     }
     return days
   }, [logs, today, mealCount])
@@ -89,18 +90,31 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
     setShowExtraForm(false)
   }
 
-  // --- öğün toggle ---
-  async function handleMealToggle(meal: MemberMeal) {
+  // --- öğün durum değiştirme (uydum / uymadım) ---
+  async function handleMealStatus(meal: MemberMeal, status: 'compliant' | 'non_compliant') {
     const existingLog = normalLogs.find(l => l.meal_id === meal.id)
     setSaving(meal.id)
     const supabase = createClient()
 
-    if (existingLog) {
-      // geri al → sil
+    if (existingLog && existingLog.status === status) {
+      // Aynı duruma tekrar tıklanırsa geri al (sil)
       const { error } = await supabase.from('meal_logs').delete().eq('id', existingLog.id)
       if (!error) setLogs(prev => prev.filter(l => l.id !== existingLog.id))
+    } else if (existingLog) {
+      // Farklı duruma geçiş (compliant -> non_compliant veya tersi)
+      const { data, error } = await supabase
+        .from('meal_logs')
+        .update({ status })
+        .eq('id', existingLog.id)
+        .select()
+        .single()
+      if (!error && data) {
+        setLogs(prev => prev.map(l => l.id === existingLog.id ? data as MealLog : l))
+        setSuccessMsg(status === 'compliant' ? 'Uydum' : 'Uymadim')
+        setTimeout(() => setSuccessMsg(null), 2000)
+      }
     } else {
-      // tamamla → oluştur
+      // Yeni log oluştur
       const { data, error } = await supabase
         .from('meal_logs')
         .upsert(
@@ -108,7 +122,7 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
             user_id: userId,
             date: selectedDate,
             meal_id: meal.id,
-            status: 'compliant' as const,
+            status,
             is_extra: false,
           },
           { onConflict: 'user_id,date,meal_id' }
@@ -117,7 +131,7 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
         .single()
       if (!error && data) {
         setLogs(prev => [...prev, data as MealLog])
-        setSuccessMsg('Kaydedildi')
+        setSuccessMsg(status === 'compliant' ? 'Uydum' : 'Uymadim')
         setTimeout(() => setSuccessMsg(null), 2000)
       }
     }
@@ -255,7 +269,8 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
     const dayAll = logs.filter(l => l.date === detailDay)
     const normal = dayAll.filter(l => !l.is_extra)
     const extra = dayAll.filter(l => l.is_extra)
-    return { normal, extra, completed: normal.length, total: mealCount }
+    const compliant = normal.filter(l => l.status === 'compliant').length
+    return { normal, extra, compliant, total: mealCount }
   }, [detailDay, logs, mealCount])
 
   // --- progress bar renk ---
@@ -314,13 +329,21 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
 
   return (
     <div className="space-y-6 pb-8">
-      {/* Başarı toast */}
+      {/* Toast */}
       {successMsg && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-fade-up">
-          <div className="flex items-center gap-2 bg-success text-white px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium">
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-            </svg>
+          <div className={`flex items-center gap-2 text-white px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium ${
+            successMsg === 'Uymadim' ? 'bg-red-500' : 'bg-emerald-500'
+          }`}>
+            {successMsg === 'Uymadim' ? (
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
             {successMsg}
           </div>
         </div>
@@ -384,7 +407,7 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
       <div className="animate-fade-up delay-150">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-semibold text-text-primary">
-            {completedCount}/{totalMeals} öğün tamamlandı
+            {compliantCount}/{totalMeals} öğün uyumlu
           </span>
           <span className="text-xs font-medium" style={{ color: getProgressColor(completionRatio) }}>
             %{totalMeals > 0 ? Math.round(completionRatio * 100) : 0}
@@ -405,7 +428,8 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
       <div className="space-y-2">
         {memberMeals.map((meal) => {
           const log = normalLogs.find(l => l.meal_id === meal.id)
-          const isCompleted = !!log
+          const isCompliant = log?.status === 'compliant'
+          const isNonCompliant = log?.status === 'non_compliant'
           const isExpanded = expandedMeal === meal.id
           const noteValue = notes[meal.id] ?? log?.note ?? ''
 
@@ -413,42 +437,58 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
             <div
               key={meal.id}
               className={`rounded-xl border transition-all duration-200 animate-fade-up ${
-                isCompleted
+                isCompliant
                   ? 'bg-success/5 border-success/30'
+                  : isNonCompliant
+                  ? 'bg-red-50 border-red-200'
                   : 'bg-surface border-border'
               }`}
             >
               {/* Ana satır */}
               <div className="flex items-center gap-3 p-3">
-                {/* Toggle checkbox */}
+                {/* Tik butonu (uydum) */}
                 <button
-                  onClick={() => handleMealToggle(meal)}
+                  onClick={() => handleMealStatus(meal, 'compliant')}
                   disabled={saving !== null}
-                  className="flex-shrink-0 cursor-pointer disabled:opacity-50"
-                  aria-label={isCompleted ? 'Geri al' : 'Tamamla'}
+                  className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-50 active:scale-90 ${
+                    isCompliant
+                      ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30'
+                      : 'border-2 border-gray-200 text-gray-300 hover:border-emerald-300 hover:text-emerald-400 hover:bg-emerald-50'
+                  }`}
+                  aria-label="Uydum"
                 >
-                  {saving === meal.id ? (
-                    <div className="w-6 h-6 flex items-center justify-center">
-                      <Spinner />
-                    </div>
-                  ) : isCompleted ? (
-                    <div className="w-6 h-6 rounded-lg bg-success flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="w-6 h-6 rounded-lg border-2 border-border hover:border-success/50 transition-colors" />
+                  {saving === meal.id ? <Spinner /> : (
+                    <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isCompliant ? 3 : 2.5} d="M5 13l4 4L19 7" />
+                    </svg>
                   )}
                 </button>
 
                 {/* Öğün adı */}
-                <span className={`flex-1 text-sm font-medium ${isCompleted ? 'text-success' : 'text-text-primary'}`}>
+                <span className={`flex-1 text-sm font-medium ${
+                  isCompliant ? 'text-emerald-600' : isNonCompliant ? 'text-red-500' : 'text-text-primary'
+                }`}>
                   {meal.name}
                 </span>
 
-                {/* Aksiyon ikonları (sadece tamamlandıysa aktif) */}
-                {isCompleted && (
+                {/* Çarpı butonu (uymadım) */}
+                <button
+                  onClick={() => handleMealStatus(meal, 'non_compliant')}
+                  disabled={saving !== null}
+                  className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-50 active:scale-90 ${
+                    isNonCompliant
+                      ? 'bg-red-500 text-white shadow-md shadow-red-500/30'
+                      : 'border-2 border-gray-200 text-gray-300 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
+                  }`}
+                  aria-label="Uymadim"
+                >
+                  <svg className="w-[16px] h-[16px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isNonCompliant ? 3 : 2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Aksiyon ikonları (log varsa aktif) */}
+                {log && (
                   <div className="flex items-center gap-1">
                     {/* Foto */}
                     <input
@@ -512,7 +552,7 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
                       onChange={(e) => setNotes(prev => ({ ...prev, [meal.id]: e.target.value }))}
                       placeholder="Öğünle ilgili not ekle..."
                       rows={2}
-                      className="w-full text-sm bg-white border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-primary placeholder:text-text-secondary/50"
+                      className="w-full text-base bg-white border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-primary placeholder:text-text-secondary/50"
                     />
                     {notes[meal.id] !== undefined && notes[meal.id] !== (log.note ?? '') && (
                       <button
@@ -524,7 +564,6 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
                       </button>
                     )}
                   </div>
-                  {/* Mevcut not kısa gösterim (collapsed'ta) */}
                 </div>
               )}
 
@@ -574,16 +613,15 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
               value={extraForm.name}
               onChange={(e) => setExtraForm(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Öğün başlığı..."
-              className="w-full text-sm bg-white border border-border rounded-lg px-3 py-2 focus:outline-none focus:border-primary placeholder:text-text-secondary/50"
+              className="w-full text-base bg-white border border-border rounded-lg px-3 py-2 focus:outline-none focus:border-primary placeholder:text-text-secondary/50"
               maxLength={100}
-              autoFocus
             />
             <textarea
               value={extraForm.note}
               onChange={(e) => setExtraForm(prev => ({ ...prev, note: e.target.value }))}
               placeholder="Not (opsiyonel)..."
               rows={2}
-              className="w-full text-sm bg-white border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-primary placeholder:text-text-secondary/50"
+              className="w-full text-base bg-white border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-primary placeholder:text-text-secondary/50"
             />
             <div className="flex gap-2">
               <button
@@ -618,7 +656,7 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
       <Card className="animate-fade-up">
         <h3 className="font-semibold text-sm text-text-primary mb-3">Son 14 Gün</h3>
         <div className="grid grid-cols-7 gap-1.5">
-          {past14Days.map(({ date, completed, total, hasExtra }) => {
+          {past14Days.map(({ date, compliant, total, hasExtra }) => {
             const isSelected = date === selectedDate
             const dayNum = new Date(date + 'T00:00:00').getDate()
 
@@ -632,7 +670,7 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
                 }`}
               >
                 <span className="text-[10px] text-text-secondary">{shortDayName(date)}</span>
-                <span className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-semibold ${getGridColor(completed, total)}`}>
+                <span className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-semibold ${getGridColor(compliant, total)}`}>
                   {dayNum}
                 </span>
                 {hasExtra && (
@@ -654,17 +692,17 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
             {/* Özet */}
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold">
-                {detailDayData.completed}/{detailDayData.total} öğün tamamlandı
+                {detailDayData.compliant}/{detailDayData.total} öğün uyumlu
               </span>
               <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{
-                backgroundColor: detailDayData.total > 0 && detailDayData.completed / detailDayData.total >= 1
-                  ? 'rgb(34 197 94 / 0.15)' : detailDayData.completed / detailDayData.total >= 0.5
+                backgroundColor: detailDayData.total > 0 && detailDayData.compliant / detailDayData.total >= 1
+                  ? 'rgb(34 197 94 / 0.15)' : detailDayData.compliant / detailDayData.total >= 0.5
                   ? 'rgb(245 158 11 / 0.15)' : 'rgb(239 68 68 / 0.15)',
-                color: detailDayData.total > 0 && detailDayData.completed / detailDayData.total >= 1
-                  ? 'rgb(22 163 74)' : detailDayData.completed / detailDayData.total >= 0.5
+                color: detailDayData.total > 0 && detailDayData.compliant / detailDayData.total >= 1
+                  ? 'rgb(22 163 74)' : detailDayData.compliant / detailDayData.total >= 0.5
                   ? 'rgb(217 119 6)' : 'rgb(220 38 38)',
               }}>
-                %{detailDayData.total > 0 ? Math.round((detailDayData.completed / detailDayData.total) * 100) : 0}
+                %{detailDayData.total > 0 ? Math.round((detailDayData.compliant / detailDayData.total) * 100) : 0}
               </span>
             </div>
 
@@ -672,21 +710,31 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
             <div className="space-y-2">
               {memberMeals.map((meal) => {
                 const log = detailDayData.normal.find(l => l.meal_id === meal.id)
+                const logCompliant = log?.status === 'compliant'
+                const logNonCompliant = log?.status === 'non_compliant'
                 return (
                   <div key={meal.id} className={`flex items-start gap-3 p-3 rounded-lg border ${
-                    log ? 'bg-success/5 border-success/30' : 'bg-surface border-border'
+                    logCompliant ? 'bg-success/5 border-success/30'
+                      : logNonCompliant ? 'bg-red-50 border-red-200'
+                      : 'bg-surface border-border'
                   }`}>
-                    {log ? (
+                    {logCompliant ? (
                       <svg className="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
-                    ) : (
-                      <svg className="w-5 h-5 text-text-secondary/40 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    ) : logNonCompliant ? (
+                      <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                       </svg>
+                    ) : (
+                      <div className="w-5 h-5 rounded-full border-2 border-border flex-shrink-0 mt-0.5" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${log ? 'text-text-primary' : 'text-text-secondary'}`}>{meal.name}</p>
+                      <p className={`text-sm font-medium ${
+                        logCompliant ? 'text-text-primary'
+                          : logNonCompliant ? 'text-red-500'
+                          : 'text-text-secondary'
+                      }`}>{meal.name}</p>
                       {log?.note && <p className="text-xs text-text-secondary mt-0.5">{log.note}</p>}
                       {log?.photo_url && (
                         <a href={log.photo_url} target="_blank" rel="noopener noreferrer" className="block mt-2">
