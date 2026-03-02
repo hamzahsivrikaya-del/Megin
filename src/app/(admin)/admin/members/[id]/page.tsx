@@ -14,6 +14,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
     { data: mealLogs },
     { data: memberMeals },
     { data: dependents },
+    { data: progressPhotos },
   ] = await Promise.all([
     supabase
       .from('users')
@@ -50,6 +51,11 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
       .from('users')
       .select('id, full_name, is_active, gender')
       .eq('parent_id', id),
+    supabase
+      .from('progress_photos')
+      .select('*')
+      .eq('user_id', id)
+      .order('taken_at', { ascending: false }),
   ])
 
   if (!member) notFound()
@@ -63,6 +69,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
       mealLogs={mealLogs || []}
       memberMeals={memberMeals || []}
       dependents={dependents || []}
+      progressPhotos={progressPhotos || []}
     />
   )
 }
