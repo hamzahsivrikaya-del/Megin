@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Sidebar from './Sidebar'
+import { SubscriptionPlan } from '@/lib/types'
 
 interface MobileSidebarProps {
   trainerName?: string
+  plan?: SubscriptionPlan
 }
 
-export default function MobileSidebar({ trainerName }: MobileSidebarProps) {
+export default function MobileSidebar({ trainerName, plan }: MobileSidebarProps) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
@@ -35,7 +37,7 @@ export default function MobileSidebar({ trainerName }: MobileSidebarProps) {
       {open && (
         <div className="md:hidden fixed inset-0 z-40 bg-black/60" onClick={() => setOpen(false)}>
           <div onClick={(e) => e.stopPropagation()}>
-            <Sidebar trainerName={trainerName} />
+            <Sidebar trainerName={trainerName} plan={plan} />
           </div>
         </div>
       )}

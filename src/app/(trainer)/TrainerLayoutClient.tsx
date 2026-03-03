@@ -2,22 +2,24 @@
 
 import Sidebar from '@/components/shared/Sidebar'
 import MobileSidebar from '@/components/shared/MobileSidebar'
+import { SubscriptionPlan } from '@/lib/types'
 
 interface TrainerLayoutClientProps {
   children: React.ReactNode
   trainerName: string
+  plan?: SubscriptionPlan
 }
 
-export default function TrainerLayoutClient({ children, trainerName }: TrainerLayoutClientProps) {
+export default function TrainerLayoutClient({ children, trainerName, plan = 'free' }: TrainerLayoutClientProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop sidebar */}
       <div className="hidden md:block">
-        <Sidebar trainerName={trainerName} />
+        <Sidebar trainerName={trainerName} plan={plan} />
       </div>
 
       {/* Mobile sidebar */}
-      <MobileSidebar trainerName={trainerName} />
+      <MobileSidebar trainerName={trainerName} plan={plan} />
 
       {/* Ana içerik */}
       <main className="md:ml-64 min-h-screen">

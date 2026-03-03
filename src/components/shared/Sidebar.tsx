@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { SubscriptionPlan } from '@/lib/types'
 
 interface SidebarProps {
   trainerName?: string
+  plan?: SubscriptionPlan
 }
 
 const menuItems = [
@@ -21,7 +23,7 @@ const menuItems = [
   { href: '/dashboard/settings', label: 'Profilim', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
 ]
 
-export default function Sidebar({ trainerName }: SidebarProps) {
+export default function Sidebar({ trainerName, plan = 'free' }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -67,8 +69,27 @@ export default function Sidebar({ trainerName }: SidebarProps) {
         })}
       </nav>
 
-      {/* Çıkış */}
-      <div className="p-3 border-t border-border">
+      {/* Upgrade CTA + Çıkış */}
+      <div className="p-3 border-t border-border space-y-1">
+        {plan !== 'elite' && (
+          <Link
+            href="/dashboard/upgrade"
+            className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary/20 transition-colors"
+          >
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            {plan === 'free' ? "Pro'ya Geç" : "Elite'e Geç"}
+          </Link>
+        )}
+        {plan === 'elite' && (
+          <div className="flex items-center gap-2 px-3 py-2 text-xs">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold text-[10px] uppercase tracking-wider">
+              Elite
+            </span>
+          </div>
+        )}
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-sm text-text-secondary hover:text-text-primary hover:bg-surface-hover active:bg-surface-hover transition-colors cursor-pointer"
