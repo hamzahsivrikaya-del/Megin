@@ -1,6 +1,8 @@
 'use server'
 
 import { sendPushNotification } from '@/lib/push'
+import { notifyAdmin } from '@/lib/admin-notify'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function sendLessonCompletedPush(userId: string) {
   await sendPushNotification({
@@ -24,4 +26,21 @@ export async function sendLowLessonPush(userId: string, remaining: number) {
     message,
     url: '/dashboard/notifications',
   })
+
+  // Admin'e de bildir
+  const adminClient = createAdminClient()
+  const { data: user } = await adminClient
+    .from('users')
+    .select('full_name')
+    .eq('id', userId)
+    .single()
+
+  if (user) {
+    await notifyAdmin({
+      type: 'admin_low_lessons',
+      title: 'Paket Uyarısı',
+      message: `${user.full_name}'${remaining === 1 ? 'in son dersi kaldı' : `in ${remaining} dersi kaldı`}`,
+      url: '/admin/notifications',
+    })
+  }
 }

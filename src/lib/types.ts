@@ -154,7 +154,7 @@ export interface MemberBadge {
   notified: boolean
 }
 
-export type NotificationType = 'low_lessons' | 'weekly_report' | 'inactive' | 'manual' | 'nutrition_reminder' | 'badge_earned'
+export type NotificationType = 'low_lessons' | 'weekly_report' | 'inactive' | 'manual' | 'nutrition_reminder' | 'badge_earned' | 'admin_nutrition_summary' | 'admin_measurement' | 'admin_low_lessons'
 
 export interface Notification {
   id: string

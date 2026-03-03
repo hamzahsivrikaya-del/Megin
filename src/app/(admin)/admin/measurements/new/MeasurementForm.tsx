@@ -7,6 +7,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
+import { notifyAdminMeasurement } from './actions'
 
 function calculateBodyFat(gender: string, age: number, weight: number, sf1: number, sf2: number, sf3: number) {
   const sum = sf1 + sf2 + sf3
@@ -116,6 +117,7 @@ export default function MeasurementForm({ members }: { members: { id: string; fu
       setError(insertError.message)
     } else {
       setSuccess(true)
+      notifyAdminMeasurement(userId)
       setUserId('')
       setMeasurements({ weight: '', height: '', chest: '', waist: '', arm: '', leg: '', sf_chest: '', sf_abdomen: '', sf_thigh: '' })
       setSfAge('')

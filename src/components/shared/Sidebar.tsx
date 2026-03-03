@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -21,6 +22,28 @@ const menuItems = [
 export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    async function fetchUnread() {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user?.id) return
+
+      const { count } = await supabase
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', session.user.id)
+        .eq('is_read', false)
+
+      setUnreadCount(count || 0)
+    }
+
+    fetchUnread()
+    const interval = setInterval(fetchUnread, 60_000)
+    return () => clearInterval(interval)
+  }, [])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -58,6 +81,11 @@ export default function Sidebar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
               </svg>
               {item.label}
+              {item.href === '/admin/notifications' && unreadCount > 0 && (
+                <span className="ml-auto bg-primary text-white text-xs font-medium rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </Link>
           )
         })}

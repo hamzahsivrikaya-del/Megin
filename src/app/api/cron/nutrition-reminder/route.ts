@@ -62,12 +62,16 @@ export async function GET(request: Request) {
   // Bugun zaten gonderildi mi? (tekrar onleme)
   const turkeyNow = new Date(Date.now() + 3 * 60 * 60 * 1000)
   const todayStr = turkeyNow.toISOString().slice(0, 10)
-  const { count } = await admin
+  const { count, error: dedupError } = await admin
     .from('notifications')
     .select('id', { count: 'exact', head: true })
     .eq('type', 'nutrition_reminder')
-    .gte('created_at', `${todayStr}T00:00:00+03:00`)
-    .lt('created_at', `${todayStr}T23:59:59+03:00`)
+    .gte('sent_at', `${todayStr}T00:00:00+03:00`)
+    .lt('sent_at', `${todayStr}T23:59:59+03:00`)
+
+  if (dedupError) {
+    return NextResponse.json({ ok: false, error: 'dedup-check-failed' }, { status: 500 })
+  }
 
   if (count && count > 0) {
     return NextResponse.json({ ok: true, sent: 0, skipped: 'already-sent-today' })

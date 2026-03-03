@@ -60,6 +60,9 @@ export function getNotificationTypeLabel(type: string): string {
     inactive: 'Devamsızlık',
     manual: 'Bildirim',
     nutrition_reminder: 'Beslenme Hatırlatma',
+    admin_nutrition_summary: 'Beslenme Durumu',
+    admin_measurement: 'Ölçüm',
+    admin_low_lessons: 'Paket Uyarısı',
   }
   return labels[type] || type
 }

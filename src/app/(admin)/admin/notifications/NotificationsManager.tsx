@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card'
@@ -19,9 +19,10 @@ type NotifWithUser = Notification & { users: { full_name: string } }
 interface Props {
   initialNotifications: NotifWithUser[]
   members: { id: string; full_name: string }[]
+  adminNotifications: Notification[]
 }
 
-export default function NotificationsManager({ initialNotifications, members }: Props) {
+export default function NotificationsManager({ initialNotifications, members, adminNotifications }: Props) {
   const router = useRouter()
   const [notifications, setNotifications] = useState(initialNotifications)
   const [showSendModal, setShowSendModal] = useState(false)
@@ -33,7 +34,29 @@ export default function NotificationsManager({ initialNotifications, members }: 
 
   const [form, setForm] = useState({ user_id: '', title: '', message: '', url: '' })
 
+  const [activeTab, setActiveTab] = useState<'mine' | 'send'>('mine')
+  const [myNotifications, setMyNotifications] = useState(adminNotifications)
+
   const readCount = notifications.filter((n) => n.is_read).length
+  const unreadAdminCount = myNotifications.filter(n => !n.is_read).length
+
+  // Mark admin notifications as read when "mine" tab is active
+  useEffect(() => {
+    if (activeTab !== 'mine') return
+    const unreadIds = myNotifications.filter(n => !n.is_read).map(n => n.id)
+    if (unreadIds.length === 0) return
+
+    const supabase = createClient()
+    supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .in('id', unreadIds)
+      .then(() => {
+        setMyNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
+      })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab])
+  // Note: We intentionally only depend on activeTab (not myNotifications) to avoid infinite loop
 
   async function handleDelete(id: string) {
     setDeleting(id)
@@ -103,7 +126,7 @@ export default function NotificationsManager({ initialNotifications, members }: 
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Bildirimler</h1>
-        <Button onClick={() => setShowSendModal(true)}>Bildirim Gönder</Button>
+        <Button onClick={() => { setActiveTab('send'); setShowSendModal(true) }}>Bildirim Gönder</Button>
       </div>
 
       {success && (
@@ -112,66 +135,135 @@ export default function NotificationsManager({ initialNotifications, members }: 
         </div>
       )}
 
-      {/* Bildirim logu */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Bildirim Geçmişi</CardTitle>
-            {readCount > 0 && (
-              <button
-                onClick={handleClearRead}
-                disabled={clearingRead}
-                className="text-xs text-text-secondary hover:text-danger transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {clearingRead ? 'Siliniyor...' : `${readCount} okunmuşu sil`}
-              </button>
-            )}
-          </div>
-        </CardHeader>
+      {/* Tab header */}
+      <div className="flex gap-1 bg-surface-hover rounded-lg p-1">
+        <button
+          onClick={() => setActiveTab('mine')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+            activeTab === 'mine'
+              ? 'bg-surface text-text-primary shadow-sm'
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          Bildirimlerim
+          {unreadAdminCount > 0 && (
+            <span className="ml-2 bg-primary text-white text-xs rounded-full px-1.5 py-0.5">
+              {unreadAdminCount}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('send')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+            activeTab === 'send'
+              ? 'bg-surface text-text-primary shadow-sm'
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          Gönder & Geçmiş
+        </button>
+      </div>
 
-        {notifications.length === 0 ? (
-          <p className="text-sm text-text-secondary text-center py-4">Bildirim yok</p>
-        ) : (
-          <div className="space-y-1">
-            {notifications.map((notif) => (
-              <div
-                key={notif.id}
-                className="flex items-start gap-3 py-3 border-b border-border/50 last:border-0"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium">{notif.title}</span>
-                    <Badge variant={notif.is_read ? 'default' : 'primary'}>
-                      {notif.is_read ? 'Okundu' : 'Okunmadı'}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-text-secondary mt-0.5">
-                    {notif.users?.full_name} • {getNotificationTypeLabel(notif.type)} • {timeAgo(notif.sent_at)}
-                  </p>
-                  <p className="text-sm text-text-secondary mt-1">{notif.message}</p>
-                </div>
-
-                {/* Sil butonu */}
-                <button
-                  onClick={() => handleDelete(notif.id)}
-                  disabled={deleting === notif.id}
-                  title="Sil"
-                  className="flex-shrink-0 p-1.5 text-text-secondary hover:text-danger hover:bg-danger/10 rounded-lg transition-all cursor-pointer disabled:opacity-40 mt-0.5"
+      {/* Bildirimlerim tab */}
+      {activeTab === 'mine' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Bildirimlerim</CardTitle>
+          </CardHeader>
+          {myNotifications.length === 0 ? (
+            <p className="text-sm text-text-secondary text-center py-8">Henüz bildirim yok</p>
+          ) : (
+            <div className="space-y-1">
+              {myNotifications.map((n) => (
+                <div
+                  key={n.id}
+                  className={`p-3 rounded-lg border ${
+                    n.is_read ? 'border-border bg-surface' : 'border-primary/20 bg-primary/5'
+                  }`}
                 >
-                  {deleting === notif.id ? (
-                    <span className="text-xs">...</span>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  )}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{n.title}</span>
+                        <Badge variant="default">
+                          {getNotificationTypeLabel(n.type)}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-text-secondary mt-1 whitespace-pre-line">{n.message}</p>
+                    </div>
+                    <span className="text-xs text-text-secondary whitespace-nowrap">
+                      {timeAgo(n.sent_at)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Gönder & Geçmiş tab -- existing notification log */}
+      {activeTab === 'send' && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Bildirim Geçmişi</CardTitle>
+              {readCount > 0 && (
+                <button
+                  onClick={handleClearRead}
+                  disabled={clearingRead}
+                  className="text-xs text-text-secondary hover:text-danger transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {clearingRead ? 'Siliniyor...' : `${readCount} okunmuşu sil`}
                 </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
+              )}
+            </div>
+          </CardHeader>
+
+          {notifications.length === 0 ? (
+            <p className="text-sm text-text-secondary text-center py-4">Bildirim yok</p>
+          ) : (
+            <div className="space-y-1">
+              {notifications.map((notif) => (
+                <div
+                  key={notif.id}
+                  className="flex items-start gap-3 py-3 border-b border-border/50 last:border-0"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium">{notif.title}</span>
+                      <Badge variant={notif.is_read ? 'default' : 'primary'}>
+                        {notif.is_read ? 'Okundu' : 'Okunmadı'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-text-secondary mt-0.5">
+                      {notif.users?.full_name} • {getNotificationTypeLabel(notif.type)} • {timeAgo(notif.sent_at)}
+                    </p>
+                    <p className="text-sm text-text-secondary mt-1">{notif.message}</p>
+                  </div>
+
+                  {/* Sil butonu */}
+                  <button
+                    onClick={() => handleDelete(notif.id)}
+                    disabled={deleting === notif.id}
+                    title="Sil"
+                    className="flex-shrink-0 p-1.5 text-text-secondary hover:text-danger hover:bg-danger/10 rounded-lg transition-all cursor-pointer disabled:opacity-40 mt-0.5"
+                  >
+                    {deleting === notif.id ? (
+                      <span className="text-xs">...</span>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* Bildirim gönder modal */}
       <Modal open={showSendModal} onClose={() => setShowSendModal(false)} title="Bildirim Gönder">
