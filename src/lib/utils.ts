@@ -24,6 +24,16 @@ export function formatPrice(price: number | null): string {
   return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0 }).format(price)
 }
 
+// ── Paket Durumu ──
+export function getPackageStatusLabel(status: string): string {
+  switch (status) {
+    case 'active': return 'Aktif'
+    case 'completed': return 'Tamamlandı'
+    case 'expired': return 'Süresi Doldu'
+    default: return status
+  }
+}
+
 // ── String Helpers ──
 export function slugify(text: string): string {
   return text

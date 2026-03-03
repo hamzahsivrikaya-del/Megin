@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
 import Modal from '@/components/ui/Modal'
+import AddClientModal from '@/components/shared/AddClientModal'
+import type { AddClientResult } from '@/components/shared/AddClientModal'
 
 // ── Types ──
 interface Package {
@@ -57,7 +58,7 @@ function getPackageStatus(packages: Package[]): {
       return { label: 'Paket bitti', color: 'text-danger' }
     }
     return {
-      label: `${remaining} ders kaldi`,
+      label: `${remaining} ders kaldı`,
       color: remaining <= 2 ? 'text-warning' : 'text-success',
     }
   }
@@ -82,6 +83,7 @@ export default function ClientsPage({
     phone: string | null
   } | null>(null)
   const [copied, setCopied] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   // Counts
   const pendingCount = clients.filter((c) => !c.invite_accepted).length
@@ -146,7 +148,7 @@ export default function ClientsPage({
   function getWhatsAppUrl(): string {
     if (!inviteData) return '#'
     const message = encodeURIComponent(
-      `Merhaba! Seni Megin uzerinden danisanim olarak ekledim. Bu linkten kaydini tamamlayabilirsin: ${inviteData.url}`
+      `Merhaba! Seni Megin üzerinden danışanım olarak ekledim. Bu linkten kaydını tamamlayabilirsin: ${inviteData.url}`
     )
     if (inviteData.phone) {
       const phone = inviteData.phone.replace(/\D/g, '')
@@ -155,12 +157,25 @@ export default function ClientsPage({
     return `https://wa.me/?text=${message}`
   }
 
+  async function handleDeleteClient(clientId: string, clientName: string) {
+    if (!confirm(`"${clientName}" adlı danışanı ve tüm kayıtlarını silmek istediğinize emin misiniz?`)) return
+    setDeletingId(clientId)
+    try {
+      const res = await fetch(`/api/trainer/clients/${clientId}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const data = await res.json()
+        alert(data.error || 'Silinemedi')
+      } else {
+        router.refresh()
+      }
+    } catch {
+      alert('Bağlantı hatası')
+    }
+    setDeletingId(null)
+  }
+
   // Add client success handler
-  function handleClientAdded(data: {
-    client: { full_name: string; invite_token: string }
-    inviteUrl: string
-    phone: string | null
-  }) {
+  function handleClientAdded(data: AddClientResult) {
     setAddModalOpen(false)
     showInvitePopup(
       data.client.full_name,
@@ -175,9 +190,9 @@ export default function ClientsPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Danisanlar</h1>
+          <h1 className="text-2xl font-bold text-text-primary">Danışanlar</h1>
           <p className="mt-1 text-sm text-text-secondary">
-            {clients.length} danisan
+            {clients.length} danışan
             {pendingCount > 0 && (
               <span className="ml-2 text-warning">
                 ({pendingCount} bekleyen)
@@ -185,7 +200,7 @@ export default function ClientsPage({
             )}
           </p>
         </div>
-        <Button onClick={() => setAddModalOpen(true)}>+ Yeni Danisan</Button>
+        <Button onClick={() => setAddModalOpen(true)}>+ Yeni Danışan</Button>
       </div>
 
       {/* Search + Filter (only when there are clients) */}
@@ -204,7 +219,7 @@ export default function ClientsPage({
               onClick={() => setFilter('all')}
               count={clients.length}
             >
-              Tumu
+              Tümü
             </FilterButton>
             <FilterButton
               active={filter === 'active'}
@@ -230,7 +245,7 @@ export default function ClientsPage({
       ) : filteredClients.length === 0 ? (
         <div className="card-base text-center py-12">
           <p className="text-text-secondary">
-            Aramanizla eslesen danisan bulunamadi.
+            Aramanızla eşleşen danışan bulunamadı.
           </p>
         </div>
       ) : (
@@ -239,6 +254,12 @@ export default function ClientsPage({
             <ClientCard
               key={client.id}
               client={client}
+              deleting={deletingId === client.id}
+              onClick={() => {
+                if (client.invite_accepted) {
+                  router.push(`/dashboard/clients/${client.id}`)
+                }
+              }}
               onShowInvite={() =>
                 showInvitePopup(
                   client.full_name,
@@ -246,6 +267,7 @@ export default function ClientsPage({
                   client.phone
                 )
               }
+              onDelete={() => handleDeleteClient(client.id, client.full_name)}
             />
           ))}
         </div>
@@ -302,13 +324,13 @@ export default function ClientsPage({
               fullWidth
               onClick={copyInviteLink}
             >
-              {copied ? 'Kopyalandi!' : 'Kopyala'}
+              {copied ? 'Kopyalandı!' : 'Kopyala'}
             </Button>
             <Button
               fullWidth
               onClick={() => window.open(getWhatsAppUrl(), '_blank')}
             >
-              WhatsApp&apos;ta Gonder
+              WhatsApp&apos;ta Gönder
             </Button>
           </div>
         </div>
@@ -355,16 +377,28 @@ function FilterButton({
 // ── Client Card ──
 function ClientCard({
   client,
+  deleting,
+  onClick,
   onShowInvite,
+  onDelete,
 }: {
   client: Client
+  deleting: boolean
+  onClick: () => void
   onShowInvite: () => void
+  onDelete: () => void
 }) {
   const packageStatus = getPackageStatus(client.packages)
   const isPending = !client.invite_accepted
 
   return (
-    <div className="card-base hover-lift flex items-center gap-4">
+    <div
+      className={cn(
+        'card-base hover-lift flex items-center gap-4',
+        !isPending && 'cursor-pointer'
+      )}
+      onClick={onClick}
+    >
       {/* Avatar */}
       <div
         className={cn(
@@ -407,7 +441,7 @@ function ClientCard({
             onShowInvite()
           }}
           className="flex-shrink-0 p-2 rounded-lg text-text-tertiary hover:bg-background hover:text-primary transition-colors"
-          title="Davet linkini goster"
+          title="Davet linkini göster"
         >
           <svg
             className="w-4 h-4"
@@ -424,6 +458,28 @@ function ClientCard({
           </svg>
         </button>
       )}
+
+      {/* Delete button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onDelete()
+        }}
+        disabled={deleting}
+        className="flex-shrink-0 p-2 rounded-lg text-text-tertiary hover:bg-danger/10 hover:text-danger transition-colors cursor-pointer disabled:opacity-40"
+        title="Danışanı sil"
+      >
+        {deleting ? (
+          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        ) : (
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        )}
+      </button>
     </div>
   )
 }
@@ -448,156 +504,15 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
         </svg>
       </div>
       <h3 className="text-lg font-bold text-text-primary">
-        Henuz danisan eklenmemis
+        Henüz danışan eklenmemiş
       </h3>
       <p className="mt-2 text-sm text-text-secondary max-w-sm mx-auto">
-        Ilk danisanini ekle, davet linkini gonder ve yonetmeye basla.
+        İlk danışanını ekle, davet linkini gönder ve yönetmeye başla.
       </p>
       <div className="mt-6">
-        <Button onClick={onAdd}>+ Yeni Danisan Ekle</Button>
+        <Button onClick={onAdd}>+ Yeni Danışan Ekle</Button>
       </div>
     </div>
   )
 }
 
-// ── Add Client Modal ──
-function AddClientModal({
-  open,
-  onClose,
-  onSuccess,
-}: {
-  open: boolean
-  onClose: () => void
-  onSuccess: (data: {
-    client: { full_name: string; invite_token: string }
-    inviteUrl: string
-    phone: string | null
-  }) => void
-}) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [form, setForm] = useState({
-    full_name: '',
-    email: '',
-    phone: '',
-    gender: '',
-  })
-
-  function updateField(field: string, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }))
-    setError('')
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-
-    if (!form.full_name.trim() || form.full_name.trim().length < 2) {
-      setError('Ad soyad en az 2 karakter olmalidir')
-      return
-    }
-    if (!form.email.trim()) {
-      setError('E-posta adresi zorunludur')
-      return
-    }
-
-    setLoading(true)
-    setError('')
-
-    try {
-      const res = await fetch('/api/trainer/clients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          full_name: form.full_name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim() || null,
-          gender: form.gender || null,
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error || 'Bir hata olustu')
-        return
-      }
-
-      // Reset form
-      setForm({ full_name: '', email: '', phone: '', gender: '' })
-      onSuccess({ ...data, phone: form.phone.trim() || null })
-    } catch {
-      setError('Baglanti hatasi. Lutfen tekrar deneyin.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  function handleClose() {
-    setForm({ full_name: '', email: '', phone: '', gender: '' })
-    setError('')
-    onClose()
-  }
-
-  return (
-    <Modal open={open} onClose={handleClose} title="Yeni Danisan Ekle">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          label="Ad Soyad"
-          placeholder="Ornek: Ahmet Yilmaz"
-          value={form.full_name}
-          onChange={(e) => updateField('full_name', e.target.value)}
-          required
-        />
-
-        <Input
-          label="E-posta"
-          type="email"
-          placeholder="ornek@email.com"
-          value={form.email}
-          onChange={(e) => updateField('email', e.target.value)}
-          required
-        />
-
-        <Input
-          label="Telefon"
-          type="tel"
-          placeholder="+90 5XX XXX XX XX"
-          hint="WhatsApp ile davet gondermek icin"
-          value={form.phone}
-          onChange={(e) => updateField('phone', e.target.value)}
-        />
-
-        <Select
-          label="Cinsiyet"
-          value={form.gender}
-          onChange={(e) => updateField('gender', e.target.value)}
-          options={[
-            { value: '', label: 'Seciniz' },
-            { value: 'male', label: 'Erkek' },
-            { value: 'female', label: 'Kadin' },
-          ]}
-        />
-
-        {error && (
-          <div className="rounded-xl bg-danger/10 border border-danger/20 p-3">
-            <p className="text-sm text-danger">{error}</p>
-          </div>
-        )}
-
-        <div className="flex gap-3 pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            fullWidth
-            onClick={handleClose}
-          >
-            Iptal
-          </Button>
-          <Button type="submit" fullWidth loading={loading}>
-            Danisan Ekle
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  )
-}
