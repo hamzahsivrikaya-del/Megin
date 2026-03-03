@@ -22,6 +22,16 @@ export async function GET(request: Request) {
   const admin = createAdminClient()
   const { weekStart, weekEnd } = getWeekRange(new Date())
 
+  // Bu hafta zaten gonderildi mi? (tekrar onleme)
+  const { count: existingCount } = await admin
+    .from('weekly_reports')
+    .select('id', { count: 'exact', head: true })
+    .eq('week_start', weekStart)
+
+  if (existingCount && existingCount > 0) {
+    return NextResponse.json({ ok: true, generated: 0, skipped: 'already-generated-this-week' })
+  }
+
   // Aktif üyeleri al
   const { data: members, error: memberError } = await admin
     .from('users')

@@ -59,6 +59,20 @@ export async function GET(request: Request) {
 
   const admin = createAdminClient()
 
+  // Bugun zaten gonderildi mi? (tekrar onleme)
+  const turkeyNow = new Date(Date.now() + 3 * 60 * 60 * 1000)
+  const todayStr = turkeyNow.toISOString().slice(0, 10)
+  const { count } = await admin
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('type', 'nutrition_reminder')
+    .gte('created_at', `${todayStr}T00:00:00+03:00`)
+    .lt('created_at', `${todayStr}T23:59:59+03:00`)
+
+  if (count && count > 0) {
+    return NextResponse.json({ ok: true, sent: 0, skipped: 'already-sent-today' })
+  }
+
   // Tum aktif uyeleri al (bagli uyeler haric — onlar giris yapmaz)
   const { data: members, error: memberError } = await admin
     .from('users')
