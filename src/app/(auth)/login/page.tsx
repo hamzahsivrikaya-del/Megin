@@ -31,7 +31,23 @@ export default function LoginPage() {
       return
     }
 
-    router.push('/dashboard')
+    // Rol bazlı yönlendirme: trainer → /dashboard, client → /app
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: trainer } = await supabase
+        .from('trainers')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (trainer) {
+        router.push('/dashboard')
+      } else {
+        router.push('/app')
+      }
+    } else {
+      router.push('/dashboard')
+    }
     router.refresh()
   }
 
@@ -143,6 +159,10 @@ export default function LoginPage() {
         <Link href="/signup" className="font-medium text-primary hover:text-primary-dark">
           Kayıt Ol
         </Link>
+      </p>
+
+      <p className="mt-4 text-center text-xs text-text-tertiary">
+        Danışan mısın? Antrenörünüzden davet linki isteyin.
       </p>
     </div>
   )

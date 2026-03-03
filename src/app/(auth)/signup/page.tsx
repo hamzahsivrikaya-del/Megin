@@ -139,6 +139,10 @@ export default function SignUpPage() {
         </Link>
       </p>
 
+      <p className="mt-4 text-center text-xs text-text-tertiary">
+        Danışan mısın? Antrenörünüzden davet linki isteyin.
+      </p>
+
       <p className="mt-8 text-center text-xs text-text-tertiary">
         Kayıt olarak{' '}
         <Link href="/terms" className="underline hover:text-text-secondary">

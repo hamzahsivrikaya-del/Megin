@@ -43,7 +43,8 @@ export async function updateSession(request: NextRequest) {
     (path) =>
       request.nextUrl.pathname === path ||
       request.nextUrl.pathname.startsWith('/api/') ||
-      request.nextUrl.pathname.match(/^\/[a-z0-9_-]+$/) // /<username> public profil
+      request.nextUrl.pathname.match(/^\/[a-z0-9_-]+$/) || // /<username> public profil
+      request.nextUrl.pathname.match(/^\/[a-z0-9_-]+\/davet\/[a-z0-9]+$/) // /<handle>/davet/<token>
   )
 
   if (!user && !isPublicPath) {
