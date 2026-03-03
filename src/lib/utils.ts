@@ -64,3 +64,13 @@ export function isValidEmail(email: string): boolean {
 export function cn(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(' ')
 }
+
+// ── Token Helpers ──
+export function generateInviteToken(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  let token = ''
+  for (let i = 0; i < 24; i++) {
+    token += chars[Math.floor(Math.random() * chars.length)]
+  }
+  return token
+}
