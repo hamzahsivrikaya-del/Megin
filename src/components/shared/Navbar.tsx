@@ -80,8 +80,8 @@ export default function Navbar({ userName: initialName, showNotifications = true
             className="p-2 sm:p-0 text-sm text-text-secondary hover:text-text-primary transition-colors"
             title="Beslenme"
           >
-            <svg className="w-5 h-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+            <svg className="w-5 h-5 sm:hidden" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7 2v9a3 3 0 003 3v7a1 1 0 002 0v-7a3 3 0 003-3V2h-2v9a1 1 0 01-1 1h-2a1 1 0 01-1-1V2H7zM17 2v20a1 1 0 002 0v-8h1a2 2 0 002-2V5a3 3 0 00-3-3h-2z" />
             </svg>
             <span className="hidden sm:inline">Beslenme</span>
           </Link>
