@@ -265,7 +265,7 @@ export interface ProgressPhoto {
 }
 
 // ── Abonelik (SaaS) ──
-export type SubscriptionPlan = 'free' | 'pro' | 'studio'
+export type SubscriptionPlan = 'free' | 'pro' | 'elite'
 export type SubscriptionStatus = 'active' | 'cancelled' | 'past_due'
 
 export interface Subscription {
@@ -275,7 +275,27 @@ export interface Subscription {
   status: SubscriptionStatus
   current_period_start: string
   current_period_end: string
+  payment_order_id: string | null
+  cancel_at_period_end: boolean
   created_at: string
+}
+
+// ── Ödeme Siparişleri ──
+export type PaymentOrderStatus = 'pending' | 'success' | 'failed'
+
+export interface PaymentOrder {
+  id: string
+  trainer_id: string
+  merchant_oid: string
+  plan: SubscriptionPlan
+  amount: number
+  currency: string
+  status: PaymentOrderStatus
+  paytr_token: string | null
+  payment_type: string | null
+  failed_reason: string | null
+  created_at: string
+  completed_at: string | null
 }
 
 // ── Audit Log ──
