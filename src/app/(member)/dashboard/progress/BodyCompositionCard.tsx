@@ -5,17 +5,17 @@ import { formatDateShort } from '@/lib/utils'
 
 function getCategory(pct: number, gender: Gender = 'male') {
   if (gender === 'female') {
-    if (pct <= 13) return { label: 'Temel Yag',  color: '#A855F7', bg: 'rgba(168,85,247,0.12)' }
+    if (pct <= 13) return { label: 'Temel Yağ',  color: '#A855F7', bg: 'rgba(168,85,247,0.12)' }
     if (pct <= 20) return { label: 'Sporcu',      color: '#22C55E', bg: 'rgba(34,197,94,0.12)' }
     if (pct <= 24) return { label: 'Fit',          color: '#3B82F6', bg: 'rgba(59,130,246,0.12)' }
     if (pct <= 31) return { label: 'Normal',       color: '#F59E0B', bg: 'rgba(245,158,11,0.12)' }
-    return                { label: 'Yuksek',       color: '#EF4444', bg: 'rgba(239,68,68,0.12)' }
+    return                { label: 'Yüksek',       color: '#EF4444', bg: 'rgba(239,68,68,0.12)' }
   }
-  if (pct <= 5)  return { label: 'Temel Yag',  color: '#A855F7', bg: 'rgba(168,85,247,0.12)' }
+  if (pct <= 5)  return { label: 'Temel Yağ',  color: '#A855F7', bg: 'rgba(168,85,247,0.12)' }
   if (pct <= 13) return { label: 'Sporcu',      color: '#22C55E', bg: 'rgba(34,197,94,0.12)' }
   if (pct <= 17) return { label: 'Fit',          color: '#3B82F6', bg: 'rgba(59,130,246,0.12)' }
   if (pct <= 24) return { label: 'Normal',       color: '#F59E0B', bg: 'rgba(245,158,11,0.12)' }
-  return                { label: 'Yuksek',       color: '#EF4444', bg: 'rgba(239,68,68,0.12)' }
+  return                { label: 'Yüksek',       color: '#EF4444', bg: 'rgba(239,68,68,0.12)' }
 }
 
 function gaugeOffset(pct: number, max = 50): number {
@@ -56,10 +56,10 @@ export default function BodyCompositionCard({ measurements, gender = 'male' }: P
       <div className="flex items-center justify-between mb-5 sm:mb-7">
         <div>
           <p className="text-[11px] tracking-[3px] text-text-secondary uppercase mb-1">
-            Vucut Kompozisyonu
+            Vücut Kompozisyonu
           </p>
           <p className="text-[13px] text-text-secondary">
-            {formatDateShort(latest.date)} olcumu
+            {formatDateShort(latest.date)} ölçümü
           </p>
         </div>
         <span style={{
@@ -99,7 +99,7 @@ export default function BodyCompositionCard({ measurements, gender = 'male' }: P
             <span className="text-[26px] sm:text-[32px] font-extrabold leading-none" style={{ color: cat.color }}>
               {pct.toFixed(1)}
             </span>
-            <span className="text-[12px] sm:text-[13px] text-text-secondary mt-0.5">Yag %</span>
+            <span className="text-[12px] sm:text-[13px] text-text-secondary mt-0.5">Yağ %</span>
             {fatDiff != null && (
               <span className="text-[11px] mt-0.5 font-semibold" style={{
                 color: fatDiff < 0 ? '#22C55E' : '#EF4444',
@@ -113,15 +113,15 @@ export default function BodyCompositionCard({ measurements, gender = 'male' }: P
         {/* Metrikler */}
         <div className="flex-1 w-full flex flex-col gap-3 sm:gap-4">
 
-          {/* Yag / Yagsiz kutle split bar */}
+          {/* Yağ / Yağsız kütle split bar */}
           {fatKg != null && leanKg != null && (
             <div>
               <div className="flex justify-between mb-1.5">
                 <span className="text-[11px] sm:text-[12px] text-orange-500 font-semibold">
-                  Yag {fatKg.toFixed(1)} kg
+                  Yağ {fatKg.toFixed(1)} kg
                 </span>
                 <span className="text-[11px] sm:text-[12px] text-blue-500 font-semibold">
-                  Yagsiz {leanKg.toFixed(1)} kg
+                  Yağsız {leanKg.toFixed(1)} kg
                 </span>
               </div>
               <div className="h-2 rounded bg-border overflow-hidden relative">
@@ -135,7 +135,7 @@ export default function BodyCompositionCard({ measurements, gender = 'male' }: P
                 }} />
               </div>
               <p className="text-[10px] text-text-secondary mt-1">
-                * Yagsiz Kutle = kas + kemik + su + organlar
+                * Yağsız Kütle = kas + kemik + su + organlar
               </p>
             </div>
           )}
@@ -150,20 +150,20 @@ export default function BodyCompositionCard({ measurements, gender = 'male' }: P
               {fatKg != null && (
                 <div className="flex-1 bg-surface-hover rounded-[10px] p-2.5 sm:p-3 border border-border">
                   <div className="text-lg sm:text-xl font-bold text-orange-500">{fatKg.toFixed(1)}</div>
-                  <div className="text-[10px] sm:text-[11px] text-text-secondary mt-0.5">Yag kg</div>
+                  <div className="text-[10px] sm:text-[11px] text-text-secondary mt-0.5">Yağ kg</div>
                 </div>
               )}
               {leanKg != null && (
                 <div className="flex-1 bg-surface-hover rounded-[10px] p-2.5 sm:p-3 border border-border">
                   <div className="text-lg sm:text-xl font-bold text-blue-500">{leanKg.toFixed(1)}</div>
-                  <div className="text-[10px] sm:text-[11px] text-text-secondary mt-0.5">Yagsiz kg</div>
+                  <div className="text-[10px] sm:text-[11px] text-text-secondary mt-0.5">Yağsız kg</div>
                   <div className="text-[9px] text-text-secondary mt-px">kas+kemik+su</div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Skinfold olcumleri */}
+          {/* Skinfold ölçümleri */}
           {(latest.sf_chest || latest.sf_abdomen || latest.sf_thigh) && (
             <div className="bg-surface-hover rounded-[10px] p-3 sm:p-4 border border-border">
               <p className="text-[10px] text-text-secondary tracking-[2px] uppercase mb-2.5">
@@ -173,13 +173,13 @@ export default function BodyCompositionCard({ measurements, gender = 'male' }: P
                 {latest.sf_chest && (
                   <div className="text-center">
                     <div className="text-base sm:text-lg font-bold text-amber-500">{latest.sf_chest}</div>
-                    <div className="text-[10px] text-text-secondary mt-px">Gogus</div>
+                    <div className="text-[10px] text-text-secondary mt-px">Göğüs</div>
                   </div>
                 )}
                 {latest.sf_abdomen && (
                   <div className="text-center">
                     <div className="text-base sm:text-lg font-bold text-amber-500">{latest.sf_abdomen}</div>
-                    <div className="text-[10px] text-text-secondary mt-px">Karin</div>
+                    <div className="text-[10px] text-text-secondary mt-px">Karın</div>
                   </div>
                 )}
                 {latest.sf_thigh && (
@@ -205,11 +205,11 @@ export default function BodyCompositionCard({ measurements, gender = 'male' }: P
         </div>
       </div>
 
-      {/* Gecmis yag % tablosu */}
+      {/* Geçmiş yağ % tablosu */}
       {withFat.length > 1 && (
         <div className="mt-5 sm:mt-6 border-t border-border pt-4 sm:pt-5">
           <p className="text-[10px] text-text-secondary tracking-[2px] uppercase mb-3">
-            Yag % Gecmisi
+            Yağ % Geçmişi
           </p>
           <div className="flex flex-wrap gap-2">
             {withFat.slice(0, 8).reverse().map((m, i, arr) => {
