@@ -38,6 +38,14 @@ export async function updateSession(request: NextRequest) {
   // Public rotalar - auth gerektirmez
   if (
     pathname.startsWith('/login') ||
+    pathname.startsWith('/features') ||
+    pathname.startsWith('/pricing') ||
+    pathname.startsWith('/use-cases') ||
+    pathname.startsWith('/contact') ||
+    pathname.startsWith('/tools') ||
+    pathname.startsWith('/signup') ||
+    pathname.startsWith('/tr') ||
+    pathname.startsWith('/legal') ||
     pathname.startsWith('/blog') ||
     pathname.startsWith('/araclar') ||
     pathname.startsWith('/antrenmanlar') ||
@@ -51,7 +59,7 @@ export async function updateSession(request: NextRequest) {
     pathname.includes('.')
   ) {
     // Giriş yapmış kullanıcıyı login veya landing page'den yönlendir
-    if ((pathname === '/login' || pathname === '/') && user) {
+    if (pathname === '/login' && user) {
       const cachedRole = request.cookies.get('x-user-role')?.value
       let role: string | null = null
 
