@@ -42,13 +42,13 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: 'Hamza Sivrikaya | Kişisel Antrenör',
-  description: 'Hamza Sivrikaya - Kişisel Antrenör | Üye takip sistemi',
+  title: 'Megin — The Platform for Personal Trainers',
+  description: 'Client tracking, workout programming, nutrition management — all in one platform.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Hamza Sivrikaya',
+    title: 'Megin',
   },
 }
 
@@ -64,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="tr">
+    <html lang="en">
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
