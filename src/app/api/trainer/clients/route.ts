@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateInviteToken, normalizeEmail } from '@/lib/utils'
+import { getTrainerPlan } from '@/lib/subscription'
+import { getActiveClientCount } from '@/lib/subscription'
+import { canAddClient } from '@/lib/plans'
 
 // ── POST: Yeni danışan ekle ──
 export async function POST(request: NextRequest) {
@@ -22,6 +25,17 @@ export async function POST(request: NextRequest) {
 
     if (trainerError || !trainer) {
       return NextResponse.json({ error: 'Eğitmen profili bulunamadı' }, { status: 403 })
+    }
+
+    // Plan limiti kontrolü
+    const plan = await getTrainerPlan(supabase, trainer.id)
+    const clientCount = await getActiveClientCount(supabase, trainer.id)
+
+    if (!canAddClient(plan, clientCount)) {
+      return NextResponse.json(
+        { error: 'client_limit', message: 'Danışan limitinize ulaştınız. Planınızı yükseltin.' },
+        { status: 403 }
+      )
     }
 
     // Body parse
