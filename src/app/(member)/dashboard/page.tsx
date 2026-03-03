@@ -195,34 +195,82 @@ export default async function MemberDashboard() {
       {/* Bugünün Beslenmesi */}
       <Link href="/dashboard/beslenme" className="block">
         <Card className="hover-lift card-glow animate-fade-up delay-100">
-          <div className="flex items-center gap-2 mb-3">
-            <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7 2v9a3 3 0 003 3v7a1 1 0 002 0v-7a3 3 0 003-3V2h-2v9a1 1 0 01-1 1h-2a1 1 0 01-1-1V2H7zM17 2v20a1 1 0 002 0v-8h1a2 2 0 002-2V5a3 3 0 00-3-3h-2z" />
-            </svg>
-            <h3 className="font-semibold text-text-primary">Beslenme Raporu</h3>
-          </div>
-          {memberMeals && memberMeals.length > 0 ? (
+          {memberMeals && memberMeals.length > 0 ? (() => {
+            const compliantCount = todayMeals?.filter((m: { status: string }) => m.status === 'compliant').length || 0
+            const total = memberMeals.length
+            const ratio = total > 0 ? compliantCount / total : 0
+            return (
+              <>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7 2v9a3 3 0 003 3v7a1 1 0 002 0v-7a3 3 0 003-3V2h-2v9a1 1 0 01-1 1h-2a1 1 0 01-1-1V2H7zM17 2v20a1 1 0 002 0v-8h1a2 2 0 002-2V5a3 3 0 00-3-3h-2z" />
+                    </svg>
+                    <h3 className="font-semibold text-text-primary">Beslenme</h3>
+                  </div>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                    ratio >= 1 ? 'bg-emerald-100 text-emerald-700'
+                      : ratio >= 0.5 ? 'bg-amber-100 text-amber-700'
+                      : compliantCount > 0 ? 'bg-red-100 text-red-600'
+                      : 'bg-gray-100 text-text-secondary'
+                  }`}>
+                    {compliantCount}/{total}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {(memberMeals as MemberMeal[]).map((meal) => {
+                    const log = todayMeals?.find((m: { meal_id: string; status: string }) => m.meal_id === meal.id)
+                    const isCompliant = log?.status === 'compliant'
+                    const isNonCompliant = log?.status === 'non_compliant'
+                    return (
+                      <div key={meal.id} className={`flex items-center justify-between px-3 py-1.5 rounded-lg ${
+                        isCompliant ? 'bg-emerald-50'
+                          : isNonCompliant ? 'bg-red-50'
+                          : 'bg-gray-50'
+                      }`}>
+                        <span className={`text-sm ${
+                          isCompliant ? 'text-emerald-700 font-medium'
+                            : isNonCompliant ? 'text-red-600 font-medium'
+                            : 'text-text-secondary'
+                        }`}>
+                          {meal.name}
+                        </span>
+                        {isCompliant && (
+                          <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                        {isNonCompliant && (
+                          <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+                {/* Progress bar */}
+                <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${ratio * 100}%`,
+                      backgroundColor: ratio >= 1 ? '#10b981' : ratio >= 0.5 ? '#f59e0b' : '#ef4444',
+                    }}
+                  />
+                </div>
+              </>
+            )
+          })() : (
             <>
-              <div className="flex gap-2 overflow-hidden">
-                {(memberMeals as MemberMeal[]).map((meal) => {
-                  const log = todayMeals?.find((m: { meal_id: string; status: string }) => m.meal_id === meal.id)
-                  return (
-                    <div key={meal.id} className={`flex-1 min-w-0 text-center py-2 rounded-lg text-xs font-medium truncate px-1 ${
-                      log?.status === 'compliant' ? 'bg-green-100 text-green-700'
-                        : log?.status === 'non_compliant' ? 'bg-red-100 text-red-600'
-                        : 'bg-red-50 text-text-secondary'
-                    }`}>
-                      {meal.name}
-                    </div>
-                  )
-                })}
+              <div className="flex items-center gap-2 mb-3">
+                <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 2v9a3 3 0 003 3v7a1 1 0 002 0v-7a3 3 0 003-3V2h-2v9a1 1 0 01-1 1h-2a1 1 0 01-1-1V2H7zM17 2v20a1 1 0 002 0v-8h1a2 2 0 002-2V5a3 3 0 00-3-3h-2z" />
+                </svg>
+                <h3 className="font-semibold text-text-primary">Beslenme</h3>
               </div>
-              <p className="text-xs text-text-secondary mt-2">
-                {todayMeals?.filter((m: { status: string }) => m.status === 'compliant').length || 0}/{memberMeals.length} öğün uyumlu
-              </p>
+              <p className="text-sm text-text-secondary">Henüz öğün planı atanmadı</p>
             </>
-          ) : (
-            <p className="text-sm text-text-secondary">Henüz öğün planı atanmadı</p>
           )}
         </Card>
       </Link>

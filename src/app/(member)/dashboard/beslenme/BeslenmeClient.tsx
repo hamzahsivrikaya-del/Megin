@@ -446,7 +446,30 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
             >
               {/* Ana satır */}
               <div className="flex items-center gap-3 p-3">
-                {/* Tik butonu (uydum) */}
+                {/* Çarpı butonu (uymadım) — sol */}
+                <button
+                  onClick={() => handleMealStatus(meal, 'non_compliant')}
+                  disabled={saving !== null}
+                  className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-50 active:scale-90 ${
+                    isNonCompliant
+                      ? 'bg-red-500 text-white shadow-md shadow-red-500/30'
+                      : 'border-2 border-gray-200 text-gray-300 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
+                  }`}
+                  aria-label="Uymadim"
+                >
+                  <svg className="w-[16px] h-[16px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isNonCompliant ? 3 : 2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Öğün adı */}
+                <span className={`flex-1 text-sm font-medium ${
+                  isCompliant ? 'text-emerald-600' : isNonCompliant ? 'text-red-500' : 'text-text-primary'
+                }`}>
+                  {meal.name}
+                </span>
+
+                {/* Tik butonu (uydum) — sağ */}
                 <button
                   onClick={() => handleMealStatus(meal, 'compliant')}
                   disabled={saving !== null}
@@ -462,29 +485,6 @@ export default function BeslenmeClient({ userId, memberMeals, initialLogs, today
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isCompliant ? 3 : 2.5} d="M5 13l4 4L19 7" />
                     </svg>
                   )}
-                </button>
-
-                {/* Öğün adı */}
-                <span className={`flex-1 text-sm font-medium ${
-                  isCompliant ? 'text-emerald-600' : isNonCompliant ? 'text-red-500' : 'text-text-primary'
-                }`}>
-                  {meal.name}
-                </span>
-
-                {/* Çarpı butonu (uymadım) */}
-                <button
-                  onClick={() => handleMealStatus(meal, 'non_compliant')}
-                  disabled={saving !== null}
-                  className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-50 active:scale-90 ${
-                    isNonCompliant
-                      ? 'bg-red-500 text-white shadow-md shadow-red-500/30'
-                      : 'border-2 border-gray-200 text-gray-300 hover:border-red-300 hover:text-red-400 hover:bg-red-50'
-                  }`}
-                  aria-label="Uymadim"
-                >
-                  <svg className="w-[16px] h-[16px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isNonCompliant ? 3 : 2.5} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
                 </button>
 
                 {/* Aksiyon ikonları (log varsa aktif) */}
