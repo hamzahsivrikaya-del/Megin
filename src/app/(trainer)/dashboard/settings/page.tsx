@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { updateTrainerProfile } from './actions'
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card'
@@ -8,6 +9,9 @@ import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
 import Select from '@/components/ui/Select'
 import Button from '@/components/ui/Button'
+import { Subscription, PaymentOrder } from '@/lib/types'
+import { PLAN_CONFIGS } from '@/lib/plans'
+import { formatPrice } from '@/lib/utils'
 
 const EXPERTISE_OPTIONS = [
   { value: 'pt', label: 'Personal Training' },
@@ -42,6 +46,10 @@ export default function TrainerProfilePage() {
   const [sifreMessage, setSifreMessage] = useState('')
   const [sifreError, setSifreError] = useState('')
 
+  // Abonelik state
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [paymentOrders, setPaymentOrders] = useState<PaymentOrder[]>([])
+
   useEffect(() => {
     async function load() {
       const supabase = createClient()
@@ -62,6 +70,24 @@ export default function TrainerProfilePage() {
         setExperienceYears(trainer.experience_years?.toString() || '')
         setAvatarUrl(trainer.avatar_url)
         setMemberSince(trainer.created_at)
+
+        // Abonelik bilgisi
+        const { data: sub } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('trainer_id', trainer.id)
+          .single()
+        if (sub) setSubscription(sub)
+
+        // Ödeme geçmişi
+        const { data: orders } = await supabase
+          .from('payment_orders')
+          .select('*')
+          .eq('trainer_id', trainer.id)
+          .eq('status', 'success')
+          .order('created_at', { ascending: false })
+          .limit(10)
+        if (orders) setPaymentOrders(orders)
       }
       setLoading(false)
     }
@@ -312,6 +338,72 @@ export default function TrainerProfilePage() {
             Profili Güncelle
           </Button>
         </form>
+      </Card>
+
+      {/* Abonelik */}
+      <Card>
+        <CardHeader><CardTitle>Abonelik</CardTitle></CardHeader>
+        <div className="space-y-4">
+          {subscription ? (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-text-secondary">Mevcut Plan</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="font-bold text-lg">{PLAN_CONFIGS[subscription.plan]?.name || subscription.plan}</span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      subscription.status === 'active'
+                        ? 'bg-success/10 text-success'
+                        : subscription.status === 'past_due'
+                          ? 'bg-warning/10 text-warning'
+                          : 'bg-border text-text-secondary'
+                    }`}>
+                      {subscription.status === 'active' ? 'Aktif' : subscription.status === 'past_due' ? 'Ödeme Bekliyor' : 'İptal'}
+                    </span>
+                  </div>
+                </div>
+                {subscription.plan !== 'elite' && (
+                  <Link
+                    href="/dashboard/upgrade"
+                    className="text-sm font-semibold text-primary hover:underline"
+                  >
+                    Planı Yükselt
+                  </Link>
+                )}
+              </div>
+
+              {subscription.plan !== 'free' && subscription.current_period_end && (
+                <div className="text-sm text-text-secondary">
+                  Dönem bitişi: {new Date(subscription.current_period_end).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-text-secondary">Abonelik bilgisi yüklenemedi.</p>
+          )}
+
+          {/* Ödeme Geçmişi */}
+          {paymentOrders.length > 0 && (
+            <div className="pt-3 border-t border-border">
+              <p className="text-sm font-medium text-text-primary mb-2">Ödeme Geçmişi</p>
+              <div className="space-y-2">
+                {paymentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-text-secondary">
+                        {new Date(order.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                      <span className="text-text-primary font-medium">
+                        {PLAN_CONFIGS[order.plan]?.name || order.plan}
+                      </span>
+                    </div>
+                    <span className="font-medium">{formatPrice(order.amount / 100)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </Card>
 
       {/* Şifre Değiştir */}
