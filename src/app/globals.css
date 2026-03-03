@@ -792,7 +792,7 @@ input:-webkit-autofill {
 }
 
 .mkt-cta-primary {
-  @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider uppercase transition-all press-effect;
+  @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider uppercase transition-all;
   background: #FF2D2D;
   color: #FFFFFF;
 }
@@ -801,9 +801,12 @@ input:-webkit-autofill {
   transform: translateY(-1px);
   box-shadow: 0 8px 24px -4px rgba(255, 45, 45, 0.3);
 }
+.mkt-cta-primary:active {
+  transform: scale(0.97);
+}
 
 .mkt-cta-ghost {
-  @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider uppercase transition-all press-effect;
+  @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider uppercase transition-all;
   background: transparent;
   border: 2px solid #E5E7EB;
   color: #0A0A0A;
@@ -811,6 +814,9 @@ input:-webkit-autofill {
 .mkt-cta-ghost:hover {
   border-color: #FF2D2D;
   color: #FF2D2D;
+}
+.mkt-cta-ghost:active {
+  transform: scale(0.97);
 }
 
 /* Scroll-triggered animation base */
