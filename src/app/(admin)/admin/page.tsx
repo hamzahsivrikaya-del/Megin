@@ -42,7 +42,7 @@ export default async function AdminDashboard() {
       .gte('date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]),
     supabase
       .from('lessons')
-      .select('id, users(full_name), date')
+      .select('id, users(full_name), date, start_time')
       .eq('date', new Date().toISOString().split('T')[0]),
   ])
 
@@ -69,8 +69,17 @@ export default async function AdminDashboard() {
       {/* Hızlı Aksiyonlar — hemen render */}
       <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2 sm:gap-3">
         <Link
-          href="/admin/lessons/new"
+          href="/admin/takvim"
           className="inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-3 sm:py-2.5 bg-primary text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-primary-hover active:bg-primary-hover transition-colors"
+        >
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Takvim</span>
+        </Link>
+        <Link
+          href="/admin/lessons/new"
+          className="inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-3 sm:py-2.5 bg-surface border border-border text-text-primary rounded-lg text-xs sm:text-sm font-medium hover:bg-surface-hover active:bg-surface-hover transition-colors"
         >
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -86,16 +95,37 @@ export default async function AdminDashboard() {
           </svg>
           <span>Yeni Üye</span>
         </Link>
-        <Link
-          href="/admin/measurements/new"
-          className="inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-3 sm:py-2.5 bg-surface border border-border text-text-primary rounded-lg text-xs sm:text-sm font-medium hover:bg-surface-hover active:bg-surface-hover transition-colors"
-        >
-          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          <span>Ölçüm Gir</span>
-        </Link>
       </div>
+
+      {/* Bugünün Ders Programı */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Bugünün Programı</CardTitle>
+            <Link href="/admin/takvim" className="text-xs text-primary font-medium hover:underline">
+              Takvime git →
+            </Link>
+          </div>
+        </CardHeader>
+        {todayLessons && todayLessons.length > 0 ? (
+          <div className="space-y-1.5">
+            {[...todayLessons]
+              .sort((a, b) => (String((a as Record<string, unknown>).start_time || '')).localeCompare(String((b as Record<string, unknown>).start_time || '')))
+              .map((lesson: Record<string, unknown>) => (
+                <div key={lesson.id as string} className="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-hover">
+                  <span className="text-sm font-medium text-text-primary">
+                    {(lesson.users as Record<string, string>)?.full_name}
+                  </span>
+                  <span className="text-sm text-primary font-semibold">
+                    {(lesson.start_time as string) || '—'}
+                  </span>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <p className="text-sm text-text-secondary">Bugün henüz ders planlanmamış</p>
+        )}
+      </Card>
 
       {/* Uyarılar — ertelenmiş */}
       <Suspense fallback={<AlertsSkeleton />}>

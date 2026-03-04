@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getMonday, getAdjacentWeek, toDateStr } from '@/lib/utils'
 import LessonModal from './LessonModal'
+import type { LessonChange } from './LessonModal'
 
 interface Member {
   packageId: string
@@ -64,11 +65,11 @@ export default function CalendarClient({ members }: { members: Member[] }) {
   const [selectedTime, setSelectedTime] = useState('')
   const [currentTime, setCurrentTime] = useState(new Date())
   const scrollRef = useRef<HTMLDivElement>(null)
+  const pendingChangesRef = useRef<LessonChange[]>([])
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Move mode (tap-to-move)
-  const [movingEvent, setMovingEvent] = useState<CalendarEvent | null>(null)
-  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const touchStartPos = useRef<{ x: number; y: number } | null>(null)
+  const DEBOUNCE_MS = 30 * 60 * 1000 // 30 dakika
+  const URGENT_HOURS = 24
 
   const today = toDateStr(new Date())
 
@@ -170,16 +171,6 @@ export default function CalendarClient({ members }: { members: Member[] }) {
   }
 
   function handleAddClick(dateStr: string, timeStr?: string) {
-    // Move mode: taşınacak ders varsa saat dilimine taşı
-    if (movingEvent) {
-      const newTime = timeStr || '10:00'
-      if (dateStr !== movingEvent.extendedProps.date || newTime !== movingEvent.extendedProps.startTime) {
-        moveLesson(movingEvent.extendedProps.lessonId, dateStr, newTime)
-      }
-      setMovingEvent(null)
-      return
-    }
-
     setSelectedDate(dateStr)
     setSelectedTime(timeStr || '10:00')
     setSelectedEvent(null)
@@ -187,60 +178,77 @@ export default function CalendarClient({ members }: { members: Member[] }) {
     setModalOpen(true)
   }
 
-  async function moveLesson(lessonId: string, newDate: string, newTime: string) {
-    const supabase = createClient()
-    await supabase
-      .from('lessons')
-      .update({ date: newDate, start_time: newTime })
-      .eq('id', lessonId)
-    fetchLessons()
+  function isUrgent(change: LessonChange): boolean {
+    const now = new Date()
+    const lessonDate = new Date(change.date + 'T' + change.startTime)
+    const diffHours = (lessonDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+    return diffHours <= URGENT_HOURS
   }
+
+  async function sendNotifications(mode: 'urgent' | 'batch', changes: LessonChange[]) {
+    if (changes.length === 0) return
+    try {
+      await fetch('/api/calendar-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode, changes }),
+      })
+    } catch {
+      // Push başarısız olsa bile ana akışı bozmayalım
+    }
+  }
+
+  const flushPendingChanges = useCallback(() => {
+    if (pendingChangesRef.current.length === 0) return
+    const changes = [...pendingChangesRef.current]
+    pendingChangesRef.current = []
+    sendNotifications('batch', changes)
+  }, [])
+
+  // Sayfa terk edilince biriken bildirimleri gönder
+  useEffect(() => {
+    function handleBeforeUnload() {
+      if (pendingChangesRef.current.length > 0) {
+        const data = JSON.stringify({
+          mode: 'batch',
+          changes: pendingChangesRef.current,
+        })
+        navigator.sendBeacon('/api/calendar-notify', new Blob([data], { type: 'application/json' }))
+        pendingChangesRef.current = []
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      flushPendingChanges()
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    }
+  }, [flushPendingChanges])
 
   function handleModalClose() {
     setModalOpen(false)
     setSelectedEvent(null)
   }
 
-  function handleModalSave() {
+  function handleModalSave(change: LessonChange) {
     setModalOpen(false)
     setSelectedEvent(null)
     fetchLessons()
+
+    if (isUrgent(change)) {
+      sendNotifications('urgent', [change])
+      return
+    }
+
+    pendingChangesRef.current.push(change)
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    debounceTimerRef.current = setTimeout(flushPendingChanges, DEBOUNCE_MS)
   }
 
   const activeDayIdx = selectedDayIdx ?? (todayIdx >= 0 ? todayIdx : 0)
   const activeDayStr = weekDays[activeDayIdx]
   const activeDayDate = new Date(activeDayStr + 'T00:00:00')
-
-  // ===== MOVE MODE (long press → tap to move) =====
-
-  function onCardTouchStart(e: React.TouchEvent, event: CalendarEvent) {
-    const touch = e.touches[0]
-    touchStartPos.current = { x: touch.clientX, y: touch.clientY }
-
-    longPressRef.current = setTimeout(() => {
-      setMovingEvent(event)
-      if (navigator.vibrate) navigator.vibrate(30)
-      longPressRef.current = null
-    }, 400)
-  }
-
-  function onCardTouchMove(e: React.TouchEvent) {
-    if (!longPressRef.current || !touchStartPos.current) return
-    const touch = e.touches[0]
-    const dx = Math.abs(touch.clientX - touchStartPos.current.x)
-    const dy = Math.abs(touch.clientY - touchStartPos.current.y)
-    if (dx > 10 || dy > 10) {
-      clearTimeout(longPressRef.current)
-      longPressRef.current = null
-    }
-  }
-
-  function onCardTouchEnd() {
-    if (longPressRef.current) {
-      clearTimeout(longPressRef.current)
-      longPressRef.current = null
-    }
-  }
 
   return (
     <div className="min-h-[80vh]">
@@ -364,7 +372,7 @@ export default function CalendarClient({ members }: { members: Member[] }) {
                 </div>
 
                 {/* 7 gün sütunu */}
-                {weekDays.map((dayStr, i) => {
+                {weekDays.map((dayStr) => {
                   const isTodayCol = dayStr === today
                   const dayEvts = eventsForDay(dayStr)
                   const totalH = (DAY_END - DAY_START + 1) * WEEK_HOUR_HEIGHT
@@ -396,14 +404,10 @@ export default function CalendarClient({ members }: { members: Member[] }) {
                         const dur = event.extendedProps.duration || 60
                         const top = (sh - DAY_START) * WEEK_HOUR_HEIGHT + (sm / 60) * WEEK_HOUR_HEIGHT
                         const height = Math.max((dur / 60) * WEEK_HOUR_HEIGHT - 2, 28)
-                        const isMoving = movingEvent?.id === event.id
 
                         return (
                           <div
                             key={event.id}
-                            onTouchStart={(e) => onCardTouchStart(e, event)}
-                            onTouchMove={onCardTouchMove}
-                            onTouchEnd={onCardTouchEnd}
                             onClick={(e) => { e.stopPropagation(); handleEventClick(event) }}
                             className="absolute cursor-pointer"
                             style={{
@@ -411,14 +415,12 @@ export default function CalendarClient({ members }: { members: Member[] }) {
                               right: 2,
                               top: top + 1,
                               height,
-                              background: isMoving ? '#FECACA' : '#FEF2F2',
+                              background: '#FEF2F2',
                               borderRadius: 4,
-                              borderLeft: `3px solid ${isMoving ? '#DC2626' : '#F87171'}`,
+                              borderLeft: '3px solid #F87171',
                               padding: '2px 3px',
                               overflow: 'hidden',
-                              zIndex: isMoving ? 5 : 2,
-                              boxShadow: isMoving ? '0 0 0 2px #DC2626, 0 4px 12px rgba(220,38,38,0.3)' : 'none',
-                              animation: isMoving ? 'pulse 1.5s ease-in-out infinite' : 'none',
+                              zIndex: 2,
                             }}
                           >
                             <div
@@ -560,14 +562,10 @@ export default function CalendarClient({ members }: { members: Member[] }) {
                 const endMin = sh * 60 + sm + dur
                 const eh = Math.floor(endMin / 60)
                 const em = endMin % 60
-                const isMoving = movingEvent?.id === event.id
 
                 return (
                   <div
                     key={event.id}
-                    onTouchStart={(e) => onCardTouchStart(e, event)}
-                    onTouchMove={onCardTouchMove}
-                    onTouchEnd={onCardTouchEnd}
                     onClick={(e) => { e.stopPropagation(); handleEventClick(event) }}
                     className="absolute cursor-pointer rounded-[10px]"
                     style={{
@@ -575,19 +573,14 @@ export default function CalendarClient({ members }: { members: Member[] }) {
                       right: 8,
                       top: top + 1,
                       height: height - 3,
-                      background: isMoving
-                        ? 'linear-gradient(135deg, #FECACA 0%, #FCA5A5 100%)'
-                        : 'linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%)',
-                      borderLeft: `4px solid ${isMoving ? '#DC2626' : '#F87171'}`,
+                      background: 'linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%)',
+                      borderLeft: '4px solid #F87171',
                       padding: '10px 14px',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'center',
-                      zIndex: isMoving ? 5 : 2,
-                      boxShadow: isMoving
-                        ? '0 0 0 2px #DC2626, 0 4px 12px rgba(220,38,38,0.3)'
-                        : '0 1px 6px rgba(0,0,0,0.04)',
-                      animation: isMoving ? 'pulse 1.5s ease-in-out infinite' : 'none',
+                      zIndex: 2,
+                      boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
                     }}
                   >
                     <p className="text-[15px] font-bold text-text-primary mb-0.5">
@@ -636,34 +629,6 @@ export default function CalendarClient({ members }: { members: Member[] }) {
               })()}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Move mode banner */}
-      {movingEvent && (
-        <div
-          className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 safe-area-bottom"
-          style={{
-            background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-            boxShadow: '0 -4px 20px rgba(0,0,0,0.15)',
-          }}
-        >
-          <div className="flex items-center gap-2 text-white min-w-0">
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7 11l5-5m0 0l5 5m-5-5v12" />
-            </svg>
-            <div className="min-w-0">
-              <p className="text-[13px] font-bold truncate">{shortName(movingEvent.extendedProps.memberName)}</p>
-              <p className="text-[11px] opacity-80">Yeni saat dilimine dokun</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setMovingEvent(null)}
-            className="text-white/90 text-xs font-semibold px-3 py-1.5 rounded-lg cursor-pointer"
-            style={{ background: 'rgba(255,255,255,0.2)' }}
-          >
-            İptal
-          </button>
         </div>
       )}
 
