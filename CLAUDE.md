@@ -35,6 +35,7 @@ src/
 │   ├── (auth)/login/              # Giris, sifre sifirlama
 │   ├── (admin)/admin/             # Admin paneli (sidebar layout)
 │   │   ├── members/[id]/          # Uye detay (4 tab)
+│   │   ├── takvim/                # Takvim (haftalik ders planlama + surukle-birak)
 │   │   ├── lessons/new|today/     # Ders olustur / gunluk yoklama
 │   │   ├── measurements/new/      # Olcum girisi
 │   │   ├── packages/new/          # Paket olustur
@@ -63,6 +64,7 @@ src/
 │       ├── admin/members/         # Uye CRUD
 │       ├── goals/                 # Hedef CRUD
 │       ├── badges/                # Rozet sorgulama
+│       ├── calendar-notify/       # Takvim bildirim API (urgent + batch)
 │       ├── progress-photos/       # Ilerleme fotografi
 │       └── share/                 # OG image olusturma (Instagram kart)
 ├── components/
@@ -227,6 +229,25 @@ CRON_SECRET=
 
 ## Ozellik Detaylari
 
+### Takvim (Ders Planlama)
+- **Sayfa:** `/admin/takvim` — haftalik gorunum, mobil icin gun gorunumu
+- **Dosyalar:** `CalendarClient.tsx` (ana mantik), `CalendarView.tsx` (haftalik grid), `MobileDayView.tsx` (mobil gun), `LessonModal.tsx` (ders ekle/duzenle modal), `page.tsx` (server data fetch)
+- Haftalik grid: 7 gun x zaman slotlari, ders kartlari renk kodlu
+- Ders ekle: bos slota tikla → modal (uye sec, tarih, saat, sure, not)
+- Ders duzenle: ders kartina tikla → modal (tarih/saat/sure degistir, sil)
+- Duplicate kontrol: ayni uye + ayni tarihte 2. ders engelliyor
+- **Bildirim sistemi:** Ders eklendiginde/degistiginde/silindiginde uyelere otomatik bildirim
+  - **Acil (urgent):** ≤24 saat icindeki dersler → aninda push + in-app bildirim
+  - **Toplu (batch):** >24 saat sonraki dersler → 30dk debounce ile toplanip tek bildirim gider
+  - Mesaj ornekleri: "Bu hafta 3 dersin planlandi: Pzt 10:00, Car 14:00, Cum 16:00"
+  - Iptal mesaji: "Dersiniz iptal edildi. Detaylar icin antrenorunuzle iletisime gecin."
+  - Degisiklik: "Dersiniz 10:00'den 12:00'ye tasindi."
+  - **API:** `/api/calendar-notify` — admin auth + per-user gruplama
+  - **Client:** `pendingChangesRef` + `setTimeout` debounce + `navigator.sendBeacon` (sayfa kapanirsa)
+- **Migration:** 045 (start_time/duration), 046 (UPDATE RLS), 047 (bildirim tipleri)
+- **Dashboard:** Admin dashboard'da "Bugunun Programi" karti (saatli ders listesi + takvim linki)
+- **Sidebar:** Takvim 2. sirada (Dashboard'dan hemen sonra)
+
 ### Beslenme Takibi
 - Admin uyeye ogun atar (`member_meals`) -> Uye gunluk kayit girer (`meal_logs`)
 - Sabit ogun yok, admin istedigi kadar ogun atayabilir (2, 3, 5...)
@@ -320,6 +341,8 @@ CRON_SECRET=
 | 4 | Kisisel hedef takibi | CANLI |
 | 5 | Otomatik yenileme hatirlatmasi | CANLI (trigger + push) |
 | 6 | Bosluk tehlikesi gosterimi | CANLI (badge + progress bar) |
+| 7 | Takvim (haftalik ders planlama) | CANLI |
+| 8 | Takvim bildirim sistemi (urgent + batch) | CANLI |
 
 ### Faz 2 — Premium Deneyim
 

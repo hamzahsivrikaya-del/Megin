@@ -40,6 +40,8 @@ export interface Lesson {
   package_id: string
   user_id: string
   date: string
+  start_time: string | null
+  duration: number
   notes: string | null
   created_at: string
   // joined
@@ -154,7 +156,7 @@ export interface MemberBadge {
   notified: boolean
 }
 
-export type NotificationType = 'low_lessons' | 'weekly_report' | 'inactive' | 'manual' | 'nutrition_reminder' | 'badge_earned' | 'admin_nutrition_summary' | 'admin_measurement' | 'admin_low_lessons'
+export type NotificationType = 'low_lessons' | 'weekly_report' | 'inactive' | 'manual' | 'nutrition_reminder' | 'badge_earned' | 'admin_nutrition_summary' | 'admin_measurement' | 'admin_low_lessons' | 'lesson_scheduled' | 'lesson_updated' | 'lesson_cancelled'
 
 export interface Notification {
   id: string
