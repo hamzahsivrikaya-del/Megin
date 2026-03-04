@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import { useScrollReveal } from '@/lib/hooks/useScrollReveal'
 import type { MarketingTranslations } from '@/lib/i18n/types'
 
@@ -8,117 +9,203 @@ interface FeaturesGridProps {
   t: MarketingTranslations
 }
 
-const featureIcons = [
-  // Client Management — Users
-  (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="9" cy="7" r="3.5" stroke="#FF2D2D" strokeWidth="1.8" />
-      <path d="M2 20c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="#FF2D2D" strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="18" cy="8" r="2.5" stroke="#FF2D2D" strokeWidth="1.6" opacity="0.6" />
-      <path d="M21 19c0-2.76-1.34-5-3-5" stroke="#FF2D2D" strokeWidth="1.6" strokeLinecap="round" opacity="0.6" />
-    </svg>
-  ),
-  // Workout Programs — Dumbbell
-  (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="2" y="10" width="3" height="4" rx="1" fill="#FF2D2D" />
-      <rect x="1" y="8" width="2" height="8" rx="1" fill="#FF2D2D" opacity="0.7" />
-      <rect x="19" y="10" width="3" height="4" rx="1" fill="#FF2D2D" />
-      <rect x="21" y="8" width="2" height="8" rx="1" fill="#FF2D2D" opacity="0.7" />
-      <rect x="5" y="11" width="14" height="2" rx="1" fill="#FF2D2D" />
-    </svg>
-  ),
-  // Nutrition Tracking — Apple
-  (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 6C12 6 11 3 14 2" stroke="#FF2D2D" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M18 8C18 8 20 9.5 20 13C20 17 17.5 21 14 21C13 21 12.5 20.5 12 20.5C11.5 20.5 11 21 10 21C6.5 21 4 17 4 13C4 9.5 6 8 8 8C9.5 8 10.5 8.5 12 8.5C13.5 8.5 14.5 8 16 8C16.7 8 17.4 8 18 8Z" stroke="#FF2D2D" strokeWidth="1.8" strokeLinejoin="round" />
-    </svg>
-  ),
-  // Progress Reports — Chart
-  (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="3" y="14" width="4" height="7" rx="1" fill="#FF2D2D" opacity="0.5" />
-      <rect x="10" y="9" width="4" height="12" rx="1" fill="#FF2D2D" opacity="0.7" />
-      <rect x="17" y="4" width="4" height="17" rx="1" fill="#FF2D2D" />
-      <path d="M3 3h18" stroke="#FF2D2D" strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
-    </svg>
-  ),
-  // Badge System — Trophy
-  (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M8 21h8M12 17v4M7 3H5a2 2 0 0 0-2 2v2a4 4 0 0 0 4 4h0M17 3h2a2 2 0 0 1 2 2v2a4 4 0 0 1-4 4h0" stroke="#FF2D2D" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M7 3h10v7a5 5 0 0 1-10 0V3z" stroke="#FF2D2D" strokeWidth="1.8" strokeLinejoin="round" />
-    </svg>
-  ),
-  // Push Notifications — Bell
-  (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#FF2D2D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="#FF2D2D" strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="18" cy="5" r="3" fill="#FF2D2D" />
-    </svg>
-  ),
+/* ── Mini visual mockups — scaled up for impact ── */
+
+function ClientMockup() {
+  const clients = [
+    { initials: 'AK', pct: 85, color: 'bg-green-400' },
+    { initials: 'SM', pct: 72, color: 'bg-orange-400' },
+    { initials: 'BT', pct: 94, color: 'bg-green-500' },
+  ]
+  return (
+    <div className="space-y-3.5">
+      {clients.map((c) => (
+        <div key={c.initials} className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-400 to-orange-400 flex items-center justify-center flex-shrink-0 shadow-sm shadow-red-200/50">
+            <span className="text-[10px] font-bold text-white leading-none">{c.initials}</span>
+          </div>
+          <div className="flex-1 h-2.5 bg-white/70 rounded-full overflow-hidden">
+            <div className={`h-full rounded-full ${c.color}`} style={{ width: `${c.pct}%` }} />
+          </div>
+          <span className="text-xs font-semibold text-gray-600 w-9 text-right">{c.pct}%</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function WorkoutMockup() {
+  const days = ['M', 'T', 'W', 'T', 'F']
+  const active = [true, false, true, true, false]
+  return (
+    <div className="flex gap-2 justify-center">
+      {days.map((d, i) => (
+        <div
+          key={d + i}
+          className={`w-12 h-[52px] rounded-xl flex flex-col items-center justify-center ${
+            active[i]
+              ? 'bg-gradient-to-b from-orange-400 to-red-500 shadow-md shadow-orange-300/40'
+              : 'bg-white/70 border border-gray-100'
+          }`}
+        >
+          <span className={`text-xs font-bold ${active[i] ? 'text-white' : 'text-gray-400'}`}>
+            {d}
+          </span>
+          {active[i] && <div className="w-1.5 h-1.5 rounded-full bg-white/80 mt-1" />}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function NutritionMockup() {
+  const meals = [
+    { label: 'B', done: true },
+    { label: 'L', done: true },
+    { label: 'D', done: false },
+  ]
+  return (
+    <div className="flex gap-4 justify-center">
+      {meals.map((m, i) => (
+        <div key={i} className="relative">
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-sm font-bold ${
+            m.done ? 'bg-green-100 text-green-600 shadow-sm shadow-green-200/40' : 'bg-white/70 text-gray-400 border border-gray-100'
+          }`}>
+            {m.label}
+          </div>
+          {m.done && (
+            <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-green-400 flex items-center justify-center shadow-sm">
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function ChartMockup() {
+  const bars = [35, 55, 45, 75, 60, 85, 70]
+  return (
+    <div className="flex items-end gap-2 h-20 justify-center">
+      {bars.map((h, i) => (
+        <div
+          key={i}
+          className="w-5 rounded-md bg-gradient-to-t from-blue-500 to-cyan-400 shadow-sm shadow-blue-200/30"
+          style={{ height: `${h}%` }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function BadgeMockup() {
+  const badges = [
+    { emoji: '\u{1F3C6}', bg: 'from-amber-200 to-yellow-100' },
+    { emoji: '\u{1F525}', bg: 'from-orange-200 to-red-100' },
+    { emoji: '\u{1F4AA}', bg: 'from-blue-200 to-indigo-100' },
+    { emoji: '\u{2B50}', bg: 'from-yellow-200 to-amber-100' },
+  ]
+  return (
+    <div className="flex gap-3 justify-center">
+      {badges.map((b, i) => (
+        <div
+          key={i}
+          className={`w-13 h-13 rounded-2xl bg-gradient-to-br ${b.bg} flex items-center justify-center shadow-sm`}
+        >
+          <span className="text-lg">{b.emoji}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function NotificationMockup() {
+  return (
+    <div className="space-y-3">
+      {[
+        { dot: 'bg-green-400', w: '80%' },
+        { dot: 'bg-orange-400', w: '60%' },
+        { dot: 'bg-purple-400', w: '45%' },
+      ].map((n, i) => (
+        <div key={i} className="flex items-center gap-3">
+          <div className={`w-3 h-3 rounded-full ${n.dot} flex-shrink-0 shadow-sm`} />
+          <div className="flex-1">
+            <div className="h-2.5 bg-white/70 rounded-full" style={{ width: n.w }} />
+            <div className="h-1.5 bg-white/40 rounded-full mt-1.5" style={{ width: `${parseInt(n.w) - 20}%` }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const featureVisuals = [
+  { Mockup: ClientMockup, bg: 'from-red-50 to-orange-50', border: 'hover:border-red-200' },
+  { Mockup: WorkoutMockup, bg: 'from-orange-50 to-amber-50', border: 'hover:border-orange-200' },
+  { Mockup: NutritionMockup, bg: 'from-green-50 to-emerald-50', border: 'hover:border-green-200' },
+  { Mockup: ChartMockup, bg: 'from-blue-50 to-cyan-50', border: 'hover:border-blue-200' },
+  { Mockup: BadgeMockup, bg: 'from-amber-50 to-yellow-50', border: 'hover:border-amber-200' },
+  { Mockup: NotificationMockup, bg: 'from-purple-50 to-violet-50', border: 'hover:border-purple-200' },
 ]
 
 export default function FeaturesGrid({ t }: FeaturesGridProps) {
   const revealRef = useScrollReveal()
 
   return (
-    <section className="mkt-section py-20 sm:py-28 bg-white">
+    <section className="mkt-section py-16 sm:py-20 bg-white">
       <div className="mkt-container">
         {/* Heading */}
         <div className="text-center">
           <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl">
             <span className="text-[#0A0A0A] block">{t.features.title1}</span>
-            <span className="text-[#FF2D2D] block">{t.features.title2}</span>
+            <span className="text-gradient block">{t.features.title2}</span>
           </h2>
         </div>
 
-        {/* Cards grid */}
+        {/* Feature cards with visual mockups */}
         <div
           ref={revealRef}
-          className="mkt-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-16"
+          className="mkt-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mt-14"
         >
-          {t.features.items.map((item, index) => (
-            <div
-              key={item.title}
-              className="mkt-reveal bg-[#F5F5F5] rounded-2xl p-6 sm:p-8 border border-[#E5E7EB] hover-lift card-glow transition-all cursor-default"
-            >
-              {/* Icon */}
-              <div className="w-12 h-12 rounded-full bg-[#FF2D2D]/10 flex items-center justify-center">
-                {featureIcons[index]}
+          {t.features.items.map((item, index) => {
+            const visual = featureVisuals[index]
+            if (!visual) return null
+            const { Mockup, bg, border } = visual
+            return (
+              <div
+                key={item.title}
+                className={`mkt-reveal group relative rounded-2xl border border-gray-100 ${border} bg-white hover:shadow-xl hover:shadow-black/[0.04] hover:-translate-y-1 transition-all duration-300 overflow-hidden`}
+              >
+                {/* Visual preview area */}
+                <div className={`bg-gradient-to-br ${bg} px-5 sm:px-8 py-7 sm:py-10 flex items-center justify-center`}>
+                  <div className="w-full max-w-[260px]">
+                    <Mockup />
+                  </div>
+                </div>
+
+                {/* Text area */}
+                <div className="px-5 py-4 sm:px-6 sm:py-5">
+                  <h3 className="text-base sm:text-lg font-bold text-[#0A0A0A]">{item.title}</h3>
+                  <p className="text-sm sm:text-[15px] text-[#6B7280] mt-1.5 leading-relaxed line-clamp-2">
+                    {item.description}
+                  </p>
+                </div>
               </div>
-              {/* Title */}
-              <h3 className="text-lg font-bold text-[#0A0A0A] mt-4">{item.title}</h3>
-              {/* Description */}
-              <p className="text-sm text-[#6B7280] mt-2 leading-relaxed">{item.description}</p>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* See All link */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-10">
           <Link
             href="/features"
-            className="inline-flex items-center gap-2 text-[#FF2D2D] font-semibold text-sm uppercase tracking-wider hover:underline transition-colors"
+            className="inline-flex items-center gap-2 text-[#DC2626] font-semibold text-sm uppercase tracking-wider hover:text-[#F97316] transition-colors"
           >
             {t.features.seeAll}
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M2.5 7h9M8 3.5L11.5 7 8 10.5"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

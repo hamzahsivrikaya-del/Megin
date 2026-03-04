@@ -35,40 +35,25 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const supabase = await createClient()
-
-  const { data: post } = await supabase
-    .from('blog_posts')
-    .select('title, content, cover_image')
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .single()
-
-  if (!post) return { title: 'Yazi Bulunamadi - Megin' }
-
-  const description = post.content?.replace(/<[^>]*>/g, '').slice(0, 160) ?? ''
-
-  return {
-    title: `${post.title} - Megin`,
-    description,
-    openGraph: {
+  try {
+    const supabase = await createClient()
+    const { data: post } = await supabase
+      .from('blog_posts')
+      .select('title, content, cover_image')
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single()
+    if (!post) return { title: 'Yazi Bulunamadi - Megin' }
+    const description = post.content?.replace(/<[^>]*>/g, '').slice(0, 160) ?? ''
+    return {
       title: `${post.title} - Megin`,
       description,
-      type: 'article',
-      ...(post.cover_image && { images: [{ url: post.cover_image, width: 1200, height: 630 }] }),
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${post.title} - Megin`,
-      description,
-      ...(post.cover_image && { images: [post.cover_image] }),
-    },
-    alternates: {
-      languages: {
-        en: `/blog/${slug}`,
-        tr: `/tr/blog/${slug}`,
-      },
-    },
+      openGraph: { title: `${post.title} - Megin`, description, type: 'article', ...(post.cover_image && { images: [{ url: post.cover_image, width: 1200, height: 630 }] }) },
+      twitter: { card: 'summary_large_image', title: `${post.title} - Megin`, description, ...(post.cover_image && { images: [post.cover_image] }) },
+      alternates: { languages: { en: `/blog/${slug}`, tr: `/tr/blog/${slug}` } },
+    }
+  } catch {
+    return { title: 'Blog - Megin' }
   }
 }
 
@@ -78,15 +63,19 @@ export default async function TurkishBlogPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const supabase = await createClient()
-
-  const { data: post } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .single()
-
+  let post
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single()
+    post = data
+  } catch {
+    notFound()
+  }
   if (!post) notFound()
 
   const isHtml = post.content?.trim().startsWith('<') ?? false
@@ -104,7 +93,7 @@ export default async function TurkishBlogPostPage({
         <div className="mkt-container">
           <Link
             href="/tr/blog"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#57534E] hover:text-[#FF2D2D] transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#57534E] hover:text-[#DC2626] transition-colors"
           >
             <svg
               width="16"
@@ -154,7 +143,7 @@ export default async function TurkishBlogPostPage({
 
           {/* Blog content: sanitized admin-only HTML - no user input */}
           <div
-            className="text-[#1A1A1A] leading-relaxed [&_h1]:mkt-heading-lg [&_h1]:text-2xl [&_h1]:mt-10 [&_h1]:mb-4 [&_h2]:mkt-heading-lg [&_h2]:text-xl [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:mb-5 [&_p]:text-[#374151] [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-5 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-5 [&_li]:mb-2 [&_li]:text-[#374151] [&_img]:w-full [&_img]:my-8 [&_strong]:font-bold [&_strong]:text-[#0A0A0A] [&_em]:italic [&_a]:text-[#FF2D2D] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[#FF2D2D] [&_blockquote]:pl-4 [&_blockquote]:my-6 [&_blockquote]:text-[#57534E] [&_blockquote]:italic"
+            className="text-[#1A1A1A] leading-relaxed [&_h1]:mkt-heading-lg [&_h1]:text-2xl [&_h1]:mt-10 [&_h1]:mb-4 [&_h2]:mkt-heading-lg [&_h2]:text-xl [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:mb-5 [&_p]:text-[#374151] [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-5 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-5 [&_li]:mb-2 [&_li]:text-[#374151] [&_img]:w-full [&_img]:my-8 [&_strong]:font-bold [&_strong]:text-[#0A0A0A] [&_em]:italic [&_a]:text-[#DC2626] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[#DC2626] [&_blockquote]:pl-4 [&_blockquote]:my-6 [&_blockquote]:text-[#57534E] [&_blockquote]:italic"
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
         </div>
@@ -187,7 +176,7 @@ export default async function TurkishBlogPostPage({
                 />
               </svg>
             </Link>
-            <Link href="/tr/blog" className="mkt-cta-ghost border-[#374151] text-white hover:border-[#FF2D2D]">
+            <Link href="/tr/blog" className="mkt-cta-ghost border-[#374151] text-white hover:border-[#DC2626]">
               Daha Fazla Makale
             </Link>
           </div>

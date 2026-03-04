@@ -18,6 +18,14 @@
   --font-display: var(--font-display);
 }
 
+/* Warm accent tokens (marketing pages) */
+:root {
+  --gradient-warm: linear-gradient(135deg, #DC2626, #F97316);
+  --gradient-warm-soft: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(249,115,22,0.06));
+  --gradient-section: linear-gradient(180deg, #FFFFFF 0%, #FFF7ED 50%, #FFFFFF 100%);
+  --gradient-dark: linear-gradient(180deg, #0A0A0A 0%, #1C0A04 50%, #0A0A0A 100%);
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
@@ -795,6 +803,7 @@ input:-webkit-autofill {
   @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider uppercase transition-all;
   background: #FF2D2D;
   color: #FFFFFF;
+  border-radius: 12px;
 }
 .mkt-cta-primary:hover {
   background: #E01F1F;
@@ -810,6 +819,7 @@ input:-webkit-autofill {
   background: transparent;
   border: 2px solid #E5E7EB;
   color: #0A0A0A;
+  border-radius: 12px;
 }
 .mkt-cta-ghost:hover {
   border-color: #FF2D2D;
@@ -817,6 +827,10 @@ input:-webkit-autofill {
 }
 .mkt-cta-ghost:active {
   transform: scale(0.97);
+}
+
+.mkt-section-spacious {
+  @apply py-28 sm:py-36;
 }
 
 /* Scroll-triggered animation base */
@@ -837,3 +851,204 @@ input:-webkit-autofill {
 .mkt-stagger > .mkt-reveal:nth-child(4) { transition-delay: 240ms; }
 .mkt-stagger > .mkt-reveal:nth-child(5) { transition-delay: 320ms; }
 .mkt-stagger > .mkt-reveal:nth-child(6) { transition-delay: 400ms; }
+.mkt-stagger > .mkt-reveal:nth-child(7) { transition-delay: 480ms; }
+.mkt-stagger > .mkt-reveal:nth-child(8) { transition-delay: 560ms; }
+
+/* ═══════════════════════════════════ */
+/* Marketing Premium Utilities         */
+/* ═══════════════════════════════════ */
+
+/* Warm gradient section background */
+.mkt-gradient-bg {
+  background: var(--gradient-section);
+}
+
+/* Glassmorphism card */
+.mkt-glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Warm glow shadow on hover */
+.mkt-glow-warm {
+  transition: box-shadow 0.3s ease;
+}
+.mkt-glow-warm:hover {
+  box-shadow: 0 8px 32px -4px rgba(249, 115, 22, 0.15), 0 4px 16px -2px rgba(220, 38, 38, 0.1);
+}
+
+/* Gradient text warm variant */
+.text-gradient-warm {
+  background: var(--gradient-warm);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium CTA button with warm gradient */
+.mkt-cta-gradient {
+  background: var(--gradient-warm);
+  color: #FFFFFF;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+}
+.mkt-cta-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -4px rgba(220, 38, 38, 0.3), 0 4px 12px -2px rgba(249, 115, 22, 0.2);
+}
+.mkt-cta-gradient:active {
+  transform: scale(0.97);
+}
+
+/* Dark section with warm gradient */
+.mkt-section-dark-warm {
+  background: var(--gradient-dark);
+  color: #FFFFFF;
+}
+
+/* Subtle diagonal pattern overlay */
+.mkt-pattern-diagonal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 255, 255, 0.5) 10px,
+    rgba(255, 255, 255, 0.5) 11px
+  );
+  pointer-events: none;
+}
+
+/* Gradient border for highlighted cards */
+.mkt-gradient-border {
+  position: relative;
+}
+.mkt-gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--gradient-warm);
+  z-index: -1;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 2px;
+}
+
+/* Pulse animation for emphasis words */
+@keyframes warm-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.mkt-pulse-emphasis {
+  animation: warm-pulse 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════ */
+/* Trust Badge Premium Styles          */
+/* ═══════════════════════════════════ */
+
+.mkt-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(249,250,251,0.9));
+  border: 1px solid rgba(229,231,235,0.8);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(255,255,255,0.8) inset;
+  transition: all 0.3s ease;
+}
+.mkt-trust-badge:hover {
+  border-color: rgba(220,38,38,0.2);
+  box-shadow: 0 2px 8px rgba(220,38,38,0.08), 0 0 0 1px rgba(255,255,255,0.8) inset;
+}
+.mkt-trust-badge-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #DC2626, #F97316);
+  flex-shrink: 0;
+}
+.mkt-trust-badge-icon svg {
+  width: 0.7rem;
+  height: 0.7rem;
+  color: white;
+}
+
+/* Mega menu dropdown styles removed — now uses conditional render + Tailwind classes */
+
+/* ═══════════════════════════════════ */
+/* Testimonial Card Styles             */
+/* ═══════════════════════════════════ */
+
+.mkt-testimonial-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 1px solid #E5E7EB;
+  transition: all 0.3s ease;
+}
+.mkt-testimonial-card:hover {
+  border-color: rgba(220,38,38,0.15);
+  box-shadow: 0 8px 24px -4px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════ */
+/* Pricing Toggle Switch               */
+/* ═══════════════════════════════════ */
+
+.mkt-pricing-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #F3F4F6;
+  border-radius: 9999px;
+  padding: 0.25rem;
+}
+.mkt-pricing-toggle button {
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6B7280;
+  transition: all 0.25s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.mkt-pricing-toggle button.active {
+  background: white;
+  color: #0A0A0A;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Annual save badge pulse */
+@keyframes save-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.mkt-save-badge {
+  animation: save-pulse 2s ease-in-out infinite;
+}

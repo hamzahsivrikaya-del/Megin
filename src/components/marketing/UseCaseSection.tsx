@@ -35,7 +35,7 @@ export default function UseCaseSection({
         {/* Label */}
         <p
           className={`mkt-reveal text-xs font-bold uppercase tracking-[0.2em] ${
-            dark ? 'text-white/60' : 'text-[#FF2D2D]'
+            dark ? 'text-white/60' : 'text-[#DC2626]'
           }`}
         >
           {label}
@@ -84,7 +84,7 @@ export default function UseCaseSection({
                   />
                   <path
                     d="M4.5 8.5L6.5 10.5L11 5.5"
-                    stroke="#FF2D2D"
+                    stroke="#DC2626"
                     strokeWidth="1.6"
                     strokeLinecap="round"
                     strokeLinejoin="round"

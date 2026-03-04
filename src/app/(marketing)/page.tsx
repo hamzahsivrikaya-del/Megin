@@ -2,8 +2,11 @@ import { en } from '@/lib/i18n/en'
 import HeroSection from '@/components/marketing/HeroSection'
 import ProblemStrip from '@/components/marketing/ProblemStrip'
 import FeaturesGrid from '@/components/marketing/FeaturesGrid'
+import TestimonialSection from '@/components/marketing/TestimonialSection'
 import StorySection from '@/components/marketing/StorySection'
+import BadgeShowcase from '@/components/marketing/BadgeShowcase'
 import NumbersStrip from '@/components/marketing/NumbersStrip'
+import ComparisonTable from '@/components/marketing/ComparisonTable'
 import CTASection from '@/components/marketing/CTASection'
 import type { Metadata } from 'next'
 
@@ -48,10 +51,13 @@ export default function HomePage() {
         // Static data only — no user input, safe for dangerouslySetInnerHTML
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
-      <HeroSection t={t} />
+      <HeroSection t={t} locale="en" />
       <ProblemStrip t={t} />
       <FeaturesGrid t={t} />
+      <TestimonialSection t={t} />
       <StorySection t={t} />
+      <ComparisonTable t={t} />
+      <BadgeShowcase t={t} locale="en" />
       <NumbersStrip t={t} />
       <CTASection t={t} />
     </>

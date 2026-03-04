@@ -21,8 +21,14 @@ export function useScrollReveal() {
       { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
     )
 
+    // Observe children with .mkt-reveal
     const elements = el.querySelectorAll('.mkt-reveal')
     elements.forEach((element) => observer.observe(element))
+
+    // Also observe the ref element itself if it has the class
+    if (el.classList.contains('mkt-reveal')) {
+      observer.observe(el)
+    }
 
     return () => observer.disconnect()
   }, [])

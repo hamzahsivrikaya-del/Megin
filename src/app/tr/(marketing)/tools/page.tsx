@@ -83,7 +83,7 @@ export default function TurkishToolsPage() {
                 className="rounded-2xl bg-white border border-[#E5E7EB] p-8 hover-lift card-glow flex flex-col group"
               >
                 <div
-                  className="w-14 h-14 rounded-full bg-[#FF2D2D]/8 border border-[#E5E7EB] flex items-center justify-center text-2xl"
+                  className="w-14 h-14 rounded-full bg-[#DC2626]/8 border border-[#E5E7EB] flex items-center justify-center text-2xl"
                   aria-hidden="true"
                 >
                   {tool.icon}
@@ -95,7 +95,7 @@ export default function TurkishToolsPage() {
                   {tool.description}
                 </p>
 
-                <p className="text-[#FF2D2D] text-sm font-semibold mt-4 flex items-center gap-1 group-hover:gap-2 transition-all">
+                <p className="text-[#DC2626] text-sm font-semibold mt-4 flex items-center gap-1 group-hover:gap-2 transition-all">
                   Hesapla
                   <svg
                     width="14"

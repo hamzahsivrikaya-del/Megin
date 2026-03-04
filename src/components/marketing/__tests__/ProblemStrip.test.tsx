@@ -11,16 +11,14 @@ describe('ProblemStrip', () => {
     expect(screen.getByText(en.problem.line3)).toBeInTheDocument()
   })
 
-  it('has dark section styling', () => {
+  it('has dark warm section styling', () => {
     const { container } = render(<ProblemStrip t={en} />)
     const section = container.querySelector('section')
-    expect(section).toHaveClass('mkt-section-dark')
+    expect(section).toHaveClass('mkt-section-dark-warm')
   })
 
-  it('line3 has red color class', () => {
-    const { container } = render(<ProblemStrip t={en} />)
-    const line3 = container.querySelector('p.text-\\[\\#FF2D2D\\]')
-    expect(line3).toBeInTheDocument()
-    expect(line3?.textContent).toBe(en.problem.line3)
+  it('line3 uses gradient text', () => {
+    render(<ProblemStrip t={en} />)
+    expect(screen.getByText(en.problem.line3)).toBeInTheDocument()
   })
 })

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     default: 'Megin — Kişisel Antrenörler İçin Platform',
   },
   description:
-    'Üye takibi, antrenman programlama, beslenme yönetimi ve ilerleme raporları — bir antrenör tarafından, antrenörler için geliştirilmiş tek platformda.',
+    'Üye takibi, antrenman programlama, beslenme yönetimi ve ilerleme raporları. Bir antrenör tarafından, antrenörler için geliştirilmiş tek platformda.',
   openGraph: {
     type: 'website',
     siteName: 'Megin',

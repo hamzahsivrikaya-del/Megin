@@ -32,14 +32,14 @@ export default function TurkishRefundPolicyPage() {
           <nav className="mb-6">
             <Link
               href="/tr"
-              className="text-xs text-[#9CA3AF] hover:text-[#FF2D2D] transition-colors"
+              className="text-xs text-[#9CA3AF] hover:text-[#DC2626] transition-colors"
             >
               Ana Sayfa
             </Link>
             <span className="text-[#9CA3AF] mx-2">/</span>
             <span className="text-xs text-[#0A0A0A]">İade Politikası</span>
           </nav>
-          <p className="text-xs font-bold tracking-widest uppercase text-[#FF2D2D] mb-3">
+          <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">
             Yasal
           </p>
           <h1 className="mkt-heading-xl text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
@@ -81,7 +81,7 @@ export default function TurkishRefundPolicyPage() {
                 <strong className="text-[#0A0A0A]">E-posta:</strong>{' '}
                 <a
                   href="mailto:hello@megin.io"
-                  className="text-[#FF2D2D] underline hover:no-underline"
+                  className="text-[#DC2626] underline hover:no-underline"
                 >
                   hello@megin.io
                 </a>
@@ -133,7 +133,7 @@ export default function TurkishRefundPolicyPage() {
                 <strong className="text-[#0A0A0A]">E-posta:</strong>{' '}
                 <a
                   href="mailto:hello@megin.io"
-                  className="text-[#FF2D2D] underline hover:no-underline"
+                  className="text-[#DC2626] underline hover:no-underline"
                 >
                   hello@megin.io
                 </a>
@@ -147,13 +147,13 @@ export default function TurkishRefundPolicyPage() {
           <div className="border-t border-[#E5E7EB] pt-8 flex flex-col sm:flex-row gap-4">
             <Link
               href="/tr/legal/privacy"
-              className="text-sm font-semibold text-[#57534E] hover:text-[#FF2D2D] transition-colors"
+              className="text-sm font-semibold text-[#57534E] hover:text-[#DC2626] transition-colors"
             >
               Gizlilik Politikası
             </Link>
             <Link
               href="/tr/legal/terms"
-              className="text-sm font-semibold text-[#57534E] hover:text-[#FF2D2D] transition-colors"
+              className="text-sm font-semibold text-[#57534E] hover:text-[#DC2626] transition-colors"
             >
               Kullanım Koşulları
             </Link>

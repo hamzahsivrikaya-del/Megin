@@ -19,7 +19,7 @@ const CLIENT_COUNT_OPTIONS = [
 ]
 
 const INPUT_BASE =
-  'w-full border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF2D2D] transition-colors'
+  'w-full border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 transition-colors'
 
 export default function ContactForm() {
   const [form, setForm] = useState<FormState>({
@@ -49,7 +49,7 @@ export default function ContactForm() {
       <section className="mkt-section pt-32 pb-16 bg-white">
         <div className="mkt-container">
           <div className="max-w-2xl">
-            <p className="text-xs font-bold tracking-widest uppercase text-[#FF2D2D] mb-3">
+            <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">
               Contact
             </p>
             <h1 className="mkt-heading-xl text-4xl sm:text-5xl text-[#0A0A0A]">
@@ -71,7 +71,7 @@ export default function ContactForm() {
             <div>
               {submitted ? (
                 <div className="border border-[#E5E7EB] p-10 text-center space-y-4">
-                  <div className="w-12 h-12 rounded-full bg-[#FF2D2D]/10 flex items-center justify-center mx-auto">
+                  <div className="w-12 h-12 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto">
                     <svg
                       width="22"
                       height="22"
@@ -81,7 +81,7 @@ export default function ContactForm() {
                     >
                       <path
                         d="M5 13l4 4L19 7"
-                        stroke="#FF2D2D"
+                        stroke="#DC2626"
                         strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -99,7 +99,7 @@ export default function ContactForm() {
                       setSubmitted(false)
                       setForm({ name: '', email: '', message: '', clientCount: '' })
                     }}
-                    className="text-sm font-semibold text-[#FF2D2D] hover:underline mt-2 cursor-pointer"
+                    className="text-sm font-semibold text-[#DC2626] hover:underline mt-2 cursor-pointer"
                   >
                     Send another message
                   </button>
@@ -113,7 +113,7 @@ export default function ContactForm() {
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
                       Full Name{' '}
-                      <span className="text-[#FF2D2D]" aria-hidden="true">
+                      <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
                     </label>
@@ -137,7 +137,7 @@ export default function ContactForm() {
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
                       Email Address{' '}
-                      <span className="text-[#FF2D2D]" aria-hidden="true">
+                      <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
                     </label>
@@ -187,7 +187,7 @@ export default function ContactForm() {
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
                       Message{' '}
-                      <span className="text-[#FF2D2D]" aria-hidden="true">
+                      <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
                     </label>
@@ -205,7 +205,7 @@ export default function ContactForm() {
 
                   <button
                     type="submit"
-                    className="mkt-cta-primary w-full sm:w-auto"
+                    className="mkt-cta-gradient w-full sm:w-auto"
                   >
                     Send Message
                     <svg
@@ -233,7 +233,7 @@ export default function ContactForm() {
                   Just want to try the platform?{' '}
                   <Link
                     href="/signup"
-                    className="font-semibold text-[#FF2D2D] hover:underline"
+                    className="font-semibold text-[#DC2626] hover:underline"
                   >
                     Get started free
                   </Link>{' '}
@@ -265,12 +265,12 @@ export default function ContactForm() {
                           width="18"
                           height="14"
                           rx="1"
-                          stroke="#FF2D2D"
+                          stroke="#DC2626"
                           strokeWidth="1.5"
                         />
                         <path
                           d="M3 8l9 6 9-6"
-                          stroke="#FF2D2D"
+                          stroke="#DC2626"
                           strokeWidth="1.5"
                           strokeLinecap="round"
                         />
@@ -282,7 +282,7 @@ export default function ContactForm() {
                       </p>
                       <a
                         href="mailto:hello@megin.io"
-                        className="text-sm text-[#0A0A0A] font-semibold hover:text-[#FF2D2D] transition-colors"
+                        className="text-sm text-[#0A0A0A] font-semibold hover:text-[#DC2626] transition-colors"
                       >
                         hello@megin.io
                       </a>
@@ -299,10 +299,10 @@ export default function ContactForm() {
                         fill="none"
                         aria-hidden="true"
                       >
-                        <circle cx="12" cy="12" r="9" stroke="#FF2D2D" strokeWidth="1.5" />
+                        <circle cx="12" cy="12" r="9" stroke="#DC2626" strokeWidth="1.5" />
                         <path
                           d="M12 7v5l3 3"
-                          stroke="#FF2D2D"
+                          stroke="#DC2626"
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -337,7 +337,7 @@ export default function ContactForm() {
                 </p>
                 <Link
                   href="/pricing#faq"
-                  className="text-sm font-bold text-[#FF2D2D] flex items-center gap-1.5 hover:gap-2.5 transition-all"
+                  className="text-sm font-bold text-[#DC2626] flex items-center gap-1.5 hover:gap-2.5 transition-all"
                 >
                   View FAQ
                   <svg

@@ -1,5 +1,7 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
-import UseCaseSection from '@/components/marketing/UseCaseSection'
+import { User, Building2, Globe, ArrowRight } from 'lucide-react'
+import { tr } from '@/lib/i18n/tr'
 
 export const metadata: Metadata = {
   title: 'Kullanım Senaryoları | Megin',
@@ -13,7 +15,11 @@ export const metadata: Metadata = {
   },
 }
 
+const icons = [User, Building2, Globe]
+
 export default function TurkishUseCasesPage() {
+  const segments = tr.useCases.segments
+
   return (
     <>
       <section className="mkt-section pt-32 pb-16 text-center bg-white">
@@ -27,47 +33,31 @@ export default function TurkishUseCasesPage() {
         </div>
       </section>
 
-      <UseCaseSection
-        label="Bağımsız Antrenör"
-        title="10-30 ÜYE ANTRENMAN ETTİRİYORSUNUZ"
-        description="Elektronik tablolarla uğraşmayı bırakın. İşinizi büyütmeye başlayın."
-        features={[
-          'Üye paketleri',
-          'Antrenman programlama',
-          'İlerleme takibi',
-          'Otomatik hatırlatıcılar',
-        ]}
-        dark={false}
-        ctaVariant="primary"
-      />
-
-      <UseCaseSection
-        label="Spor Salonu / Stüdyo"
-        title="ÇOKLU ANTRENÖR YÖNETİYORSUNUZ"
-        description="Ekibinize araçları verin. Genel bakışı koruyun."
-        features={[
-          'Çoklu antrenör yönetimi',
-          'Üye devri',
-          'Gelir takibi',
-          'Merkezi veri',
-        ]}
-        dark={true}
-        ctaVariant="primary"
-      />
-
-      <UseCaseSection
-        label="Online Koç"
-        title="ÜYELERİNİZ UZAKTAN ÇALIŞIYOR"
-        description="Onları her yerden hesap verebilir tutun."
-        features={[
-          'Fotoğraflı beslenme takibi',
-          'Haftalık raporlar',
-          'Rozet motivasyonu',
-          'PWA mobil uygulama',
-        ]}
-        dark={false}
-        ctaVariant="ghost"
-      />
+      <section className="mkt-section pb-24 bg-white">
+        <div className="mkt-container">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {segments.map((segment, index) => {
+              const Icon = icons[index]
+              return (
+                <Link
+                  key={segment.slug}
+                  href={`/tr/use-cases/${segment.slug}`}
+                  className="group rounded-2xl bg-[#F5F5F5] border border-[#E5E7EB] p-8 hover-lift transition-all"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#DC2626] to-[#F97316] flex items-center justify-center mb-6 shadow-lg shadow-red-500/10">
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-xl font-bold text-[#0A0A0A] mb-2">{segment.label}</h2>
+                  <p className="text-[#6B7280] text-sm leading-relaxed mb-4">{segment.description}</p>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase text-[#DC2626] group-hover:gap-2.5 transition-all">
+                    Detayları Gör <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </section>
     </>
   )
 }

@@ -18,38 +18,35 @@ export default function MarketingFooter({ locale }: MarketingFooterProps) {
   const resourceLinks = [
     { href: localePath('/blog', locale), label: t.nav.blog },
     { href: localePath('/tools', locale), label: t.nav.tools },
-    { href: localePath('/contact', locale), label: 'Contact' },
+    { href: localePath('/contact', locale), label: locale === 'tr' ? 'İletişim' : 'Contact' },
   ]
 
   const legalLinks = [
-    { href: '/legal/privacy', label: t.footer.privacy },
-    { href: '/legal/terms', label: t.footer.terms },
-    { href: '/legal/refund', label: t.footer.refund },
-  ]
-
-  const connectLinks = [
-    { href: '#', label: 'Twitter' },
-    { href: '#', label: 'Instagram' },
+    { href: localePath('/legal/privacy', locale), label: t.footer.privacy },
+    { href: localePath('/legal/terms', locale), label: t.footer.terms },
+    { href: localePath('/legal/refund', locale), label: t.footer.refund },
   ]
 
   return (
-    <footer className="bg-[#F5F5F5] border-t border-[#E5E7EB]">
+    <footer className="bg-[#FAFAFA] border-t border-[#E5E7EB]">
       <div className="max-w-6xl mx-auto px-4 py-16">
         {/* Top section */}
         <div className="flex flex-col md:flex-row gap-12 md:gap-16">
-          {/* Logo */}
+          {/* Logo + tagline */}
           <div className="md:w-48 shrink-0">
             <Link
               href={localePath('/', locale)}
               className="font-display text-xl tracking-[0.15em] text-[#0A0A0A]"
             >
-              MEGIN<span className="text-[#FF2D2D]">.</span>
+              MEGIN<span className="text-[#DC2626]">.</span>
             </Link>
             <p className="mt-3 text-sm text-[#57534E] leading-relaxed">
               {locale === 'tr'
                 ? 'Antrenörler için geliştirilmiş üye yönetim platformu.'
                 : 'Client management platform built for personal trainers.'}
             </p>
+            {/* Warm accent line */}
+            <div className="w-12 h-1 rounded-full bg-gradient-to-r from-[#DC2626] to-[#F97316] mt-4" />
           </div>
 
           {/* 4-column link grid */}
@@ -64,7 +61,7 @@ export default function MarketingFooter({ locale }: MarketingFooterProps) {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-[#57534E] hover:text-[#FF2D2D] transition-colors"
+                      className="text-sm text-[#57534E] hover:text-[#DC2626] transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -83,7 +80,7 @@ export default function MarketingFooter({ locale }: MarketingFooterProps) {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-[#57534E] hover:text-[#FF2D2D] transition-colors"
+                      className="text-sm text-[#57534E] hover:text-[#DC2626] transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -102,7 +99,7 @@ export default function MarketingFooter({ locale }: MarketingFooterProps) {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-[#57534E] hover:text-[#FF2D2D] transition-colors"
+                      className="text-sm text-[#57534E] hover:text-[#DC2626] transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -117,18 +114,16 @@ export default function MarketingFooter({ locale }: MarketingFooterProps) {
                 {t.footer.connect}
               </h3>
               <ul className="flex flex-col gap-2.5">
-                {connectLinks.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-[#57534E] hover:text-[#FF2D2D] transition-colors"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
+                <li>
+                  <span className="text-sm text-[#57534E]/50 cursor-default">
+                    Twitter <span className="text-xs">(Coming Soon)</span>
+                  </span>
+                </li>
+                <li>
+                  <span className="text-sm text-[#57534E]/50 cursor-default">
+                    Instagram <span className="text-xs">(Coming Soon)</span>
+                  </span>
+                </li>
               </ul>
             </div>
           </div>
@@ -142,7 +137,7 @@ export default function MarketingFooter({ locale }: MarketingFooterProps) {
           <div className="flex items-center gap-1.5 text-xs font-semibold">
             <Link
               href="/"
-              className={locale === 'en' ? 'text-[#FF2D2D]' : 'text-[#57534E] hover:text-[#FF2D2D] transition-colors'}
+              className={locale === 'en' ? 'text-[#DC2626]' : 'text-[#57534E] hover:text-[#DC2626] transition-colors'}
               aria-label="Switch to English"
             >
               EN
@@ -150,7 +145,7 @@ export default function MarketingFooter({ locale }: MarketingFooterProps) {
             <span className="text-gray-300">|</span>
             <Link
               href="/tr"
-              className={locale === 'tr' ? 'text-[#FF2D2D]' : 'text-[#57534E] hover:text-[#FF2D2D] transition-colors'}
+              className={locale === 'tr' ? 'text-[#DC2626]' : 'text-[#57534E] hover:text-[#DC2626] transition-colors'}
               aria-label="Turkce'ye gec"
             >
               TR

@@ -39,15 +39,18 @@ function getExcerpt(content: string | null): string {
 }
 
 export default async function MarketingBlogPage() {
-  const supabase = await createClient()
-
-  const { data: posts } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
-
-  const typedPosts: BlogPost[] = posts ?? []
+  let typedPosts: BlogPost[] = []
+  try {
+    const supabase = await createClient()
+    const { data: posts } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+    typedPosts = (posts ?? []) as BlogPost[]
+  } catch {
+    typedPosts = []
+  }
   const [featuredPost, ...restPosts] = typedPosts
 
   return (
@@ -56,7 +59,7 @@ export default async function MarketingBlogPage() {
       <section className="mkt-section pt-32 pb-16 bg-white">
         <div className="mkt-container">
           <div className="max-w-2xl">
-            <p className="text-xs font-bold tracking-widest uppercase text-[#FF2D2D] mb-3">
+            <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">
               Blog
             </p>
             <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
@@ -85,7 +88,7 @@ export default async function MarketingBlogPage() {
               {featuredPost && (
                 <Link
                   href={`/blog/${featuredPost.slug}`}
-                  className="group block border border-[#E5E7EB] hover:border-[#FF2D2D]/40 transition-colors overflow-hidden"
+                  className="group block border border-[#E5E7EB] hover:border-[#DC2626]/40 transition-colors overflow-hidden"
                   aria-label={`Read: ${featuredPost.title}`}
                 >
                   <div className="grid md:grid-cols-2">
@@ -102,7 +105,7 @@ export default async function MarketingBlogPage() {
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center bg-[#F5F5F5]">
-                          <div className="w-16 h-16 rounded-xl bg-[#FF2D2D]/10 flex items-center justify-center">
+                          <div className="w-16 h-16 rounded-xl bg-[#DC2626]/10 flex items-center justify-center">
                             <svg
                               width="28"
                               height="28"
@@ -112,7 +115,7 @@ export default async function MarketingBlogPage() {
                             >
                               <path
                                 d="M4 4h16v16H4zM4 9h16M9 4v16"
-                                stroke="#FF2D2D"
+                                stroke="#DC2626"
                                 strokeWidth="1.5"
                                 strokeLinecap="round"
                                 opacity="0.6"
@@ -125,10 +128,10 @@ export default async function MarketingBlogPage() {
 
                     {/* Content */}
                     <div className="p-8 md:p-12 flex flex-col justify-center">
-                      <span className="text-xs font-bold tracking-widest uppercase text-[#FF2D2D] mb-4 block">
+                      <span className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-4 block">
                         Featured
                       </span>
-                      <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] group-hover:text-[#FF2D2D] transition-colors leading-tight">
+                      <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] group-hover:text-[#DC2626] transition-colors leading-tight">
                         {featuredPost.title}
                       </h2>
                       <p className="text-[#6B7280] mt-4 leading-relaxed text-base">
@@ -140,7 +143,7 @@ export default async function MarketingBlogPage() {
                             ? formatDate(featuredPost.published_at)
                             : ''}
                         </span>
-                        <span className="text-xs font-bold tracking-wider uppercase text-[#FF2D2D] flex items-center gap-1.5">
+                        <span className="text-xs font-bold tracking-wider uppercase text-[#DC2626] flex items-center gap-1.5">
                           Read Article
                           <svg
                             width="14"
@@ -171,7 +174,7 @@ export default async function MarketingBlogPage() {
                     <Link
                       key={post.id}
                       href={`/blog/${post.slug}`}
-                      className="group block border border-[#E5E7EB] hover:border-[#FF2D2D]/40 transition-colors overflow-hidden"
+                      className="group block border border-[#E5E7EB] hover:border-[#DC2626]/40 transition-colors overflow-hidden"
                       aria-label={`Read: ${post.title}`}
                     >
                       {/* Cover image */}
@@ -186,7 +189,7 @@ export default async function MarketingBlogPage() {
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-12 h-12 rounded-xl bg-[#FF2D2D]/10 flex items-center justify-center">
+                            <div className="w-12 h-12 rounded-xl bg-[#DC2626]/10 flex items-center justify-center">
                               <svg
                                 width="22"
                                 height="22"
@@ -196,7 +199,7 @@ export default async function MarketingBlogPage() {
                               >
                                 <path
                                   d="M4 4h16v16H4zM4 9h16M9 4v16"
-                                  stroke="#FF2D2D"
+                                  stroke="#DC2626"
                                   strokeWidth="1.5"
                                   strokeLinecap="round"
                                   opacity="0.6"
@@ -209,7 +212,7 @@ export default async function MarketingBlogPage() {
 
                       {/* Content */}
                       <div className="p-6">
-                        <h2 className="mkt-heading-lg text-lg text-[#0A0A0A] group-hover:text-[#FF2D2D] transition-colors leading-tight">
+                        <h2 className="mkt-heading-lg text-lg text-[#0A0A0A] group-hover:text-[#DC2626] transition-colors leading-tight">
                           {post.title}
                         </h2>
                         <p className="text-[#6B7280] mt-3 text-sm leading-relaxed line-clamp-3">
@@ -219,7 +222,7 @@ export default async function MarketingBlogPage() {
                           <span className="text-xs text-[#9CA3AF]">
                             {post.published_at ? formatDate(post.published_at) : ''}
                           </span>
-                          <span className="text-xs font-bold tracking-wider uppercase text-[#FF2D2D] flex items-center gap-1">
+                          <span className="text-xs font-bold tracking-wider uppercase text-[#DC2626] flex items-center gap-1">
                             Read
                             <svg
                               width="12"

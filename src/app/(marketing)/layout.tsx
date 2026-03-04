@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     default: 'Megin — The Platform for Personal Trainers',
   },
   description:
-    'Client tracking, workout programming, nutrition management, and progress reports — all in one platform built by a trainer, for trainers.',
+    'Client tracking, workout programming, nutrition management, and progress reports, all in one platform built by a trainer, for trainers.',
   openGraph: {
     type: 'website',
     siteName: 'Megin',

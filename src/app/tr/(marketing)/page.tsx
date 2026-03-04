@@ -2,8 +2,11 @@ import { tr } from '@/lib/i18n/tr'
 import HeroSection from '@/components/marketing/HeroSection'
 import ProblemStrip from '@/components/marketing/ProblemStrip'
 import FeaturesGrid from '@/components/marketing/FeaturesGrid'
+import TestimonialSection from '@/components/marketing/TestimonialSection'
 import StorySection from '@/components/marketing/StorySection'
+import BadgeShowcase from '@/components/marketing/BadgeShowcase'
 import NumbersStrip from '@/components/marketing/NumbersStrip'
+import ComparisonTable from '@/components/marketing/ComparisonTable'
 import CTASection from '@/components/marketing/CTASection'
 import type { Metadata } from 'next'
 
@@ -55,10 +58,13 @@ export default function TurkishHomePage() {
         // Static schema data only — safe for dangerouslySetInnerHTML
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
-      <HeroSection t={t} />
+      <HeroSection t={t} locale="tr" />
       <ProblemStrip t={t} />
       <FeaturesGrid t={t} />
+      <TestimonialSection t={t} />
       <StorySection t={t} />
+      <ComparisonTable t={t} />
+      <BadgeShowcase t={t} locale="tr" />
       <NumbersStrip t={t} />
       <CTASection t={t} />
     </>

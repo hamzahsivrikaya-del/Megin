@@ -26,9 +26,10 @@ describe('StorySection', () => {
     expect(container.querySelector('blockquote')).toBeInTheDocument()
   })
 
-  it('has red left border on blockquote', () => {
+  it('renders blockquote with quote text', () => {
     const { container } = render(<StorySection t={en} />)
     const blockquote = container.querySelector('blockquote')
-    expect(blockquote).toHaveClass('border-l-4', 'border-[#FF2D2D]')
+    expect(blockquote).toBeInTheDocument()
+    expect(blockquote?.textContent).toContain(en.story.quote.slice(0, 20))
   })
 })

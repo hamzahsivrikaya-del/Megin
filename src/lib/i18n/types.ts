@@ -30,6 +30,7 @@ export interface MarketingTranslations {
     items: Array<{
       title: string
       description: string
+      bullets?: string[]
     }>
   }
   story: {
@@ -50,6 +51,101 @@ export interface MarketingTranslations {
     title2: string
     button: string
     subtext: string
+  }
+  badges: {
+    title: string
+    subtitle: string
+  }
+  useCases: {
+    segments: Array<{
+      slug: string
+      label: string
+      title: string
+      description: string
+      features: string[]
+      heroDescription: string
+      benefits: string[]
+      problemStrip: string
+      extendedFeatures: Array<{ title: string; description: string }>
+      comparisonBefore: string[]
+      comparisonAfter: string[]
+      faqItems: Array<{ question: string; answer: string }>
+      testimonialQuote: string
+      testimonialName: string
+      testimonialRole: string
+    }>
+  }
+  comparison: {
+    title: string
+    subtitle: string
+    megin: string
+    excel: string
+    whatsapp: string
+    rows: Array<{
+      feature: string
+      megin: string
+      excel: string
+      whatsapp: string
+    }>
+  }
+  testimonials: {
+    title: string
+    subtitle: string
+    items: Array<{
+      quote: string
+      name: string
+      role: string
+      rating: number
+    }>
+  }
+  pricing: {
+    title: string
+    subtitle: string
+    monthly: string
+    annual: string
+    savePercent: string
+    perMonth: string
+    perYear: string
+    mostPopular: string
+    miniTestimonials: string[]
+    startFree: string
+    startTrial: string
+    contactUs: string
+    cancelAnytime: string
+    trialNote: string
+    tiers: Array<{
+      badge: string
+      monthlyPrice: number
+      annualPrice: number
+      limit: string
+      features: string[]
+    }>
+    faq: {
+      title: string
+      items: Array<{
+        question: string
+        answer: string
+      }>
+    }
+  }
+  featuresPage: {
+    title: string
+    subtitle: string
+    ctaTitle: string
+    ctaButton: string
+    items: Array<{
+      title: string
+      description: string
+      bullets: string[]
+    }>
+  }
+  megaMenu: {
+    byUseCase: string
+    byBusiness: string
+    bySize: string
+    useCases: Array<{ title: string; description: string }>
+    businesses: Array<{ title: string; description: string }>
+    sizes: Array<{ title: string; description: string }>
   }
   footer: {
     product: string
