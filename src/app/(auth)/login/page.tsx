@@ -76,15 +76,12 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md">
         {/* Logo + Başlık */}
         <div className="text-center mb-10 animate-fade-up">
-          <h1 className="font-display text-6xl tracking-wider text-primary">
-            HAMZA
+          <h1 className="font-display text-6xl tracking-wider text-[#0A0A0A]">
+            MEGIN<span className="text-[#FF2D2D]">.</span>
           </h1>
-          <h2 className="font-display text-4xl tracking-wider text-text-primary -mt-1">
-            SİVRİKAYA
-          </h2>
           <div className="flex items-center justify-center gap-3 mt-3">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-primary/50" />
-            <p className="text-xs text-text-secondary uppercase tracking-[0.3em]">Kişisel Antrenör</p>
+            <p className="text-xs text-text-secondary uppercase tracking-[0.3em]">The Platform for Personal Trainers</p>
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-primary/50" />
           </div>
         </div>
@@ -138,7 +135,7 @@ export default function LoginPage() {
 
         {/* Alt yazı */}
         <p className="text-center text-xs text-text-secondary/50 mt-8 animate-fade-up delay-400">
-          hamzasivrikaya.com
+          megin.io
         </p>
       </div>
     </div>

@@ -53,7 +53,7 @@ describe('SignupForm', () => {
 
   it('renders trust signals on right side panel', () => {
     render(<SignupForm />)
-    expect(screen.getByText('Free for up to 3 clients')).toBeInTheDocument()
+    expect(screen.getByText('Free for up to 5 clients')).toBeInTheDocument()
     expect(screen.getByText('No credit card required')).toBeInTheDocument()
     expect(screen.getByText('Cancel anytime')).toBeInTheDocument()
   })
