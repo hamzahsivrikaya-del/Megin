@@ -1,6 +1,6 @@
 # Megin — Personal Trainer SaaS Platformu
 
-> **Repo:** github.com/hamzahsivrikaya-del/hamza-web-site (private)
+> **Repo:** github.com/hamzahsivrikaya-del/Megin (private)
 > **Deploy:** Vercel | **DB:** Supabase Cloud | **Dil:** Turkce
 > **Durum:** Cekirdek platform tamamlandi, SaaS donusumu + landing page tasarimi devam ediyor
 
