@@ -33,7 +33,11 @@ export default function ForgotPasswordPage() {
     })
 
     if (error) {
-      setError(error.message)
+      if (error.message.toLowerCase().includes('rate') || error.status === 429) {
+        setError('Çok fazla deneme yaptınız. Lütfen birkaç dakika bekleyip tekrar deneyin.')
+      } else {
+        setError(error.message)
+      }
     } else {
       setSent(true)
     }

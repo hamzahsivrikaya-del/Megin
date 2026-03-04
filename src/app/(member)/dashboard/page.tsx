@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
-import { formatDate, daysRemaining, getPackageStatusLabel, formatPrice } from '@/lib/utils'
+import { formatDate, daysRemaining, getPackageStatusLabel, formatPrice, getMonday, getDayName, toDateStr } from '@/lib/utils'
 import type { MemberMeal, MemberGoal, Package, Measurement } from '@/lib/types'
 import BadgeStrip from '@/components/shared/BadgeStrip'
 
@@ -47,12 +47,18 @@ export default async function MemberDashboard() {
   }
 
   // Kritik veri — hemen render
+  const monday = getMonday()
+  const sundayDate = new Date(monday + 'T00:00:00')
+  sundayDate.setDate(sundayDate.getDate() + 6)
+  const sunday = toDateStr(sundayDate)
+
   const [
     { data: profile },
     { data: activePackage },
     { data: firstLesson },
     { data: memberMeals },
     { data: todayMeals },
+    { data: weekLessons },
   ] = await Promise.all([
     supabase.from('users').select('*').eq('id', user.id).single(),
     supabase
@@ -80,6 +86,13 @@ export default async function MemberDashboard() {
       .select('meal_id, status')
       .eq('user_id', user.id)
       .eq('date', new Date().toISOString().split('T')[0]),
+    supabase
+      .from('lessons')
+      .select('date, start_time')
+      .eq('user_id', user.id)
+      .gte('date', monday)
+      .lte('date', sunday)
+      .order('date'),
   ])
 
   const remaining = activePackage
@@ -109,7 +122,7 @@ export default async function MemberDashboard() {
   return (
     <div className="space-y-6">
       {/* Hoşgeldin kartı */}
-      <Card className="border-primary/20 gradient-border animate-fade-up">
+      <Card className="border-primary/30 gradient-border animate-fade-up">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 rounded-full bg-surface-hover border-2 border-border overflow-hidden flex-shrink-0">
@@ -194,7 +207,7 @@ export default async function MemberDashboard() {
 
       {/* Bugünün Beslenmesi */}
       <Link href="/dashboard/beslenme" className="block">
-        <Card className="hover-lift card-glow animate-fade-up delay-100">
+        <Card className="border-primary/30 hover-lift card-glow animate-fade-up delay-100">
           {memberMeals && memberMeals.length > 0 ? (() => {
             const compliantCount = todayMeals?.filter((m: { status: string }) => m.status === 'compliant').length || 0
             const total = memberMeals.length
@@ -275,10 +288,53 @@ export default async function MemberDashboard() {
         </Card>
       </Link>
 
+      {/* Ders Programım */}
+      <Card className="border-primary/30 animate-fade-up delay-100">
+        <div className="flex items-center gap-2 mb-3">
+          <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <h3 className="font-semibold text-text-primary">Ders Programım</h3>
+        </div>
+        {weekLessons && weekLessons.length > 0 ? (
+          <div className="space-y-1.5">
+            {weekLessons.map((lesson: { date: string; start_time: string | null }, i: number) => {
+              const lessonDate = new Date(lesson.date + 'T00:00:00')
+              const dayIdx = lessonDate.getDay() === 0 ? 6 : lessonDate.getDay() - 1
+              const todayStr = toDateStr(new Date())
+              const isPast = lesson.date < todayStr
+              const isToday = lesson.date === todayStr
+
+              return (
+                <div
+                  key={i}
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg ${
+                    isToday ? 'bg-primary/5 border border-primary/15' : 'bg-surface-hover'
+                  }`}
+                >
+                  <span className={`text-sm font-medium ${
+                    isToday ? 'text-primary' : isPast ? 'text-text-secondary' : 'text-text-primary'
+                  }`}>
+                    {getDayName(dayIdx)}
+                  </span>
+                  <span className={`text-sm ${
+                    isToday ? 'text-primary font-semibold' : isPast ? 'text-text-secondary' : 'text-text-primary'
+                  }`}>
+                    {lesson.start_time || '—'}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-text-secondary">Bu hafta planlanmış ders yok</p>
+        )}
+      </Card>
+
       {/* Hizli linkler */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Link href="/dashboard/program">
-          <Card className="hover-lift card-glow text-center cursor-pointer animate-fade-up delay-200">
+          <Card className="border-primary/30 hover-lift card-glow text-center cursor-pointer animate-fade-up delay-200">
             <svg className="w-6 h-6 mx-auto text-primary mb-2" fill="currentColor" viewBox="0 0 24 24">
               <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
             </svg>
@@ -286,7 +342,7 @@ export default async function MemberDashboard() {
           </Card>
         </Link>
         <Link href="/dashboard/progress">
-          <Card className="hover-lift card-glow text-center cursor-pointer animate-fade-up delay-300">
+          <Card className="border-primary/30 hover-lift card-glow text-center cursor-pointer animate-fade-up delay-300">
             <svg className="w-6 h-6 mx-auto text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -295,7 +351,7 @@ export default async function MemberDashboard() {
           </Card>
         </Link>
         <Link href="/dashboard/packages">
-          <Card className="hover-lift card-glow text-center cursor-pointer animate-fade-up delay-400">
+          <Card className="border-primary/30 hover-lift card-glow text-center cursor-pointer animate-fade-up delay-400">
             <svg className="w-6 h-6 mx-auto text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -304,7 +360,7 @@ export default async function MemberDashboard() {
           </Card>
         </Link>
         <Link href="/dashboard/haftalik-ozet">
-          <Card className="hover-lift card-glow text-center cursor-pointer animate-fade-up delay-500">
+          <Card className="border-primary/30 hover-lift card-glow text-center cursor-pointer animate-fade-up delay-500">
             <svg className="w-6 h-6 mx-auto text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -377,7 +433,7 @@ async function DeferredSections({ userId }: { userId: string }) {
     <>
       {/* Geçmiş Paketler */}
       {pastPackages && pastPackages.length > 0 && (
-        <Card>
+        <Card className="border-primary/30">
           <CardHeader><CardTitle>Geçmiş Paketler</CardTitle></CardHeader>
           <div className="space-y-3 mt-2">
             {pastPackages.map((pkg) => (
@@ -417,7 +473,7 @@ async function DeferredSections({ userId }: { userId: string }) {
 
       {/* Son ölçüm */}
       {recentMeasurement && (
-        <Card>
+        <Card className="border-primary/30">
           <CardHeader><CardTitle>Son Ölçüm</CardTitle></CardHeader>
           <div className="text-xs text-text-secondary mb-3">{formatDate(recentMeasurement.date)}</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -522,7 +578,7 @@ async function DeferredSections({ userId }: { userId: string }) {
 
       {/* Blog yazıları */}
       {blogPosts && blogPosts.length > 0 && (
-        <Card>
+        <Card className="border-primary/30">
           <CardHeader><CardTitle>Son Yazılar</CardTitle></CardHeader>
           <div className="space-y-3">
             {blogPosts.map((post) => (
@@ -567,7 +623,7 @@ async function DeferredSections({ userId }: { userId: string }) {
             const initials = dep.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
 
             return (
-              <Card key={dep.id} className="overflow-hidden animate-fade-up">
+              <Card key={dep.id} className="border-primary/30 overflow-hidden animate-fade-up">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
                     <span className="text-sm font-bold text-primary tracking-tight">{initials}</span>

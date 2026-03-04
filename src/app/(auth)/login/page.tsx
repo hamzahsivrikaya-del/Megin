@@ -1,11 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+
+const ERROR_MESSAGES: Record<string, string> = {
+  link_gecersiz: 'Şifre sıfırlama linki geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.',
+  session_hatasi: 'Oturum oluşturulamadı. Lütfen tekrar deneyin.',
+}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -13,6 +18,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const errorParam = params.get('error')
+    if (errorParam) {
+      setError(ERROR_MESSAGES[errorParam] || 'Bir hata oluştu. Lütfen tekrar deneyin.')
+    }
+  }, [])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()

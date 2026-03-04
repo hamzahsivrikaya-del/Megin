@@ -372,6 +372,92 @@ input:-webkit-autofill {
 }
 
 /* ═══════════════════════════════════ */
+/* FullCalendar — Apple Calendar tarzı */
+/* ═══════════════════════════════════ */
+.fc {
+  --fc-border-color: var(--color-border);
+  --fc-today-bg-color: rgba(220, 38, 38, 0.03);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: transparent;
+  --fc-now-indicator-color: var(--color-primary);
+}
+.fc .fc-col-header-cell {
+  background: var(--color-surface);
+  padding: 10px 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-bottom: 2px solid var(--color-border);
+}
+.fc .fc-timegrid-slot {
+  height: 3.5rem;
+}
+.fc .fc-timegrid-slot-label {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  padding-right: 8px;
+}
+/* Event — sol kenarlık + açık arka plan (Apple Calendar stili) */
+.fc-event {
+  border-radius: 4px !important;
+  font-size: 0.8rem;
+  padding: 0 !important;
+  border: none !important;
+  border-left: 3px solid var(--fc-event-border-color, #3b82f6) !important;
+  box-shadow: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+.fc-event:hover {
+  filter: brightness(0.95);
+  transition: filter 0.15s ease;
+}
+.fc-event .fc-event-main {
+  padding: 3px 6px;
+}
+/* Custom event content */
+.fc-event-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+.fc-event-name {
+  font-weight: 600;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fc-event-time {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  line-height: 1.2;
+}
+/* Now indicator */
+.fc .fc-timegrid-now-indicator-line {
+  border-color: var(--color-primary);
+  border-width: 2px;
+}
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: var(--color-primary);
+  border-width: 5px;
+}
+/* Today header */
+.fc-day-today .fc-col-header-cell-cushion {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+/* Grid lines daha yumuşak */
+.fc .fc-timegrid-slot-lane {
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+.fc td, .fc th {
+  border-color: var(--color-border);
+}
+
+/* ═══════════════════════════════════ */
 /* Badge Card Modal                    */
 /* ═══════════════════════════════════ */
 .badge-card {

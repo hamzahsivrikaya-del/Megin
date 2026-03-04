@@ -64,6 +64,21 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Recovery code fallback — Supabase redirect URL yanlis yapilandirilmissa
+  // code parametresi dogrudan site URL'ine gelir, callback'e yonlendir
+  const code = request.nextUrl.searchParams.get('code')
+  if (code && !pathname.startsWith('/api/auth') && (
+    request.nextUrl.searchParams.get('type') === 'recovery' ||
+    pathname === '/'
+  )) {
+    const callbackUrl = new URL('/api/auth/callback', request.url)
+    callbackUrl.searchParams.set('code', code)
+    const type = request.nextUrl.searchParams.get('type')
+    if (type) callbackUrl.searchParams.set('type', type)
+    callbackUrl.searchParams.set('next', '/login/reset-password')
+    return NextResponse.redirect(callbackUrl)
+  }
+
   if (isPublicRoute) {
     // Giriş yapmış kullanıcıyı login veya landing page'den yönlendir
     if (pathname === '/login' && user) {

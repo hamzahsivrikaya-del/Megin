@@ -3,6 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
+import { toDateStr } from '@/lib/utils'
+import NutritionCard from './NutritionCard'
+import MemberSearch from '@/components/shared/MemberSearch'
 
 function AlertsSkeleton() {
   return (
@@ -48,22 +51,22 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <h1 className="text-2xl font-bold">Anasayfa</h1>
 
-      {/* İstatistik Kartları — hemen render */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card>
-          <div className="text-text-secondary text-sm">Aktif Üyeler</div>
-          <div className="text-3xl font-bold mt-1">{activeMembers || 0}</div>
-        </Card>
-        <Card>
-          <div className="text-text-secondary text-sm">Bu Hafta Ders</div>
-          <div className="text-3xl font-bold mt-1">{weeklyLessons?.length || 0}</div>
-        </Card>
-        <Card>
-          <div className="text-text-secondary text-sm">Bugün Ders</div>
-          <div className="text-3xl font-bold mt-1">{todayLessons?.length || 0}</div>
-        </Card>
+      {/* İstatistik Çipleri — kompakt tek satır */}
+      <div className="flex items-center justify-center gap-3 flex-wrap">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-primary/30 rounded-full text-sm font-medium text-text-primary">
+          <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          {activeMembers || 0} Üye
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-primary/30 rounded-full text-sm font-medium text-text-primary">
+          <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+          {weeklyLessons?.length || 0} Haftalık
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-primary/30 rounded-full text-sm font-medium text-text-primary">
+          <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          {todayLessons?.length || 0} Bugün
+        </span>
       </div>
 
       {/* Hızlı Aksiyonlar — hemen render */}
@@ -97,8 +100,11 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
+      {/* Üye Arama */}
+      <MemberSearch />
+
       {/* Bugünün Ders Programı */}
-      <Card>
+      <Card className="border-primary/30">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Bugünün Programı</CardTitle>
@@ -137,11 +143,33 @@ export default async function AdminDashboard() {
 
 async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, unknown>[] | null }) {
   const supabase = await createClient()
+  const today = toDateStr(new Date())
 
-  const { data: lowLessonMembers_raw } = await supabase
-    .from('packages')
-    .select('user_id, total_lessons, used_lessons, status, users(full_name)')
-    .in('status', ['active', 'completed'])
+  const [
+    { data: lowLessonMembers_raw },
+    { data: activeMembers_raw },
+    { data: memberMeals_raw },
+    { data: todayMealLogs_raw },
+  ] = await Promise.all([
+    supabase
+      .from('packages')
+      .select('user_id, total_lessons, used_lessons, status, users(full_name)')
+      .in('status', ['active', 'completed']),
+    supabase
+      .from('users')
+      .select('id, full_name')
+      .eq('role', 'member')
+      .eq('is_active', true),
+    supabase
+      .from('member_meals')
+      .select('user_id, id, name, order_num')
+      .order('order_num'),
+    supabase
+      .from('meal_logs')
+      .select('user_id, meal_id, status, photo_url, is_extra')
+      .eq('date', today)
+      .eq('is_extra', false),
+  ])
 
   const renewedUserIds = new Set(
     (lowLessonMembers_raw || [])
@@ -160,9 +188,62 @@ async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, u
       return remA - remB
     })
 
+  // Beslenme veri dönüşümü
+  const mealsMap = new Map<string, { id: string; name: string }[]>()
+  for (const m of memberMeals_raw || []) {
+    if (!mealsMap.has(m.user_id)) mealsMap.set(m.user_id, [])
+    mealsMap.get(m.user_id)!.push({ id: m.id, name: m.name })
+  }
+
+  const logsMap = new Map<string, Map<string, { status: string; photoUrl: string | null }>>()
+  for (const log of todayMealLogs_raw || []) {
+    if (!logsMap.has(log.user_id)) logsMap.set(log.user_id, new Map())
+    logsMap.get(log.user_id)!.set(log.meal_id, {
+      status: log.status,
+      photoUrl: log.photo_url,
+    })
+  }
+
+  type NutritionSummary = {
+    userId: string
+    fullName: string
+    meals: { name: string; completed: boolean; photoUrl: string | null }[]
+    completedCount: number
+    totalCount: number
+  }
+
+  const nutritionData: NutritionSummary[] = (activeMembers_raw || [])
+    .filter(u => mealsMap.has(u.id))
+    .map(u => {
+      const userMeals = mealsMap.get(u.id)!
+      const userLogs = logsMap.get(u.id)
+      const meals = userMeals.map(m => {
+        const log = userLogs?.get(m.id)
+        return {
+          name: m.name,
+          completed: log?.status === 'compliant',
+          photoUrl: log?.photoUrl ?? null,
+        }
+      })
+      return {
+        userId: u.id,
+        fullName: u.full_name,
+        meals,
+        completedCount: meals.filter(m => m.completed).length,
+        totalCount: meals.length,
+      }
+    })
+    .sort((a, b) => {
+      const pctA = a.totalCount > 0 ? a.completedCount / a.totalCount : 0
+      const pctB = b.totalCount > 0 ? b.completedCount / b.totalCount : 0
+      return pctA - pctB
+    })
+
+  const enteredCount = nutritionData.filter(n => n.completedCount > 0).length
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card>
+      <Card className="border-primary/30">
         <CardHeader>
           <CardTitle>Paket Uyarıları</CardTitle>
         </CardHeader>
@@ -190,7 +271,7 @@ async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, u
         )}
       </Card>
 
-      <Card>
+      <Card className="border-primary/30">
         <CardHeader>
           <CardTitle>Bugün Gelen Üyeler</CardTitle>
         </CardHeader>
@@ -206,6 +287,12 @@ async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, u
           <p className="text-sm text-text-secondary">Bugün henüz ders yok</p>
         )}
       </Card>
+
+      {nutritionData.length > 0 && (
+        <div className="lg:col-span-2">
+          <NutritionCard data={nutritionData} enteredCount={enteredCount} />
+        </div>
+      )}
     </div>
   )
 }
