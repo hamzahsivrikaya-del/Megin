@@ -40,6 +40,7 @@ export default async function ClientDetailPage({
     { data: mealLogs },
     { data: photos },
     { data: goals },
+    { data: dependents },
   ] = await Promise.all([
     admin
       .from('packages')
@@ -75,6 +76,11 @@ export default async function ClientDetailPage({
       .from('client_goals')
       .select('*')
       .eq('client_id', client.id),
+    admin
+      .from('clients')
+      .select('id, full_name, avatar_url, created_at')
+      .eq('parent_id', client.id)
+      .order('created_at', { ascending: true }),
   ])
 
   return (
@@ -88,6 +94,7 @@ export default async function ClientDetailPage({
       mealLogs={mealLogs || []}
       photos={photos || []}
       goals={goals || []}
+      dependents={dependents || []}
     />
   )
 }

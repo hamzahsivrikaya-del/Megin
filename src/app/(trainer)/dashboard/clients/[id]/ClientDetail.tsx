@@ -16,8 +16,16 @@ import type {
 } from '@/lib/types'
 import Image from 'next/image'
 import MealPlanManager from './MealPlanManager'
+import DownloadPDFButton from '@/components/shared/DownloadPDFButton'
 
 type Tab = 'overview' | 'measurements' | 'packages' | 'lessons' | 'nutrition'
+
+interface DependentInfo {
+  id: string
+  full_name: string
+  avatar_url: string | null
+  created_at: string
+}
 
 interface Props {
   client: Client
@@ -29,11 +37,12 @@ interface Props {
   mealLogs: (MealLog & { client_meal?: ClientMeal | null })[]
   photos: ProgressPhoto[]
   goals: ClientGoal[]
+  dependents: DependentInfo[]
 }
 
 export default function ClientDetail({
   client, trainerId, packages, measurements, lessons,
-  clientMeals, mealLogs, photos, goals,
+  clientMeals, mealLogs, photos, goals, dependents,
 }: Props) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
@@ -48,6 +57,28 @@ export default function ClientDetail({
   })
   const [saving, setSaving] = useState(false)
   const [deletingClient, setDeletingClient] = useState(false)
+
+  // Dependents
+  const [showAddDependent, setShowAddDependent] = useState(false)
+  const [depName, setDepName] = useState('')
+  const [addingDep, setAddingDep] = useState(false)
+
+  async function handleAddDependent() {
+    if (depName.trim().length < 2) return
+    setAddingDep(true)
+    const supabase = createClient()
+    const { error } = await supabase.rpc('add_dependent_member', {
+      p_parent_id: client.id,
+      p_trainer_id: trainerId,
+      p_full_name: depName.trim(),
+    })
+    setAddingDep(false)
+    if (!error) {
+      setDepName('')
+      setShowAddDependent(false)
+      router.refresh()
+    }
+  }
 
   // Lessons
   const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null)
@@ -552,12 +583,75 @@ export default function ClientDetail({
                 </div>
               </div>
             )}
+
+            {/* Bağlı Üyeler */}
+            <div className="rounded-xl border border-border p-5 bg-surface">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] text-text-secondary uppercase tracking-widest">Bağlı Üyeler</p>
+                <button
+                  onClick={() => setShowAddDependent(!showAddDependent)}
+                  className="text-xs text-primary font-semibold cursor-pointer hover:underline"
+                >
+                  + Üye Ekle
+                </button>
+              </div>
+
+              {showAddDependent && (
+                <div className="flex gap-2 mb-4">
+                  <Input
+                    placeholder="Ad Soyad"
+                    value={depName}
+                    onChange={(e) => setDepName(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button size="sm" onClick={handleAddDependent} loading={addingDep} disabled={depName.trim().length < 2}>
+                    Ekle
+                  </Button>
+                </div>
+              )}
+
+              {dependents.length > 0 ? (
+                <div className="space-y-2">
+                  {dependents.map((dep) => (
+                    <a
+                      key={dep.id}
+                      href={`/dashboard/clients/${dep.id}`}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/20 hover:bg-primary/[0.02] transition-all"
+                    >
+                      {dep.avatar_url ? (
+                        <img src={dep.avatar_url} alt={dep.full_name} className="w-9 h-9 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-xs font-bold text-primary">
+                            {dep.full_name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}
+                          </span>
+                        </div>
+                      )}
+                      <span className="text-sm font-medium text-text-primary">{dep.full_name}</span>
+                      <svg className="w-4 h-4 text-text-tertiary ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  ))}
+                </div>
+              ) : !showAddDependent && (
+                <p className="text-sm text-text-tertiary">Bağlı üye yok</p>
+              )}
+            </div>
           </div>
         )}
 
         {/* OLCUMLER */}
         {activeTab === 'measurements' && (
           <div className="space-y-6">
+            {measurements.length > 0 && (
+              <div className="flex justify-end">
+                <DownloadPDFButton
+                  clientName={client.full_name}
+                  measurements={measurements}
+                />
+              </div>
+            )}
             {measurements.length > 0 ? (
               <div className="space-y-4">
                 {measurements.map((m) => {

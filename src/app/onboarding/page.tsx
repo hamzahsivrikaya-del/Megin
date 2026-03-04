@@ -8,7 +8,17 @@ import Input from '@/components/ui/Input'
 import { cn, isValidUsername } from '@/lib/utils'
 import type { ExpertiseArea, ReferralSource } from '@/lib/types'
 
-const TOTAL_STEPS = 7
+const TOTAL_STEPS = 8
+
+const CITIES = [
+  'İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya',
+  'Adana', 'Konya', 'Gaziantep', 'Mersin', 'Kayseri',
+  'Eskişehir', 'Diyarbakır', 'Samsun', 'Denizli', 'Trabzon',
+  'Sakarya', 'Muğla', 'Tekirdağ', 'Kocaeli', 'Manisa',
+  'Aydın', 'Balıkesir', 'Malatya', 'Kahramanmaraş', 'Erzurum',
+  'Van', 'Hatay', 'Mardin', 'Şanlıurfa', 'Elazığ',
+  'Diğer',
+]
 
 const EXPERTISE_OPTIONS: { value: ExpertiseArea; label: string; icon: string }[] = [
   { value: 'pt', label: 'Personal Trainer', icon: '🏋️' },
@@ -43,6 +53,7 @@ export default function OnboardingPage() {
   const [expertise, setExpertise] = useState<ExpertiseArea | null>(null)
   const [experienceYears, setExperienceYears] = useState('')
   const [clientRange, setClientRange] = useState('')
+  const [city, setCity] = useState('')
   const [referralSource, setReferralSource] = useState<ReferralSource | null>(null)
 
   // Username benzersizlik kontrolü
@@ -118,6 +129,7 @@ export default function OnboardingPage() {
       expertise,
       experience_years: experienceYears ? parseInt(experienceYears) : null,
       client_count_range: clientRange || null,
+      city: city || null,
       referral_source: referralSource,
       onboarding_completed: true,
     })
@@ -128,7 +140,6 @@ export default function OnboardingPage() {
       return
     }
 
-    // Confetti göster, sonra dashboard'a yönlendir
     setShowConfetti(true)
     setTimeout(() => {
       router.push('/dashboard')
@@ -141,7 +152,8 @@ export default function OnboardingPage() {
       case 3: return username.length >= 3 && !usernameError && !usernameChecking
       case 4: return expertise !== null
       case 5: return clientRange !== ''
-      case 6: return referralSource !== null
+      case 6: return city !== ''
+      case 7: return referralSource !== null
       default: return true
     }
   }
@@ -323,8 +335,34 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 6 — Referans */}
+          {/* Step 6 — Şehir */}
           {step === 6 && (
+            <div>
+              <StepHeader
+                title="Hangi İldesin?"
+                description="Bulunduğun şehri seç."
+              />
+              <div className="mt-8 grid grid-cols-2 gap-2 max-h-80 overflow-y-auto">
+                {CITIES.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setCity(c)}
+                    className={cn(
+                      'rounded-xl border px-4 py-3 text-sm font-medium text-left transition-all',
+                      city === c
+                        ? 'border-primary bg-primary-50 text-text-primary'
+                        : 'border-border bg-surface text-text-secondary hover:border-text-tertiary'
+                    )}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 7 — Referans */}
+          {step === 7 && (
             <div>
               <StepHeader
                 title="Bizi Nereden Buldun?"
@@ -350,8 +388,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 7 — Hazırsın */}
-          {step === 7 && (
+          {/* Step 8 — Hazırsın */}
+          {step === 8 && (
             <div className="text-center">
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-success/10">
                 <span className="text-4xl">🎉</span>

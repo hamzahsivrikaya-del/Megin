@@ -1,104 +1,90 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { BADGE_DEFINITIONS } from '@/lib/badges'
 import { sendPushNotification } from '@/lib/push'
+
+export const dynamic = 'force-dynamic'
 
 function verifyCronSecret(request: NextRequest): boolean {
   const auth = request.headers.get('authorization')
   return auth === `Bearer ${process.env.CRON_SECRET}`
 }
 
-// ── GET: Kazanılan rozetleri bildir (Cron - Günlük) ──
 export async function GET(request: NextRequest) {
   if (!verifyCronSecret(request)) {
     return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 })
   }
 
   const admin = createAdminClient()
-  let notified = 0
-  let errors = 0
 
-  try {
-    // Henüz bildirilmemiş rozetleri al (client ve badge bilgileriyle birlikte)
-    const { data: unnotifiedBadges, error: badgesError } = await admin
-      .from('client_badges')
-      .select(`
-        id,
-        trainer_id,
-        client_id,
-        badge_id,
-        earned_at,
-        clients!inner(user_id, full_name),
-        badges(name, description)
-      `)
-      .eq('notified', false)
+  // notified: false olan rozetleri bul
+  const { data: unnotified } = await admin
+    .from('client_badges')
+    .select('id, client_id, trainer_id, badge_id, clients!inner(user_id)')
+    .eq('notified', false)
 
-    if (badgesError) {
-      console.error('client_badges fetch error:', badgesError)
-      return NextResponse.json({ error: 'Rozetler getirilemedi' }, { status: 500 })
-    }
-
-    if (!unnotifiedBadges?.length) {
-      return NextResponse.json({ notified: 0, message: 'Bildirim bekleyen rozet yok' })
-    }
-
-    for (const badge of unnotifiedBadges) {
-      try {
-        const client = badge.clients as unknown as { user_id: string | null; full_name: string }
-        const badgeInfo = badge.badges as unknown as { name: string; description: string } | null
-
-        const badgeName = badgeInfo?.name ?? 'Yeni Rozet'
-        const badgeDesc = badgeInfo?.description ?? 'Bir başarı kazandın!'
-
-        if (!client.user_id) {
-          // user_id yoksa yine de notified işaretle
-          await admin
-            .from('client_badges')
-            .update({ notified: true })
-            .eq('id', badge.id)
-          continue
-        }
-
-        // Bildirim oluştur
-        const { error: notifError } = await admin.from('notifications').insert({
-          user_id: client.user_id,
-          trainer_id: badge.trainer_id,
-          type: 'badge_earned',
-          title: `Rozet Kazandın: ${badgeName}`,
-          message: badgeDesc,
-          is_read: false,
-          data: { badge_id: badge.badge_id, earned_at: badge.earned_at },
-        })
-
-        if (notifError) {
-          console.error('notification insert error:', notifError)
-          errors++
-          continue
-        }
-
-        // Push bildirimi gönder
-        await sendPushNotification({
-          userIds: [client.user_id],
-          title: `Rozet Kazandın! ${badgeName}`,
-          message: badgeDesc,
-          url: '/dashboard/badges',
-        })
-
-        // Notified işaretle
-        await admin
-          .from('client_badges')
-          .update({ notified: true })
-          .eq('id', badge.id)
-
-        notified++
-      } catch (err) {
-        console.error(`Rozet bildirim hatası (id: ${badge.id}):`, err)
-        errors++
-      }
-    }
-
-    return NextResponse.json({ notified, errors })
-  } catch (error) {
-    console.error('GET /api/cron/badge-notify error:', error)
-    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 })
+  if (!unnotified || unnotified.length === 0) {
+    return NextResponse.json({ message: 'Bildirilecek rozet yok', count: 0 })
   }
+
+  // Kullanici bazinda grupla
+  const byUser = new Map<string, { userId: string; trainerId: string; badgeIds: string[] }>()
+  for (const row of unnotified) {
+    const client = row.clients as unknown as { user_id: string | null }
+    if (!client?.user_id) continue
+
+    const existing = byUser.get(client.user_id)
+    if (existing) {
+      existing.badgeIds.push(row.badge_id)
+    } else {
+      byUser.set(client.user_id, {
+        userId: client.user_id,
+        trainerId: row.trainer_id,
+        badgeIds: [row.badge_id],
+      })
+    }
+  }
+
+  let notified = 0
+
+  for (const [, { userId, trainerId, badgeIds }] of byUser) {
+    const badgeNames = badgeIds
+      .map(id => BADGE_DEFINITIONS.find(b => b.id === id)?.name)
+      .filter(Boolean)
+
+    if (badgeNames.length === 0) continue
+
+    const message = badgeNames.length === 1
+      ? `"${badgeNames[0]}" rozetini kazandın!`
+      : `${badgeNames.length} yeni rozet kazandın: ${badgeNames.join(', ')}`
+
+    // In-app bildirim
+    await admin.from('notifications').insert({
+      user_id: userId,
+      trainer_id: trainerId,
+      type: 'badge_earned',
+      title: 'Yeni Rozet!',
+      message,
+      is_read: false,
+    })
+
+    // Push bildirim
+    await sendPushNotification({
+      userIds: [userId],
+      title: 'Yeni Rozet!',
+      message,
+      url: '/app/rozetler',
+    })
+
+    notified += badgeIds.length
+  }
+
+  // Hepsini notified: true yap
+  const ids = unnotified.map(r => r.id)
+  await admin
+    .from('client_badges')
+    .update({ notified: true })
+    .in('id', ids)
+
+  return NextResponse.json({ message: `${notified} rozet bildirimi gönderildi`, count: notified })
 }

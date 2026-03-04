@@ -13,9 +13,18 @@ export default async function ClientLayout({
 
   const { data: client } = await supabase
     .from('clients')
-    .select('full_name')
+    .select('full_name, onboarding_completed')
     .eq('user_id', session.user.id)
     .maybeSingle()
+
+  // Onboarding sayfasında navbar gösterme (middleware redirect zaten hallediyor)
+  if (client && !client.onboarding_completed) {
+    return (
+      <div className="min-h-screen bg-background">
+        {children}
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">

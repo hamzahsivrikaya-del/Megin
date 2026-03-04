@@ -9,11 +9,13 @@ export default async function BeslenmePage() {
 
   const { data: client } = await supabase
     .from('clients')
-    .select('id, nutrition_note')
+    .select('id, trainer_id, nutrition_note')
     .eq('user_id', session.user.id)
     .maybeSingle()
 
   if (!client) redirect('/login')
+
+  const today = new Date().toISOString().split('T')[0]
 
   const [
     { data: memberMeals },
@@ -35,9 +37,12 @@ export default async function BeslenmePage() {
   return (
     <BeslenmeClient
       clientId={client.id}
-      nutritionNote={client.nutrition_note}
+      trainerId={client.trainer_id}
+      userId={session.user.id}
       memberMeals={memberMeals || []}
       initialLogs={mealLogs || []}
+      today={today}
+      nutritionNote={client.nutrition_note}
     />
   )
 }

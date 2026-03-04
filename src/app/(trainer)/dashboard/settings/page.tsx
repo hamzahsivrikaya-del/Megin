@@ -9,8 +9,9 @@ import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
 import Select from '@/components/ui/Select'
 import Button from '@/components/ui/Button'
-import { Subscription, PaymentOrder } from '@/lib/types'
+import { Subscription, PaymentOrder, TourProgress, SubscriptionPlan } from '@/lib/types'
 import { PLAN_CONFIGS } from '@/lib/plans'
+import { TRAINER_TOUR_STEPS, isTourStepLocked } from '@/lib/tour'
 import { formatPrice } from '@/lib/utils'
 
 const EXPERTISE_OPTIONS = [
@@ -50,6 +51,11 @@ export default function TrainerProfilePage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [paymentOrders, setPaymentOrders] = useState<PaymentOrder[]>([])
 
+  // Tour state
+  const [tourProgress, setTourProgress] = useState<TourProgress | null>(null)
+  const [tourStepStatus, setTourStepStatus] = useState<Record<string, boolean>>({})
+  const [trainerPlan, setTrainerPlan] = useState<SubscriptionPlan>('free')
+
   useEffect(() => {
     async function load() {
       const supabase = createClient()
@@ -88,6 +94,26 @@ export default function TrainerProfilePage() {
           .order('created_at', { ascending: false })
           .limit(10)
         if (orders) setPaymentOrders(orders)
+
+        // Tour progress
+        setTourProgress(trainer.tour_progress as TourProgress | null)
+        const plan = (sub?.plan || 'free') as SubscriptionPlan
+        setTrainerPlan(plan)
+
+        // Gerçek aksiyonları kontrol et
+        const [clients, workouts, measurements] = await Promise.all([
+          supabase.from('clients').select('id').eq('trainer_id', trainer.id).limit(1),
+          supabase.from('workouts').select('id').eq('trainer_id', trainer.id).limit(1),
+          supabase.from('measurements').select('id').eq('trainer_id', trainer.id).limit(1),
+        ])
+
+        setTourStepStatus({
+          invite_client: (clients.data?.length ?? 0) > 0,
+          create_workout: (workouts.data?.length ?? 0) > 0,
+          record_measurement: (measurements.data?.length ?? 0) > 0,
+          send_notification: false,
+          complete_profile: !!(trainer.bio || trainer.phone),
+        })
       }
       setLoading(false)
     }
@@ -441,6 +467,65 @@ export default function TrainerProfilePage() {
           </Button>
         </form>
       </Card>
+
+      {/* Platform Rehberi */}
+      {tourProgress && !tourProgress.dismissed && (
+        <Card>
+          <CardHeader><CardTitle>Platform Rehberi</CardTitle></CardHeader>
+          <div className="space-y-1">
+            {(() => {
+              const completedCount = TRAINER_TOUR_STEPS.filter(s =>
+                tourStepStatus[s.key] || isTourStepLocked(s, trainerPlan)
+              ).length
+              const allDone = completedCount === TRAINER_TOUR_STEPS.length
+              return (
+                <>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm text-text-secondary mb-2">
+                      <span>İlerleme</span>
+                      <span>{completedCount}/{TRAINER_TOUR_STEPS.length} tamamlandı</span>
+                    </div>
+                    <div className="h-2 bg-border rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all duration-500"
+                        style={{ width: `${(completedCount / TRAINER_TOUR_STEPS.length) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  {allDone ? (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-success font-medium">Tebrikler! Platformu keşfettin.</p>
+                    </div>
+                  ) : (
+                    TRAINER_TOUR_STEPS.map(s => {
+                      const locked = isTourStepLocked(s, trainerPlan)
+                      const completed = tourStepStatus[s.key]
+                      return (
+                        <div key={s.key} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
+                          <div className="flex items-center gap-3">
+                            <span className="text-base">{locked ? '🔒' : completed ? '✅' : '◻️'}</span>
+                            <span className={`text-sm ${completed ? 'text-text-tertiary line-through' : 'text-text-primary'}`}>
+                              {s.title}
+                            </span>
+                          </div>
+                          {!completed && (
+                            <Link
+                              href={locked ? '/dashboard/upgrade' : s.ctaPath}
+                              className="text-xs text-primary hover:text-primary/80 font-medium"
+                            >
+                              {locked ? 'Pro ile Aç' : '→ Git'}
+                            </Link>
+                          )}
+                        </div>
+                      )
+                    })
+                  )}
+                </>
+              )
+            })()}
+          </div>
+        </Card>
+      )}
     </div>
   )
 }

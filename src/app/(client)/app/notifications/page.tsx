@@ -20,7 +20,6 @@ export default async function ClientNotificationsPage() {
   const { data: notifications } = await supabase
     .from('notifications')
     .select('*')
-    .eq('client_id', client.id)
     .order('sent_at', { ascending: false })
     .limit(50)
 

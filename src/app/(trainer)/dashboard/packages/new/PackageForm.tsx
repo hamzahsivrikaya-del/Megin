@@ -33,6 +33,7 @@ export default function PackageForm({ clients, trainerId }: PackageFormProps) {
   const [totalLessons, setTotalLessons] = useState(8)
   const [customLessons, setCustomLessons] = useState('')
   const [isCustom, setIsCustom] = useState(false)
+  const [durationDays, setDurationDays] = useState('56')
   const [price, setPrice] = useState('')
   const [paymentStatus, setPaymentStatus] = useState('unpaid')
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
@@ -43,10 +44,13 @@ export default function PackageForm({ clients, trainerId }: PackageFormProps) {
   const client = clients.find((c) => c.id === selectedClient)
   const lessons = isCustom ? Number(customLessons) || 0 : totalLessons
 
-  // Bitiş tarihi hesapla (ders başına 1 hafta)
+  const days = Number(durationDays) || 0
+
+  // Bitiş tarihi hesapla
   const expireDate = (() => {
+    if (days <= 0) return ''
     const d = new Date(startDate)
-    d.setDate(d.getDate() + lessons * 7)
+    d.setDate(d.getDate() + days)
     return d.toISOString().split('T')[0]
   })()
 
@@ -61,6 +65,11 @@ export default function PackageForm({ clients, trainerId }: PackageFormProps) {
 
     if (lessons < 1) {
       setError('Ders sayısı en az 1 olmalıdır')
+      return
+    }
+
+    if (days < 1) {
+      setError('Paket süresi en az 1 gün olmalıdır')
       return
     }
 
@@ -190,6 +199,22 @@ export default function PackageForm({ clients, trainerId }: PackageFormProps) {
             onChange={(e) => setStartDate(e.target.value)}
           />
 
+          <div>
+            <Input
+              label="Paket Süresi (gün)"
+              type="number"
+              placeholder="56"
+              value={durationDays}
+              onChange={(e) => setDurationDays(e.target.value)}
+              min={1}
+            />
+            {expireDate && (
+              <p className="text-xs text-text-secondary mt-1">
+                Bitiş: {new Date(expireDate + 'T00:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
+            )}
+          </div>
+
           <Input
             label="Ücret (TL)"
             type="number"
@@ -221,7 +246,13 @@ export default function PackageForm({ clients, trainerId }: PackageFormProps) {
                 <span className="text-text-secondary">Ders:</span>
                 <span className="font-medium">{lessons} ders</span>
                 <span className="text-text-secondary">Süre:</span>
-                <span className="font-medium">{startDate} — {expireDate}</span>
+                <span className="font-medium">{days} gün</span>
+                <span className="text-text-secondary">Tarih:</span>
+                <span className="font-medium">
+                  {new Date(startDate + 'T00:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                  {' — '}
+                  {expireDate ? new Date(expireDate + 'T00:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                </span>
                 {price && (
                   <>
                     <span className="text-text-secondary">Ücret:</span>

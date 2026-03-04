@@ -22,6 +22,7 @@ interface Notification {
 
 interface ClientInfo {
   id: string
+  user_id: string
   full_name: string
 }
 
@@ -60,8 +61,8 @@ export default function NotificationsManager({ initialNotifications, clients, tr
         const inserts = clients.map((c) => ({
           trainer_id: trainerId,
           client_id: c.id,
-          user_id: null,
-          type: 'manual',
+          user_id: c.user_id,
+          type: 'manual' as const,
           title: title.trim(),
           message: message.trim(),
           is_read: false,
@@ -72,11 +73,12 @@ export default function NotificationsManager({ initialNotifications, clients, tr
         }
       } else {
         // Tek danışana gönder
+        const targetClient = clients.find(c => c.id === target)
         await supabase.from('notifications').insert({
           trainer_id: trainerId,
           client_id: target,
-          user_id: null,
-          type: 'manual',
+          user_id: targetClient?.user_id || null,
+          type: 'manual' as const,
           title: title.trim(),
           message: message.trim(),
           is_read: false,

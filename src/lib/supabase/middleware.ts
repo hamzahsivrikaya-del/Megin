@@ -53,5 +53,20 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Onboarding redirect — /app/* rotaları için
+  if (user && request.nextUrl.pathname.startsWith('/app') && request.nextUrl.pathname !== '/app/onboarding') {
+    const { data: client } = await supabase
+      .from('clients')
+      .select('onboarding_completed')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (client && client.onboarding_completed === false) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/app/onboarding'
+      return NextResponse.redirect(url)
+    }
+  }
+
   return supabaseResponse
 }

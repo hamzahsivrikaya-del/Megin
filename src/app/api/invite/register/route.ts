@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         user_id: authData.user.id,
         full_name: full_name.trim(),
         invite_accepted: true,
-        onboarding_completed: true,
+        onboarding_completed: false,
       })
       .eq('id', client.id)
 

@@ -18,6 +18,27 @@ export function formatDateShort(dateStr: string): string {
   return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
 }
 
+// ── Takvim Helpers ──
+export function getMonday(date: Date = new Date()): string {
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  d.setDate(d.getDate() + diff)
+  return toDateStr(d)
+}
+
+const DAY_NAMES = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar']
+
+export function getDayName(dayIndex: number): string {
+  return DAY_NAMES[dayIndex] || ''
+}
+
+export function getAdjacentWeek(mondayStr: string, direction: -1 | 1): string {
+  const d = new Date(mondayStr + 'T00:00:00')
+  d.setDate(d.getDate() + direction * 7)
+  return toDateStr(d)
+}
+
 // ── Fiyat Helpers ──
 export function formatPrice(price: number | null): string {
   if (price === null || price === undefined) return ''
@@ -32,6 +53,14 @@ export function getPackageStatusLabel(status: string): string {
     case 'expired': return 'Süresi Doldu'
     default: return status
   }
+}
+
+// ── Kalan Gün ──
+export function daysRemaining(expireDate: string): number {
+  const now = new Date()
+  const expire = new Date(expireDate)
+  const diff = expire.getTime() - now.getTime()
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
 }
 
 // ── String Helpers ──

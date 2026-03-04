@@ -36,12 +36,15 @@ export default function LoginPage() {
     if (user) {
       const { data: trainer } = await supabase
         .from('trainers')
-        .select('id')
+        .select('id, onboarding_completed')
         .eq('user_id', user.id)
         .maybeSingle()
 
       if (trainer) {
-        router.push('/dashboard')
+        router.push(trainer.onboarding_completed ? '/dashboard' : '/onboarding')
+      } else if (user.user_metadata?.role === 'trainer') {
+        // Trainer kaydı henüz yok (onboarding tamamlanmamış)
+        router.push('/onboarding')
       } else {
         router.push('/app')
       }

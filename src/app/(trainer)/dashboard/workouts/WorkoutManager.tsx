@@ -8,6 +8,7 @@ import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
 import Modal from '@/components/ui/Modal'
 import Badge from '@/components/ui/Badge'
+import ExerciseAutocomplete from '@/components/shared/ExerciseAutocomplete'
 
 const DAY_NAMES = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar']
 
@@ -396,10 +397,10 @@ export default function WorkoutManager({ initialWorkouts, clients, initialWeek, 
               .filter(({ ex }) => ex.section === 'strength')
               .map(({ ex, originalIndex }) => (
                 <div key={originalIndex} className="flex gap-2 mb-2 items-end">
-                  <Input
-                    placeholder="Egzersiz adı"
+                  <ExerciseAutocomplete
                     value={ex.name}
-                    onChange={(e) => updateExercise(originalIndex, 'name', e.target.value)}
+                    onChange={(val) => updateExercise(originalIndex, 'name', val)}
+                    trainerId={trainerId}
                     className="flex-1"
                   />
                   <Input
@@ -445,10 +446,10 @@ export default function WorkoutManager({ initialWorkouts, clients, initialWeek, 
               .filter(({ ex }) => ex.section === 'accessory')
               .map(({ ex, originalIndex }) => (
                 <div key={originalIndex} className="flex gap-2 mb-2 items-end">
-                  <Input
-                    placeholder="Egzersiz adı"
+                  <ExerciseAutocomplete
                     value={ex.name}
-                    onChange={(e) => updateExercise(originalIndex, 'name', e.target.value)}
+                    onChange={(val) => updateExercise(originalIndex, 'name', val)}
+                    trainerId={trainerId}
                     className="flex-1"
                   />
                   <Input

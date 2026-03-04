@@ -28,9 +28,18 @@ export async function GET() {
       return NextResponse.json({ error: 'Danışan profili bulunamadı' }, { status: 403 })
     }
 
+    // Bu haftanin baslangici (Pazartesi)
+    const now = new Date()
+    const dayOfWeek = now.getDay()
+    const monday = new Date(now)
+    monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7))
+    monday.setHours(0, 0, 0, 0)
+    const mondayStr = monday.toISOString().split('T')[0]
+
     // İstatistikleri paralel olarak çek
     const [
       { count: totalLessons },
+      { count: weeklyLessons },
       { data: weeklyReports },
       { data: goals },
       { data: earnedBadges },
@@ -41,6 +50,13 @@ export async function GET() {
         .from('lessons')
         .select('id', { count: 'exact', head: true })
         .eq('client_id', client.id),
+
+      // Bu haftaki ders sayısı
+      supabase
+        .from('lessons')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', client.id)
+        .gte('date', mondayStr),
 
       // Haftalık raporlar (streak ve beslenme uyumu için)
       supabase
@@ -86,7 +102,7 @@ export async function GET() {
 
     const stats: BadgeStats = {
       totalLessons: totalLessons ?? 0,
-      weeklyLessons: currentStreak,
+      weeklyLessons: weeklyLessons ?? 0,
       maxStreak,
       currentStreak,
       goalsSet,
@@ -102,7 +118,7 @@ export async function GET() {
     const adminClient = createAdminClient()
 
     // Yeni kazanılan rozetleri kontrol et ve kaydet
-    const newlyEarned: string[] = []
+    const newBadges: string[] = []
 
     for (const badge of BADGE_DEFINITIONS) {
       if (badge.trigger === 'admin') continue
@@ -121,7 +137,7 @@ export async function GET() {
 
         if (!insertError) {
           earnedBadgeIds.add(badge.id)
-          newlyEarned.push(badge.id)
+          newBadges.push(badge.id)
 
           // Bildirim oluştur
           await adminClient
@@ -130,10 +146,9 @@ export async function GET() {
               user_id: user.id,
               trainer_id: client.trainer_id,
               type: 'badge_earned',
-              title: `Rozet Kazandın: ${badge.name}`,
-              message: badge.description,
+              title: 'Yeni Rozet!',
+              message: `"${badge.name}" rozetini kazandın! ${badge.description}`,
               is_read: false,
-              data: { badge_id: badge.id, badge_emoji: badge.emoji },
             })
         }
       }
@@ -153,7 +168,7 @@ export async function GET() {
       }
     })
 
-    return NextResponse.json({ badges, stats, newlyEarned })
+    return NextResponse.json({ badges, stats, newBadges, userId: user.id })
   } catch (error) {
     console.error('GET /api/badges error:', error)
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 })

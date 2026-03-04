@@ -66,10 +66,20 @@ export default function QuickActions({ trainerUsername }: QuickActionsProps) {
 
   return (
     <>
-      <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2 sm:gap-3">
+      <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-2 sm:gap-3">
+        <Link
+          href="/dashboard/takvim"
+          className={`${btnBase} bg-primary text-white hover:bg-primary-dark active:bg-primary-dark`}
+        >
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Takvim</span>
+        </Link>
         <Link
           href="/dashboard/lessons/new"
-          className={`${btnBase} bg-primary text-white hover:bg-primary-dark active:bg-primary-dark`}
+          data-tour="quick-add-lesson"
+          className={`${btnBase} bg-surface border border-border text-text-primary hover:bg-surface-hover active:bg-surface-hover`}
         >
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -78,6 +88,7 @@ export default function QuickActions({ trainerUsername }: QuickActionsProps) {
         </Link>
         <button
           onClick={() => setAddModalOpen(true)}
+          data-tour="quick-add-client"
           className={`${btnBase} bg-surface border border-border text-text-primary hover:bg-surface-hover active:bg-surface-hover cursor-pointer`}
         >
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,6 +98,7 @@ export default function QuickActions({ trainerUsername }: QuickActionsProps) {
         </button>
         <Link
           href="/dashboard/measurements/new"
+          data-tour="quick-add-measurement"
           className={`${btnBase} bg-surface border border-border text-text-primary hover:bg-surface-hover active:bg-surface-hover`}
         >
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

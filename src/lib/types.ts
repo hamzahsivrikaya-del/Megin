@@ -21,6 +21,7 @@ export interface Trainer {
   referral_source: ReferralSource | null
   bio: string | null
   onboarding_completed: boolean
+  tour_progress: TourProgress | null
   is_active: boolean
   created_at: string
 }
@@ -42,6 +43,7 @@ export interface Client {
   invite_token: string | null
   invite_accepted: boolean
   onboarding_completed: boolean
+  tour_progress: TourProgress | null
   created_at: string
 }
 
@@ -308,4 +310,11 @@ export interface AuditLog {
   entity_id: string | null
   metadata: Record<string, unknown> | null
   created_at: string
+}
+
+// ── Platform Turu ──
+export interface TourProgress {
+  completed: string[]
+  skipped: string[]
+  dismissed: boolean
 }

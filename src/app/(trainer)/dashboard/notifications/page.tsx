@@ -27,7 +27,7 @@ export default async function TrainerNotificationsPage() {
       .limit(50),
     supabase
       .from('clients')
-      .select('id, full_name')
+      .select('id, user_id, full_name')
       .eq('trainer_id', trainer.id)
       .eq('invite_accepted', true)
       .eq('is_active', true)

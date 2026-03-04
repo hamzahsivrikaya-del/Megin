@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
 import { GoalMetricType, ClientGoal, Measurement, ProgressPhoto } from '@/lib/types'
 import ClientProgressPhotos from './ClientProgressPhotos'
+import DownloadPDFButton from '@/components/shared/DownloadPDFButton'
+import GoalSetter from './GoalSetter'
 
 const GOAL_METRIC_LABELS: Record<GoalMetricType, string> = {
   weight: 'Kilo',
@@ -46,7 +48,7 @@ export default async function ProgressPage() {
 
   const { data: client } = await supabase
     .from('clients')
-    .select('id')
+    .select('id, trainer_id, full_name')
     .eq('user_id', session.user.id)
     .maybeSingle()
 
@@ -85,11 +87,19 @@ export default async function ProgressPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/app" className="text-sm text-text-secondary hover:text-primary transition-colors">
-          ← Geri
-        </Link>
-        <h1 className="text-2xl font-bold mt-1">İlerleme</h1>
+      <div className="flex items-end justify-between">
+        <div>
+          <Link href="/app" className="text-sm text-text-secondary hover:text-primary transition-colors">
+            ← Geri
+          </Link>
+          <h1 className="text-2xl font-bold mt-1">İlerleme</h1>
+        </div>
+        {measurements && measurements.length > 0 && (
+          <DownloadPDFButton
+            clientName={client.full_name}
+            measurements={measurements as Measurement[]}
+          />
+        )}
       </div>
 
       {/* İlerleme Fotoğrafları */}
@@ -136,7 +146,25 @@ export default async function ProgressPage() {
             })}
           </div>
 
-          {/* Hedefler */}
+          {/* Hedef Belirleme */}
+          <Card>
+            <CardHeader><CardTitle>Hedeflerim</CardTitle></CardHeader>
+            <GoalSetter
+              clientId={client.id}
+              trainerId={client.trainer_id}
+              goals={(goals as ClientGoal[]) || []}
+              currentValues={{
+                weight: measurements[0]?.weight ? Number(measurements[0].weight) : null,
+                body_fat_pct: measurements[0]?.body_fat_pct ? Number(measurements[0].body_fat_pct) : null,
+                chest: measurements[0]?.chest ? Number(measurements[0].chest) : null,
+                waist: measurements[0]?.waist ? Number(measurements[0].waist) : null,
+                arm: measurements[0]?.arm ? Number(measurements[0].arm) : null,
+                leg: measurements[0]?.leg ? Number(measurements[0].leg) : null,
+              }}
+            />
+          </Card>
+
+          {/* Hedef Detayları */}
           {goals && goals.length > 0 && (() => {
             const latestM = measurements[0]
             return (
