@@ -2,41 +2,10 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
   const pathname = request.nextUrl.pathname
 
-  // Public rotalar - auth gerektirmez
-  if (
+  // Public rotalar - auth gerektirmez (Supabase client'tan önce kontrol et)
+  const isPublicRoute =
     pathname.startsWith('/login') ||
     pathname.startsWith('/features') ||
     pathname.startsWith('/pricing') ||
@@ -57,7 +26,45 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/api/push') ||
     pathname.startsWith('/api/share') ||
     pathname.includes('.')
-  ) {
+
+  // Supabase env yoksa public route'ları direkt geçir, auth route'ları login'e yönlendir
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (isPublicRoute) return NextResponse.next({ request })
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (isPublicRoute) {
     // Giriş yapmış kullanıcıyı login veya landing page'den yönlendir
     if (pathname === '/login' && user) {
       const cachedRole = request.cookies.get('x-user-role')?.value
