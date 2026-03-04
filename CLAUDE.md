@@ -389,3 +389,242 @@ CRON_SECRET=
 - **GitHub:** github.com/hamzahsivrikaya-del/hamza-web-site (private)
 
 > **Not:** Admin ve test hesabi bilgileri guvenlik nedeniyle bu dosyada yer almaz. Erisim icin proje sahibiyle iletisime gecin.
+
+---
+---
+
+# Megin — PT SaaS Platformu
+
+> **Repo:** github.com/hamzahsivrikaya-del/Megin (private)
+> **Deploy:** Vercel | **DB:** Supabase Cloud | **Dil:** Turkce
+> **Durum:** Erken asama (altyapi + odeme sistemi kuruldu, dashboard portlama devam ediyor)
+
+---
+
+## Megin Nedir?
+
+Megin, hamza-web-site'in **multi-tenant SaaS versiyonu**dur. hamza-web-site tek antrenor (Hamza) icin calisirken, Megin tum personal trainer'lara acik bir platform olarak tasarlandi.
+
+**Iliski:** hamza-web-site = Asama 1 (kendi isinde kanit verisi olustur), Megin = Asama 2 (SaaS olarak PT'lere sat)
+
+**Hedef:** Turkiye'deki 15.000-20.000 PT'ye dijital danisan takip araci sunmak. Ilk 6 ay 200 PT, 1. yil 1.000 PT hedefi.
+
+---
+
+## hamza-web-site vs Megin Karsilastirmasi
+
+| Ozellik | hamza-web-site | Megin |
+|---------|----------------|-------|
+| **Kapsam** | 1 PT + uyeleri | Sinirsiz PT |
+| **Schema** | `users (role: admin/member)` | `trainers` + `clients` (ayri tablolar) |
+| **Tenant izolasyonu** | Role-based RLS | `trainer_id` based RLS |
+| **Rota yapisi** | `/admin/*`, `/dashboard/*` | `/dashboard/*` (PT), `/app/*` (danisan) |
+| **Plan kisitlamasi** | Yok | Free(3 danisan) / Pro(10) / Elite(sinirsiz) |
+| **Odeme** | Manuel (elden + havale) | PayTR entegrasyonu |
+| **PT profili** | Yok | Public handle: `megin.com/username` |
+| **Davet sistemi** | Yok | Invite token + email/WhatsApp |
+| **Audit log** | Yok | `audit_logs` tablosu |
+| **Google SSO** | Yok | Var |
+
+**UI/UX ayni:** Tum gorsel tasarim, component'ler ve kullanici deneyimi hamza-web-site'dan direkt port ediliyor. Ayni renk paleti, ayni component yapisi.
+
+---
+
+## Teknoloji Stack
+
+hamza-web-site ile ayni stack + SaaS eklemeler:
+
+- **Framework:** Next.js 16 (App Router) + TypeScript + React 19
+- **Styling:** Tailwind CSS v4
+- **Backend:** Supabase (Auth + PostgreSQL + Storage) — **ayri instance**
+- **Odeme:** PayTR (iframe token + webhook)
+- **Analytics:** Microsoft Clarity + Sentry (planli)
+- **Bot koruma:** Cloudflare Turnstile (planli)
+
+---
+
+## Proje Yapisi
+
+```
+src/
+├── app/
+│   ├── (auth)/                    # Giris, kayit, callback
+│   ├── (trainer)/dashboard/       # PT paneli (sidebar layout)
+│   │   ├── clients/[id]/          # Danisan detay
+│   │   ├── lessons/new|today/     # Ders olustur / yoklama
+│   │   ├── measurements/new/      # Olcum girisi
+│   │   ├── packages/new/          # Paket olustur
+│   │   ├── workouts/              # Antrenman yonetimi
+│   │   ├── notifications/         # Bildirim
+│   │   ├── settings/              # Profil + abonelik
+│   │   ├── finance/               # Gelir dashboard (yeni)
+│   │   └── upgrade/               # Plan yukseltme (yeni)
+│   ├── (client)/app/              # Danisan paneli (navbar layout)
+│   │   ├── beslenme/              # Beslenme takibi
+│   │   ├── program/               # Antrenman programi
+│   │   ├── progress/              # Olcum + grafik
+│   │   ├── notifications/         # Bildirimler
+│   │   └── ...
+│   ├── [username]/                # Public PT profili
+│   │   └── davet/[token]/         # Davet kabul sayfasi
+│   └── api/
+│       ├── auth/callback/         # OAuth callback
+│       ├── trainer/clients/       # Danisan CRUD
+│       ├── paytr/                 # PayTR webhook + token
+│       ├── invite/register/       # Davet API
+│       └── cron/                  # Zamanlanmis isler
+├── components/
+│   ├── ui/                        # Card, Badge, Button, Modal, Input, Select, Textarea
+│   └── shared/                    # Sidebar, ClientNavbar, NotificationBell
+└── lib/
+    ├── supabase/                  # client.ts, server.ts, middleware.ts, admin.ts
+    ├── types.ts                   # Trainer, Client, Subscription, PaymentOrder, AuditLog...
+    ├── plans.ts                   # Plan config (free/pro/elite)
+    ├── subscription.ts            # canAddClient(), hasFeatureAccess()
+    ├── utils.ts                   # Yardimci fonksiyonlar
+    └── pdf/measurement-report.ts  # PDF olusturma
+```
+
+---
+
+## Veritabani Tablolari
+
+### hamza-web-site'dan Portlanan Tablolar
+Ayni mantik, farkli scope: `user_id` yerine `trainer_id` + `client_id`
+
+| Tablo | Aciklama |
+|-------|----------|
+| `trainers` | PT bilgileri (username, expertise, experience_years) |
+| `clients` | Danisanlar (trainer_id FK, invite_token, parent_id) |
+| `packages` | Ders paketleri (trainer_id scope) |
+| `lessons` | Yapilan dersler |
+| `measurements` | Vucut olcumleri |
+| `workouts` / `workout_exercises` | Antrenman programlari |
+| `client_meals` / `meal_logs` | Beslenme takibi |
+| `notifications` | Bildirimler |
+| `push_subscriptions` | Push abonelikleri |
+| `weekly_reports` | Haftalik raporlar |
+| `client_goals` | Kisisel hedefler |
+| `client_badges` | Rozetler |
+| `progress_photos` | Ilerleme fotograflari |
+| `blog_posts` | Blog yazilari |
+
+### SaaS'a Ozel Yeni Tablolar
+
+| Tablo | Aciklama | Onemli Sutunlar |
+|-------|----------|-----------------|
+| `subscriptions` | PT abonelikleri | `plan` (free/pro/elite), `status`, `current_period_end` |
+| `payment_orders` | PayTR odemeleri | `merchant_oid`, `amount`, `status` (pending/success/failed) |
+| `audit_logs` | Islem gecmisi | `trainer_id`, `action`, `details` (JSONB) |
+
+**Supabase:** tjhktfygvrjasixpwwhk.supabase.co (hamza-web-site'dan tamamen bagimsiz)
+
+**Migrations:** `supabase/migrations/` altinda 001-006 arasi
+
+---
+
+## Plan Yapisi (Freemium)
+
+| Ozellik | Free | Pro | Elite |
+|---------|------|-----|-------|
+| Danisan limiti | 3 | 10 | Sinirsiz |
+| Antrenman programi | ✓ | ✓ | ✓ |
+| Ders takibi | ✓ | ✓ | ✓ |
+| Temel olcum | ✓ | ✓ | ✓ |
+| Olcum grafikleri | ✗ | ✓ | ✓ |
+| Beslenme takibi | ✗ | ✓ | ✓ |
+| Haftalik raporlar | ✗ | ✓ | ✓ |
+| Push bildirim | ✗ | ✓ | ✓ |
+| Finans ekrani | ✗ | ✓ | ✓ |
+| Ilerleme fotograflari | ✗ | ✗ | ✓ |
+| Rozet sistemi | ✗ | ✗ | ✓ |
+| Blog | ✗ | ✗ | ✓ |
+| Risk skoru | ✗ | ✗ | ✓ |
+| Instagram karti | ✗ | ✗ | ✓ |
+
+**Helper fonksiyonlar:** `canAddClient(plan, currentCount)` ve `hasFeatureAccess(plan, feature)` — `lib/subscription.ts`
+
+---
+
+## Danisan Davet Akisi
+
+1. PT dashboard'da "Danisan Ekle" → isim girer → invite token olusur
+2. PT linki WhatsApp/SMS ile paylasr: `megin.com/[username]/davet/[token]`
+3. Danisan linke tiklar → sifre olusturur → hesap acilir → dashboard'a yonlendirilir
+4. Fake email: `client-{uuid}@megin.local` (email girilmezse)
+
+---
+
+## Odeme Sistemi (PayTR)
+
+- **Endpoint:** `/api/paytr/token` (iframe token olustur) + `/api/paytr/callback` (webhook)
+- **Akis:** PT "Plan Yukselt" tiklar → PayTR iframe acilir → odeme → webhook → subscription guncellenir
+- **Durum:** Test modunda, PayTR onay bekleniyor
+- **Env vars:** `PAYTR_MERCHANT_ID`, `PAYTR_MERCHANT_KEY`, `PAYTR_MERCHANT_SALT`
+
+---
+
+## Mevcut Durum
+
+### Tamamlanan
+- Supabase schema (6 migration)
+- Auth endpoints (email/password + Google SSO planli)
+- PayTR entegrasyonu (token + webhook)
+- Plan config + subscription logic
+- Client limit enforcement
+
+### Yapilacak
+- Dashboard sayfalari (hamza-web-site'dan port)
+- Danisan app sayfalari (beslenme, program, progress)
+- Cron jobs (haftalik rapor, push bildirimleri)
+- Landing page
+- Email sistemi
+- Analytics (Clarity + Sentry)
+- Superadmin panel
+
+---
+
+## Kritik Kurallar (Megin'e Ozel)
+
+- **Tenant izolasyonu:** Her sorgu `trainer_id` ile scope'lanmali. RLS'siz sorgu YASAK
+- **Plan limitleri:** Danisan eklemeden once `canAddClient()`, ozellik kullanmadan once `hasFeatureAccess()` kontrol et
+- **Invite token:** Unique, tek kullanimlik
+- **Audit log:** Kritik islemlerde (danisan ekleme/silme, plan degisikligi) log kaydi olustur
+- **Ayri Supabase:** hamza-web-site ve Megin tamamen farkli Supabase instance'lari, karistirma!
+
+---
+
+## Environment Variables (Megin)
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=        # tjhktfygvrjasixpwwhk.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SITE_URL=            # http://localhost:3000 (dev) | megin.com (prod)
+CRON_SECRET=
+PAYTR_MERCHANT_ID=
+PAYTR_MERCHANT_KEY=
+PAYTR_MERCHANT_SALT=
+NEXT_PUBLIC_CLARITY_ID=
+NEXT_PUBLIC_SENTRY_DSN=
+```
+
+---
+
+## Hesaplar & Altyapi (Megin)
+
+- **Supabase:** tjhktfygvrjasixpwwhk.supabase.co
+- **GitHub:** github.com/hamzahsivrikaya-del/Megin (private)
+- **Domain:** megin.com (henuz alinmadi)
+
+---
+
+## Dokumantasyon Dosyalari (Megin repo icinde)
+
+| Dosya | Icerik |
+|-------|--------|
+| `docs/plans/2026-03-01-hamza-saas-is-plani.md` | Is plani, rakip analizi, gelir projeksiyonu |
+| `docs/plans/2026-03-02-megin-saas-design.md` | Teknik tasarim, onboarding, davet akisi |
+| `docs/plans/2026-03-03-dashboard-porting.md` | hamza-web-site → Megin dashboard portlama plani |
+| `docs/plans/2026-03-03-danisan-ekleme-davet-design.md` | Danisan ekleme ve davet akisi detayi |
+| `docs/reports/2026-03-01-kullanici-yorum-analizi-ve-tr-pazar.md` | Rakip uygulama kullanici yorum analizi |
