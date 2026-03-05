@@ -37,6 +37,8 @@ export async function GET() {
     const mondayStr = monday.toISOString().split('T')[0]
 
     // İstatistikleri paralel olarak çek
+    const todayStr = now.toISOString().split('T')[0]
+
     const [
       { count: totalLessons },
       { count: weeklyLessons },
@@ -45,18 +47,20 @@ export async function GET() {
       { data: earnedBadges },
       { count: mealLogCount },
     ] = await Promise.all([
-      // Toplam ders sayısı
-      supabase
-        .from('lessons')
-        .select('id', { count: 'exact', head: true })
-        .eq('client_id', client.id),
-
-      // Bu haftaki ders sayısı
+      // Toplam ders sayısı (sadece bugün ve öncesi — gelecek dersler sayılmaz)
       supabase
         .from('lessons')
         .select('id', { count: 'exact', head: true })
         .eq('client_id', client.id)
-        .gte('date', mondayStr),
+        .lte('date', todayStr),
+
+      // Bu haftaki ders sayısı (sadece bugün ve öncesi)
+      supabase
+        .from('lessons')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', client.id)
+        .gte('date', mondayStr)
+        .lte('date', todayStr),
 
       // Haftalık raporlar (streak ve beslenme uyumu için)
       supabase
