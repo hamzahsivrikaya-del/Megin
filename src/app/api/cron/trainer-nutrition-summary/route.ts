@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushNotification } from '@/lib/push'
 import { safeCompare } from '@/lib/auth-utils'
+import { hasFeatureAccess } from '@/lib/plans'
+import { SubscriptionPlan } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,6 +57,17 @@ export async function GET(request: NextRequest) {
     }
 
     for (const trainer of trainers) {
+      // Plan kontrolü: nutrition özelliği olmayan planları atla
+      const { data: sub } = await admin
+        .from('subscriptions')
+        .select('plan')
+        .eq('trainer_id', trainer.id)
+        .eq('status', 'active')
+        .single()
+
+      const plan = (sub?.plan || 'free') as SubscriptionPlan
+      if (!hasFeatureAccess(plan, 'nutrition')) continue
+
       // Bu eğitmenin aktif paketli danışanlarını al
       const { data: packages } = await admin
         .from('packages')

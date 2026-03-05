@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { BADGE_DEFINITIONS } from '@/lib/badges'
 import { sendPushNotification } from '@/lib/push'
 import { safeCompare } from '@/lib/auth-utils'
+import { hasFeatureAccess } from '@/lib/plans'
+import { SubscriptionPlan } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,9 +48,24 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Plan kontrolü: badges özelliği olmayan eğitmenleri atla
+  const trainerIds = [...new Set([...byUser.values()].map((v) => v.trainerId))]
+  const { data: subs } = await admin
+    .from('subscriptions')
+    .select('trainer_id, plan')
+    .in('trainer_id', trainerIds)
+    .eq('status', 'active')
+
+  const trainerPlanMap = new Map<string, SubscriptionPlan>()
+  for (const s of subs ?? []) {
+    trainerPlanMap.set(s.trainer_id, s.plan as SubscriptionPlan)
+  }
+
   let notified = 0
 
   for (const [, { userId, trainerId, badgeIds }] of byUser) {
+    const plan = trainerPlanMap.get(trainerId) || 'free'
+    if (!hasFeatureAccess(plan, 'badges')) continue
     const badgeNames = badgeIds
       .map(id => BADGE_DEFINITIONS.find(b => b.id === id)?.name)
       .filter(Boolean)

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushNotification } from '@/lib/push'
 import { safeCompare } from '@/lib/auth-utils'
+import { hasFeatureAccess } from '@/lib/plans'
+import { SubscriptionPlan } from '@/lib/types'
 
 function verifyCronSecret(request: NextRequest): boolean {
   const auth = request.headers.get('authorization') || ''
@@ -92,6 +94,17 @@ export async function GET(request: NextRequest) {
     }
 
     for (const trainer of trainers) {
+      // Plan kontrolü: weekly_reports özelliği olmayan planları atla
+      const { data: sub } = await admin
+        .from('subscriptions')
+        .select('plan')
+        .eq('trainer_id', trainer.id)
+        .eq('status', 'active')
+        .single()
+
+      const plan = (sub?.plan || 'free') as SubscriptionPlan
+      if (!hasFeatureAccess(plan, 'weekly_reports')) continue
+
       // Bu eğitmenin aktif paketi olan danışanlarını al
       const { data: packages, error: packagesError } = await admin
         .from('packages')

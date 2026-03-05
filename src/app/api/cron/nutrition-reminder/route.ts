@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushNotification } from '@/lib/push'
 import { safeCompare } from '@/lib/auth-utils'
+import { hasFeatureAccess } from '@/lib/plans'
+import { SubscriptionPlan } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -115,8 +117,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: true, sent: 0 })
     }
 
+    // Plan kontrolü: nutrition özelliği olmayan eğitmenlerin danışanlarını çıkar
+    const trainerIds = [...new Set(clientsToNotify.map((c) => c.trainerId))]
+    const { data: subs } = await admin
+      .from('subscriptions')
+      .select('trainer_id, plan')
+      .in('trainer_id', trainerIds)
+      .eq('status', 'active')
+
+    const trainerPlanMap = new Map<string, SubscriptionPlan>()
+    for (const s of subs ?? []) {
+      trainerPlanMap.set(s.trainer_id, s.plan as SubscriptionPlan)
+    }
+
+    const filteredClients = clientsToNotify.filter((c) => {
+      const plan = trainerPlanMap.get(c.trainerId) || 'free'
+      return hasFeatureAccess(plan, 'nutrition')
+    })
+
+    if (!filteredClients.length) {
+      return NextResponse.json({ ok: true, sent: 0 })
+    }
+
     // Toplu bildirim kayıtları oluştur
-    const notifications = clientsToNotify.map((c) => ({
+    const notifications = filteredClients.map((c) => ({
       user_id: c.userId,
       trainer_id: c.trainerId,
       type: 'nutrition_reminder' as const,
@@ -132,7 +156,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Push bildirim gönder
-    const userIds = clientsToNotify.map((c) => c.userId)
+    const userIds = filteredClients.map((c) => c.userId)
     await sendPushNotification({
       userIds,
       title: dailyMessage.title,
@@ -140,7 +164,7 @@ export async function GET(request: NextRequest) {
       url: '/app/beslenme',
     })
 
-    remindersSent = clientsToNotify.length
+    remindersSent = filteredClients.length
 
     return NextResponse.json({ ok: true, sent: remindersSent, errors, day: dayOfWeek })
   } catch (error) {
