@@ -318,3 +318,15 @@ export interface TourProgress {
   skipped: string[]
   dismissed: boolean
 }
+
+// ── Blog ──
+export interface BlogPost {
+  id: string
+  trainer_id: string
+  title: string
+  content: string
+  cover_image_url: string | null
+  published: boolean
+  created_at: string
+  updated_at: string
+}
