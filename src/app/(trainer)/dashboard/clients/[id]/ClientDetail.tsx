@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
@@ -18,6 +18,9 @@ import { hasFeatureAccess } from '@/lib/plans'
 import Image from 'next/image'
 import MealPlanManager from './MealPlanManager'
 import DownloadPDFButton from '@/components/shared/DownloadPDFButton'
+import InstagramCard from '@/components/shared/InstagramCard'
+import { calculateRiskScore } from '@/lib/risk-score'
+import type { RiskResult } from '@/lib/risk-score'
 
 type Tab = 'overview' | 'measurements' | 'packages' | 'lessons' | 'nutrition'
 
@@ -40,11 +43,12 @@ interface Props {
   goals: ClientGoal[]
   dependents: DependentInfo[]
   plan: SubscriptionPlan
+  trainerName?: string
 }
 
 export default function ClientDetail({
   client, trainerId, packages, measurements, lessons,
-  clientMeals, mealLogs, photos, goals, dependents, plan,
+  clientMeals, mealLogs, photos, goals, dependents, plan, trainerName,
 }: Props) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
@@ -134,6 +138,47 @@ export default function ClientDetail({
     return acc
   }, {})
   const initials = client.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
+
+  // ── Risk Score ──
+  const riskResult: RiskResult | null = useMemo(() => {
+    if (!hasFeatureAccess(plan, 'risk_score')) return null
+
+    const now = new Date()
+
+    // lastLessonDaysAgo
+    const sortedLessons = [...lessons].sort((a, b) => b.date.localeCompare(a.date))
+    const lastLessonDaysAgo = sortedLessons.length > 0
+      ? Math.floor((now.getTime() - new Date(sortedLessons[0].date).getTime()) / (1000 * 60 * 60 * 24))
+      : 30
+
+    // attendanceRate: lessons in last 28 days / expected (activePackage frequency * 4 weeks, fallback total)
+    const fourWeeksAgo = new Date(now)
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28)
+    const recentLessons = lessons.filter((l) => new Date(l.date) >= fourWeeksAgo)
+    const expectedLessons = activePackage ? Math.max(1, Math.round(activePackage.total_lessons / 4)) : 4
+    const attendanceRate = Math.min(1, recentLessons.length / expectedLessons)
+
+    // nutritionCompliance: compliant logs / total logs in last 30 days
+    const thirtyDaysAgo = new Date(now)
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    const recentMealLogs = mealLogs.filter((ml) => new Date(ml.date) >= thirtyDaysAgo)
+    const nutritionCompliance = recentMealLogs.length > 0
+      ? recentMealLogs.filter((ml) => ml.status === 'compliant').length / recentMealLogs.length
+      : 1 // no data = neutral
+
+    // packageProgress
+    const packageProgress = activePackage
+      ? activePackage.used_lessons / activePackage.total_lessons
+      : 0
+
+    return calculateRiskScore({
+      lastLessonDaysAgo,
+      attendanceRate,
+      nutritionCompliance,
+      packageProgress,
+      streakWeeks: 0,
+    })
+  }, [lessons, mealLogs, activePackage, plan])
 
   // ── Handlers ──
 
@@ -597,6 +642,52 @@ export default function ClientDetail({
               </div>
             )}
 
+            {/* Risk Skoru */}
+            {riskResult && (
+              <div className="rounded-xl border border-border p-5 bg-surface">
+                <p className="text-[10px] text-text-secondary uppercase tracking-widest mb-4">Risk Skoru</p>
+                <div className="flex items-center gap-4 mb-3">
+                  <div className={`text-3xl font-bold ${
+                    riskResult.level === 'critical' ? 'text-red-600' :
+                    riskResult.level === 'high' ? 'text-orange-500' :
+                    riskResult.level === 'medium' ? 'text-yellow-500' : 'text-green-500'
+                  }`}>
+                    {riskResult.score}
+                  </div>
+                  <Badge variant={
+                    riskResult.level === 'critical' ? 'danger' :
+                    riskResult.level === 'high' ? 'warning' :
+                    riskResult.level === 'medium' ? 'warning' : 'success'
+                  }>
+                    {riskResult.level === 'critical' ? 'Kritik' :
+                     riskResult.level === 'high' ? 'Yuksek' :
+                     riskResult.level === 'medium' ? 'Orta' : 'Dusuk'}
+                  </Badge>
+                </div>
+                {/* Progress bar */}
+                <div className="w-full h-2 bg-surface-hover rounded-full overflow-hidden mb-3">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      riskResult.level === 'critical' ? 'bg-red-600' :
+                      riskResult.level === 'high' ? 'bg-orange-500' :
+                      riskResult.level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                    }`}
+                    style={{ width: `${riskResult.score}%` }}
+                  />
+                </div>
+                {riskResult.factors.length > 0 && (
+                  <ul className="space-y-1">
+                    {riskResult.factors.map((f, i) => (
+                      <li key={i} className="text-xs text-text-secondary flex items-start gap-1.5">
+                        <span className="text-text-tertiary mt-0.5">•</span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
             {/* Bağlı Üyeler */}
             {hasFeatureAccess(plan, 'dependents') && <div className="rounded-xl border border-border p-5 bg-surface">
               <div className="flex items-center justify-between mb-4">
@@ -658,7 +749,14 @@ export default function ClientDetail({
         {activeTab === 'measurements' && (
           <div className="space-y-6">
             {measurements.length > 0 && (
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
+                {hasFeatureAccess(plan, 'instagram_card') && measurements.length >= 2 && (
+                  <InstagramCard
+                    clientName={client.full_name}
+                    measurements={measurements}
+                    trainerName={trainerName}
+                  />
+                )}
                 <DownloadPDFButton
                   clientName={client.full_name}
                   measurements={measurements}
