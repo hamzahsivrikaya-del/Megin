@@ -207,10 +207,10 @@ export default function BadgeCardModal({ open, onClose, badge, userName, earnedD
 
             <div className="bc-bottom bc-reveal bc-d7">
               <div className="bc-brand-col">
-                <span className="bc-brand-name">@hamzasivrikayaa</span>
-                <span className="bc-brand-sub">Kişisel Antrenör — Antalya</span>
+                <span className="bc-brand-name">megin</span>
+                <span className="bc-brand-sub">Kişisel Antrenör Platformu</span>
               </div>
-              <span className="bc-brand-url">hamzasivrikaya.com</span>
+              <span className="bc-brand-url">megin.app</span>
             </div>
           </div>
         </div>

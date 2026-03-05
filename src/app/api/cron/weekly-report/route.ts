@@ -1,16 +1,60 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getWeekRange, generateMessage } from '@/lib/weekly-report'
 import { sendPushNotification } from '@/lib/push'
 import { safeCompare } from '@/lib/auth-utils'
+import { hasFeatureAccess } from '@/lib/plans'
+import { SubscriptionPlan } from '@/lib/types'
+
+function verifyCronSecret(request: NextRequest): boolean {
+  const auth = request.headers.get('authorization') || ''
+  return safeCompare(auth, `Bearer ${process.env.CRON_SECRET}`)
+}
+
+function getWeekStart(): string {
+  const now = new Date()
+  const day = now.getDay() // 0=Pazar, 1=Pazartesi, ...
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1) // Pazartesi'ye getir
+  const monday = new Date(now.setDate(diff))
+  return monday.toISOString().split('T')[0]
+}
+
+function generateSummary(lessonsCount: number, nutritionCompliance: number | null, consecutiveWeeks: number): string {
+  const parts: string[] = []
+
+  if (lessonsCount === 0) {
+    parts.push('Bu hafta hiç antrenman yapılmadı.')
+  } else if (lessonsCount === 1) {
+    parts.push('Bu hafta 1 antrenman tamamlandı.')
+  } else {
+    parts.push(`Bu hafta ${lessonsCount} antrenman tamamlandı.`)
+  }
+
+  if (nutritionCompliance !== null) {
+    const pct = Math.round(nutritionCompliance)
+    if (pct >= 80) {
+      parts.push(`Beslenme uyumu mükemmel: %${pct}.`)
+    } else if (pct >= 50) {
+      parts.push(`Beslenme uyumu orta düzeyde: %${pct}.`)
+    } else {
+      parts.push(`Beslenme uyumu düşük: %${pct}. Gelişime ihtiyaç var.`)
+    }
+  }
+
+  if (consecutiveWeeks >= 4) {
+    parts.push(`${consecutiveWeeks} hafta üst üste aktif - harika bir çalışma serisi!`)
+  } else if (consecutiveWeeks >= 2) {
+    parts.push(`${consecutiveWeeks} haftadır düzenli devam ediyor.`)
+  }
+
+  return parts.join(' ')
+}
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization') || ''
-  const expected = `Bearer ${process.env.CRON_SECRET}`
-  if (!safeCompare(authHeader, expected)) {
-    return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 })
+// ── GET: Haftalık rapor oluştur (Cron - Her Pazar) ──
+export async function GET(request: NextRequest) {
+  if (!verifyCronSecret(request)) {
+    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 })
   }
 
   // Saat kontrolü: sadece 11:00-19:00 UTC (TR 14:00-22:00) arasında gönder
@@ -20,9 +64,12 @@ export async function GET(request: Request) {
   }
 
   const admin = createAdminClient()
-  const { weekStart, weekEnd } = getWeekRange(new Date())
+  const weekStart = getWeekStart()
+  const weekEnd = new Date(weekStart)
+  weekEnd.setDate(weekEnd.getDate() + 6)
+  const weekEndStr = weekEnd.toISOString().split('T')[0]
 
-  // Bu hafta zaten gonderildi mi? (tekrar onleme)
+  // Bu hafta zaten üretildi mi? (tekrar önleme)
   const { count: existingCount } = await admin
     .from('weekly_reports')
     .select('id', { count: 'exact', head: true })
@@ -32,113 +79,146 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: true, generated: 0, skipped: 'already-generated-this-week' })
   }
 
-  // Aktif üyeleri al
-  const { data: members, error: memberError } = await admin
-    .from('users')
-    .select('id')
-    .eq('role', 'member')
-    .eq('is_active', true)
+  let reportsGenerated = 0
+  let errors = 0
 
-  if (memberError || !members?.length) {
-    return NextResponse.json({ ok: true, generated: 0, total: 0 })
-  }
+  try {
+    // Aktif eğitmenleri al
+    const { data: trainers, error: trainersError } = await admin
+      .from('trainers')
+      .select('id')
+      .eq('is_active', true)
 
-  const results = await Promise.allSettled(
-    members.map((member) => generateReport(admin, member.id, weekStart, weekEnd))
-  )
-
-  // Push bildirim gönder
-  const userIds = members.map((m) => m.id)
-  await sendPushNotification({
-    userIds,
-    title: 'Haftalık Raporun Hazır!',
-    message: 'Bu haftaki performansını görmek için tıkla 💪',
-    url: '/dashboard/haftalik-ozet',
-  })
-
-  const succeeded = results.filter((r) => r.status === 'fulfilled').length
-  return NextResponse.json({ ok: true, generated: succeeded, total: members.length })
-}
-
-async function generateReport(
-  admin: ReturnType<typeof createAdminClient>,
-  userId: string,
-  weekStart: string,
-  weekEnd: string
-) {
-  // Bu haftaki dersler
-  const { count: lessonsCount } = await admin
-    .from('lessons')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gte('date', weekStart)
-    .lte('date', weekEnd)
-
-  const count = lessonsCount ?? 0
-  const totalHours = parseFloat((count * 1).toFixed(1))
-
-  // Streak hesapla
-  const consecutiveWeeks = await calculateStreak(admin, userId, weekStart)
-
-  // Beslenme uyumu hesapla
-  const { data: weekMeals } = await admin
-    .from('meal_logs')
-    .select('status')
-    .eq('user_id', userId)
-    .eq('is_extra', false)
-    .gte('date', weekStart)
-    .lte('date', weekEnd)
-
-  const nutritionCompliance = weekMeals && weekMeals.length > 0
-    ? Math.round((weekMeals.filter((m: { status: string }) => m.status === 'compliant').length / weekMeals.length) * 100)
-    : null
-
-  const message = generateMessage(count, consecutiveWeeks, nutritionCompliance)
-
-  // Upsert — aynı hafta için tekrar çalışırsa günceller
-  await admin.from('weekly_reports').upsert(
-    {
-      user_id: userId,
-      week_start: weekStart,
-      week_end: weekEnd,
-      lessons_count: count,
-      total_hours: totalHours,
-      consecutive_weeks: consecutiveWeeks,
-      nutrition_compliance: nutritionCompliance,
-      message,
-    },
-    { onConflict: 'user_id,week_start' }
-  )
-}
-
-async function calculateStreak(
-  admin: ReturnType<typeof createAdminClient>,
-  userId: string,
-  currentWeekStart: string
-): Promise<number> {
-  let streak = 0
-  const checkDate = new Date(currentWeekStart)
-
-  for (let i = 0; i < 52; i++) {
-    const wStart = checkDate.toISOString().split('T')[0]
-    const wEnd = new Date(checkDate)
-    wEnd.setDate(checkDate.getDate() + 6)
-    const wEndStr = wEnd.toISOString().split('T')[0]
-
-    const { count } = await admin
-      .from('lessons')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .gte('date', wStart)
-      .lte('date', wEndStr)
-
-    if ((count ?? 0) > 0) {
-      streak++
-      checkDate.setDate(checkDate.getDate() - 7) // Önceki haftaya git
-    } else {
-      break // Seri bozuldu
+    if (trainersError || !trainers?.length) {
+      return NextResponse.json({ reportsGenerated: 0, message: 'Aktif eğitmen bulunamadı' })
     }
-  }
 
-  return streak
+    for (const trainer of trainers) {
+      // Plan kontrolü: weekly_reports özelliği olmayan planları atla
+      const { data: sub } = await admin
+        .from('subscriptions')
+        .select('plan')
+        .eq('trainer_id', trainer.id)
+        .eq('status', 'active')
+        .single()
+
+      const plan = (sub?.plan || 'free') as SubscriptionPlan
+      if (!hasFeatureAccess(plan, 'weekly_reports')) continue
+
+      // Bu eğitmenin aktif paketi olan danışanlarını al
+      const { data: packages, error: packagesError } = await admin
+        .from('packages')
+        .select('client_id, clients!inner(id, user_id, full_name, is_active)')
+        .eq('trainer_id', trainer.id)
+        .eq('status', 'active')
+
+      if (packagesError || !packages?.length) continue
+
+      // Benzersiz danışanlar
+      const seen = new Set<string>()
+      const uniqueClients: Array<{ id: string; user_id: string | null; full_name: string }> = []
+
+      for (const pkg of packages) {
+        const client = pkg.clients as unknown as { id: string; user_id: string | null; full_name: string; is_active: boolean }
+        if (!seen.has(client.id) && client.is_active) {
+          seen.add(client.id)
+          uniqueClients.push({ id: client.id, user_id: client.user_id, full_name: client.full_name })
+        }
+      }
+
+      for (const client of uniqueClients) {
+        try {
+          // Bu haftaki ders sayısı (sadece yapıldı işaretlenen)
+          const { count: lessonsCount } = await admin
+            .from('lessons')
+            .select('id', { count: 'exact', head: true })
+            .eq('trainer_id', trainer.id)
+            .eq('client_id', client.id)
+            .gte('date', weekStart)
+            .lte('date', weekEndStr)
+            .eq('attended', true)
+
+          // Bu haftaki beslenme uyumu
+          const { data: mealLogs } = await admin
+            .from('meal_logs')
+            .select('status')
+            .eq('trainer_id', trainer.id)
+            .eq('client_id', client.id)
+            .gte('date', weekStart)
+            .lte('date', weekEndStr)
+
+          let nutritionCompliance: number | null = null
+          if (mealLogs && mealLogs.length > 0) {
+            const compliantCount = mealLogs.filter((l) => l.status === 'compliant').length
+            nutritionCompliance = (compliantCount / mealLogs.length) * 100
+          }
+
+          // Önceki rapordan ardışık hafta sayısı
+          const { data: prevReport } = await admin
+            .from('weekly_reports')
+            .select('consecutive_weeks')
+            .eq('trainer_id', trainer.id)
+            .eq('client_id', client.id)
+            .order('week_start', { ascending: false })
+            .limit(1)
+            .single()
+
+          const prevConsecutive = prevReport?.consecutive_weeks ?? 0
+          const currentLessons = lessonsCount ?? 0
+          const consecutiveWeeks = currentLessons > 0 ? prevConsecutive + 1 : 0
+
+          const summary = generateSummary(currentLessons, nutritionCompliance, consecutiveWeeks)
+
+          // Rapor ekle
+          const { error: insertError } = await admin
+            .from('weekly_reports')
+            .insert({
+              trainer_id: trainer.id,
+              client_id: client.id,
+              week_start: weekStart,
+              lessons_count: currentLessons,
+              nutrition_compliance: nutritionCompliance,
+              consecutive_weeks: consecutiveWeeks,
+              summary,
+            })
+
+          if (insertError) {
+            console.error('weekly_reports insert error:', insertError)
+            errors++
+            continue
+          }
+
+          // Danışana bildirim oluştur
+          if (client.user_id) {
+            await admin.from('notifications').insert({
+              user_id: client.user_id,
+              trainer_id: trainer.id,
+              type: 'weekly_report',
+              title: 'Haftalık Raporun Hazır',
+              message: summary,
+              is_read: false,
+              data: { week_start: weekStart, lessons_count: currentLessons },
+            })
+
+            await sendPushNotification({
+              userIds: [client.user_id],
+              title: 'Haftalık Raporun Hazır',
+              message: `${client.full_name}, bu haftaki performans raporunu görüntüle.`,
+              url: '/dashboard',
+            })
+          }
+
+          reportsGenerated++
+        } catch (err) {
+          console.error(`Rapor oluşturma hatası (client: ${client.id}):`, err)
+          errors++
+        }
+      }
+    }
+
+    return NextResponse.json({ reportsGenerated, errors, weekStart })
+  } catch (error) {
+    console.error('GET /api/cron/weekly-report error:', error)
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 })
+  }
 }

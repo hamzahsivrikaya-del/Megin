@@ -1,11 +1,12 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'jpftfjhmgdyrnenopays.supabase.co',
+        hostname: 'tjhktfygvrjasixpwwhk.supabase.co',
+        pathname: '/storage/v1/object/public/**',
       },
     ],
   },
@@ -14,50 +15,22 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
           {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' https://jpftfjhmgdyrnenopays.supabase.co data: blob:",
-              "font-src 'self' blob:",
-              "connect-src 'self' https://jpftfjhmgdyrnenopays.supabase.co",
-              "worker-src 'self'",
-              "frame-ancestors 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "upgrade-insecure-requests",
-            ].join('; '),
+            value: 'camera=(self), microphone=(), geolocation=()',
           },
         ],
       },
-    ];
+    ]
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

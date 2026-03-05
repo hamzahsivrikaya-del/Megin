@@ -5,18 +5,13 @@ import { sendPushNotification } from '@/lib/push'
 
 interface LessonChange {
   type: 'create' | 'update' | 'delete'
-  userId: string
-  memberName: string
+  clientId: string
+  clientName: string
   date: string
   startTime: string
   oldDate?: string
   oldStartTime?: string
   duration: number
-}
-
-interface RequestBody {
-  mode: 'urgent' | 'batch'
-  changes: LessonChange[]
 }
 
 const DAYS_TR = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi']
@@ -27,7 +22,7 @@ function formatDateTR(dateStr: string): string {
   return `${d.getDate()} ${MONTHS_TR[d.getMonth()]} ${DAYS_TR[d.getDay()]}`
 }
 
-function buildUrgentMessage(change: LessonChange): { title: string; message: string; notifType: string } {
+function buildMessage(change: LessonChange): { title: string; message: string; notifType: string } {
   if (change.type === 'delete') {
     return {
       title: 'Ders İptali',
@@ -58,109 +53,76 @@ function buildUrgentMessage(change: LessonChange): { title: string; message: str
   }
 }
 
-function buildBatchMessage(changes: LessonChange[]): { title: string; message: string; notifType: string } {
-  const creates = changes.filter(c => c.type === 'create')
-  const updates = changes.filter(c => c.type === 'update')
-  const deletes = changes.filter(c => c.type === 'delete')
-
-  if (creates.length > 0 && updates.length === 0 && deletes.length === 0) {
-    const list = creates
-      .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
-      .map(c => {
-        const d = new Date(c.date + 'T00:00:00')
-        return `${DAYS_TR[d.getDay()].slice(0, 3)} ${c.startTime}`
-      })
-      .join(', ')
-    return {
-      title: 'Ders Programı',
-      message: `Bu hafta ${creates.length} dersin planlandı: ${list}`,
-      notifType: 'lesson_scheduled',
-    }
-  }
-
-  const parts: string[] = []
-  if (creates.length > 0) parts.push(`${creates.length} ders eklendi`)
-  if (updates.length > 0) parts.push(`${updates.length} ders güncellendi`)
-  if (deletes.length > 0) parts.push(`${deletes.length} ders iptal edildi`)
-
-  return {
-    title: 'Ders Programı Güncellendi',
-    message: `Programında değişiklik: ${parts.join(', ')}. Dashboard'undan kontrol et.`,
-    notifType: creates.length >= updates.length && creates.length >= deletes.length
-      ? 'lesson_scheduled'
-      : updates.length >= deletes.length ? 'lesson_updated' : 'lesson_cancelled',
-  }
-}
-
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session?.user) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { data: userData } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', session.user.id)
+  // Trainer kontrolü
+  const { data: trainer } = await supabase
+    .from('trainers')
+    .select('id')
+    .eq('user_id', user.id)
     .single()
 
-  if (userData?.role !== 'admin') {
+  if (!trainer) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  let body: RequestBody
+  let changes: LessonChange[]
   try {
-    body = await req.json()
+    const body = await req.json()
+    changes = body.changes
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { mode, changes } = body
   if (!changes || changes.length === 0) {
     return NextResponse.json({ ok: true })
   }
 
   const admin = createAdminClient()
 
-  const byUser = new Map<string, LessonChange[]>()
-  for (const c of changes) {
-    const arr = byUser.get(c.userId) || []
-    arr.push(c)
-    byUser.set(c.userId, arr)
-  }
+  // Client'ların user_id'lerini toplu al
+  const clientIds = [...new Set(changes.map((c) => c.clientId))]
+  const { data: clients } = await admin
+    .from('clients')
+    .select('id, user_id')
+    .in('id', clientIds)
+    .not('user_id', 'is', null)
 
-  for (const [userId, userChanges] of byUser) {
-    let title: string
-    let message: string
-    let notifType: string
+  const clientUserMap = new Map(
+    (clients ?? []).map((c) => [c.id, c.user_id as string])
+  )
 
-    if (mode === 'urgent') {
-      const result = buildUrgentMessage(userChanges[0])
-      title = result.title
-      message = result.message
-      notifType = result.notifType
-    } else {
-      const result = buildBatchMessage(userChanges)
-      title = result.title
-      message = result.message
-      notifType = result.notifType
-    }
+  let notified = 0
+
+  for (const change of changes) {
+    const userId = clientUserMap.get(change.clientId)
+    if (!userId) continue
+
+    const { title, message, notifType } = buildMessage(change)
 
     await admin.from('notifications').insert({
       user_id: userId,
+      trainer_id: trainer.id,
       type: notifType,
       title,
       message,
+      is_read: false,
     })
 
     await sendPushNotification({
       userIds: [userId],
       title,
       message,
-      url: '/dashboard',
+      url: '/app',
     })
+
+    notified++
   }
 
-  return NextResponse.json({ ok: true, notified: byUser.size })
+  return NextResponse.json({ ok: true, notified })
 }
