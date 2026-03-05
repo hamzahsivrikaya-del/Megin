@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import BeslenmeClient from './BeslenmeClient'
+import { getTrainerPlan } from '@/lib/subscription'
+import FeatureGate from '@/components/shared/FeatureGate'
 
 export default async function BeslenmePage() {
   const supabase = await createClient()
@@ -14,6 +16,8 @@ export default async function BeslenmePage() {
     .maybeSingle()
 
   if (!client) redirect('/login')
+
+  const plan = await getTrainerPlan(supabase, client.trainer_id)
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -35,14 +39,16 @@ export default async function BeslenmePage() {
   ])
 
   return (
-    <BeslenmeClient
-      clientId={client.id}
-      trainerId={client.trainer_id}
-      userId={session.user.id}
-      memberMeals={memberMeals || []}
-      initialLogs={mealLogs || []}
-      today={today}
-      nutritionNote={client.nutrition_note}
-    />
+    <FeatureGate plan={plan} feature="nutrition" role="client">
+      <BeslenmeClient
+        clientId={client.id}
+        trainerId={client.trainer_id}
+        userId={session.user.id}
+        memberMeals={memberMeals || []}
+        initialLogs={mealLogs || []}
+        today={today}
+        nutritionNote={client.nutrition_note}
+      />
+    </FeatureGate>
   )
 }
