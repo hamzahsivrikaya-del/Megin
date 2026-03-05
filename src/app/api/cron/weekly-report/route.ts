@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushNotification } from '@/lib/push'
+import { safeCompare } from '@/lib/auth-utils'
 
 function verifyCronSecret(request: NextRequest): boolean {
-  const auth = request.headers.get('authorization')
-  return auth === `Bearer ${process.env.CRON_SECRET}`
+  const auth = request.headers.get('authorization') || ''
+  return safeCompare(auth, `Bearer ${process.env.CRON_SECRET}`)
 }
 
 function getWeekStart(): string {
@@ -46,10 +47,18 @@ function generateSummary(lessonsCount: number, nutritionCompliance: number | nul
   return parts.join(' ')
 }
 
+export const dynamic = 'force-dynamic'
+
 // ── GET: Haftalık rapor oluştur (Cron - Her Pazar) ──
 export async function GET(request: NextRequest) {
   if (!verifyCronSecret(request)) {
     return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 })
+  }
+
+  // Saat kontrolü: sadece 11:00-19:00 UTC (TR 14:00-22:00) arasında gönder
+  const nowUTC = new Date().getUTCHours()
+  if (nowUTC < 11 || nowUTC >= 19) {
+    return NextResponse.json({ ok: true, generated: 0, skipped: 'outside-time-window' })
   }
 
   const admin = createAdminClient()
@@ -57,6 +66,16 @@ export async function GET(request: NextRequest) {
   const weekEnd = new Date(weekStart)
   weekEnd.setDate(weekEnd.getDate() + 6)
   const weekEndStr = weekEnd.toISOString().split('T')[0]
+
+  // Bu hafta zaten üretildi mi? (tekrar önleme)
+  const { count: existingCount } = await admin
+    .from('weekly_reports')
+    .select('id', { count: 'exact', head: true })
+    .eq('week_start', weekStart)
+
+  if (existingCount && existingCount > 0) {
+    return NextResponse.json({ ok: true, generated: 0, skipped: 'already-generated-this-week' })
+  }
 
   let reportsGenerated = 0
   let errors = 0

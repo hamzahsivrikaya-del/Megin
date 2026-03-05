@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import ServiceWorkerRegistration from '@/components/shared/ServiceWorkerRegistration'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
+        <link rel="manifest" href="/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -35,6 +37,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-background text-text-primary antialiased">
         {children}
+        <ServiceWorkerRegistration />
         {/* Microsoft Clarity */}
         {process.env.NEXT_PUBLIC_CLARITY_ID && (
           <script

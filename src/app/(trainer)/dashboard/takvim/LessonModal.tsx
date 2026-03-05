@@ -14,7 +14,17 @@ export interface LessonChange {
   clientName: string
   date: string
   startTime: string
+  oldDate?: string
+  oldStartTime?: string
   duration: number
+}
+
+function notifyLessonChange(changes: LessonChange[]) {
+  fetch('/api/calendar-notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ changes }),
+  }).catch(() => {})
 }
 
 interface Client {
@@ -143,14 +153,16 @@ export default function LessonModal({
       }
 
       setSaving(false)
-      onSave({
+      const change: LessonChange = {
         type: 'create',
         clientId,
         clientName: client.fullName,
         date,
         startTime: time,
         duration: Number(duration),
-      })
+      }
+      notifyLessonChange([change])
+      onSave(change)
     } else {
       if (!event) {
         setSaving(false)
@@ -174,14 +186,18 @@ export default function LessonModal({
       }
 
       setSaving(false)
-      onSave({
+      const change: LessonChange = {
         type: 'update',
         clientId: event.extendedProps.clientId,
         clientName: event.extendedProps.clientName,
         date,
         startTime: time,
+        oldDate: event.extendedProps.date,
+        oldStartTime: event.extendedProps.startTime ?? undefined,
         duration: Number(duration),
-      })
+      }
+      notifyLessonChange([change])
+      onSave(change)
     }
   }
 
@@ -208,14 +224,16 @@ export default function LessonModal({
     }
 
     setDeleting(false)
-    onSave({
+    const change: LessonChange = {
       type: 'delete',
       clientId: event.extendedProps.clientId,
       clientName: event.extendedProps.clientName,
       date: event.extendedProps.date,
       startTime: event.extendedProps.startTime || '10:00',
       duration: event.extendedProps.duration || 60,
-    })
+    }
+    notifyLessonChange([change])
+    onSave(change)
   }
 
   const clientOptions = [

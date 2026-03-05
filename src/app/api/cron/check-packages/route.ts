@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushNotification } from '@/lib/push'
+import { safeCompare } from '@/lib/auth-utils'
 
 function verifyCronSecret(request: NextRequest): boolean {
-  const auth = request.headers.get('authorization')
-  return auth === `Bearer ${process.env.CRON_SECRET}`
+  const auth = request.headers.get('authorization') || ''
+  return safeCompare(auth, `Bearer ${process.env.CRON_SECRET}`)
 }
 
 function getTodayStr(): string {

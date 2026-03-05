@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { BADGE_DEFINITIONS } from '@/lib/badges'
 import { sendPushNotification } from '@/lib/push'
+import { safeCompare } from '@/lib/auth-utils'
 
 export const dynamic = 'force-dynamic'
 
 function verifyCronSecret(request: NextRequest): boolean {
-  const auth = request.headers.get('authorization')
-  return auth === `Bearer ${process.env.CRON_SECRET}`
+  const auth = request.headers.get('authorization') || ''
+  return safeCompare(auth, `Bearer ${process.env.CRON_SECRET}`)
 }
 
 export async function GET(request: NextRequest) {
