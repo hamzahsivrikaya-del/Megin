@@ -29,16 +29,19 @@ const GOAL_METRIC_UNITS: Record<GoalMetricType, string> = {
 
 const LOWER_IS_BETTER: GoalMetricType[] = ['weight', 'body_fat_pct', 'waist']
 
-function calcGoalProgress(metric: GoalMetricType, current: number, target: number): number {
+function calcGoalProgress(metric: GoalMetricType, current: number, target: number, start: number): number {
+  if (current === target) return 100
   if (LOWER_IS_BETTER.includes(metric)) {
-    return current <= target ? 100 : 50
+    const totalNeeded = start - target
+    if (totalNeeded <= 0) return current <= target ? 100 : 0
+    const achieved = start - current
+    return Math.min(100, Math.max(0, Math.round((achieved / totalNeeded) * 100)))
+  } else {
+    const totalNeeded = target - start
+    if (totalNeeded <= 0) return current >= target ? 100 : 0
+    const achieved = current - start
+    return Math.min(100, Math.max(0, Math.round((achieved / totalNeeded) * 100)))
   }
-  return current >= target ? 100 : 50
-}
-
-function isGoalAchieved(metric: GoalMetricType, current: number, target: number): boolean {
-  if (LOWER_IS_BETTER.includes(metric)) return current <= target
-  return current >= target
 }
 
 export default async function ProgressPage() {
@@ -161,25 +164,46 @@ export default async function ProgressPage() {
                 arm: measurements[0]?.arm ? Number(measurements[0].arm) : null,
                 leg: measurements[0]?.leg ? Number(measurements[0].leg) : null,
               }}
+              startValues={(() => {
+                const first = measurements[measurements.length - 1]
+                return {
+                  weight: first?.weight ? Number(first.weight) : null,
+                  body_fat_pct: first?.body_fat_pct ? Number(first.body_fat_pct) : null,
+                  chest: first?.chest ? Number(first.chest) : null,
+                  waist: first?.waist ? Number(first.waist) : null,
+                  arm: first?.arm ? Number(first.arm) : null,
+                  leg: first?.leg ? Number(first.leg) : null,
+                }
+              })()}
             />
           </Card>
 
           {/* Hedef Detayları */}
           {goals && goals.length > 0 && (() => {
             const latestM = measurements[0]
+            const firstM = measurements[measurements.length - 1]
             return (
               <Card>
-                <CardHeader><CardTitle>Hedeflerim</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Hedef Detayları</CardTitle></CardHeader>
                 <div className="space-y-5">
                   {(goals as ClientGoal[]).map((goal) => {
                     const metric = goal.metric_type as GoalMetricType
                     const rawVal = latestM?.[metric]
                     const current: number | null = typeof rawVal === 'number' ? rawVal : null
+                    const rawStart = firstM?.[metric]
+                    const start: number | null = typeof rawStart === 'number' ? rawStart : current
                     const unit = GOAL_METRIC_UNITS[metric]
                     const label = GOAL_METRIC_LABELS[metric]
-                    const achieved = current !== null && isGoalAchieved(metric, current, goal.target_value)
-                    const progress = current !== null
-                      ? calcGoalProgress(metric, current, goal.target_value)
+                    const achieved = current !== null && (
+                      LOWER_IS_BETTER.includes(metric)
+                        ? current <= goal.target_value
+                        : current >= goal.target_value
+                    )
+                    const progress = current !== null && start !== null
+                      ? calcGoalProgress(metric, current, goal.target_value, start)
+                      : null
+                    const remaining = current !== null
+                      ? Math.round(Math.abs(goal.target_value - current) * 10) / 10
                       : null
 
                     return (
@@ -200,14 +224,18 @@ export default async function ProgressPage() {
                           <div className="space-y-1">
                             <div className="h-2 bg-border rounded-full overflow-hidden">
                               <div
-                                className={`h-full rounded-full transition-all duration-500 ${
-                                  achieved ? 'bg-success' : 'bg-primary'
-                                }`}
-                                style={{ width: `${progress}%` }}
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{
+                                  width: `${achieved ? 100 : progress}%`,
+                                  backgroundColor: achieved ? '#22c55e' : '#DC2626',
+                                }}
                               />
                             </div>
-                            <div className="text-xs text-text-secondary text-right">
-                              %{progress} tamamlandı
+                            <div className={`text-xs text-right ${achieved ? 'text-success' : 'text-danger'}`}>
+                              {achieved
+                                ? 'Hedefe ulaştın!'
+                                : `${remaining} ${unit} kaldı — %${progress}`
+                              }
                             </div>
                           </div>
                         )}

@@ -322,11 +322,6 @@ export default async function ClientDashboardPage() {
                         {lesson.start_time.slice(0, 5)}
                       </span>
                     )}
-                    {lesson.duration && (
-                      <span className="text-xs text-text-secondary bg-surface-hover px-1.5 py-0.5 rounded">
-                        {lesson.duration} dk
-                      </span>
-                    )}
                   </div>
                 </div>
               )

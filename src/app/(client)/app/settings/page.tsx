@@ -171,22 +171,21 @@ export default function ClientSettingsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const [{ data: client }, { data: firstLesson }] = await Promise.all([
-        supabase
-          .from('clients')
-          .select('full_name, phone, avatar_url, start_date')
-          .eq('user_id', user.id)
-          .maybeSingle(),
-        supabase
-          .from('lessons')
-          .select('date')
-          .eq('client_id', user.id)
-          .order('date', { ascending: true })
-          .limit(1)
-          .maybeSingle(),
-      ])
+      const { data: client } = await supabase
+        .from('clients')
+        .select('id, full_name, phone, avatar_url, start_date')
+        .eq('user_id', user.id)
+        .maybeSingle()
 
       if (client) {
+        const { data: firstLesson } = await supabase
+          .from('lessons')
+          .select('date')
+          .eq('client_id', client.id)
+          .order('date', { ascending: true })
+          .limit(1)
+          .maybeSingle()
+
         setFullName(client.full_name || '')
         setPhone(client.phone || '')
         setAvatarUrl(client.avatar_url || null)
@@ -197,7 +196,7 @@ export default function ClientSettingsPage() {
           .from('clients')
           .select('tour_progress, trainer_id')
           .eq('user_id', user.id)
-          .single()
+          .maybeSingle()
         if (fullClient) {
           setTourProgress(fullClient.tour_progress as TourProgress | null)
           const { data: sub } = await supabase

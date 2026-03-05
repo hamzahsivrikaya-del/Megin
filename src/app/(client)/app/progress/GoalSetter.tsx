@@ -7,23 +7,53 @@ import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
 import type { GoalMetricType, ClientGoal } from '@/lib/types'
 
-const METRICS: { key: GoalMetricType; label: string; unit: string; color: string }[] = [
-  { key: 'weight', label: 'Kilo', unit: 'kg', color: '#DC2626' },
-  { key: 'body_fat_pct', label: 'Yağ %', unit: '%', color: '#F97316' },
-  { key: 'chest', label: 'Göğüs', unit: 'cm', color: '#F59E0B' },
-  { key: 'waist', label: 'Bel', unit: 'cm', color: '#22C55E' },
-  { key: 'arm', label: 'Kol', unit: 'cm', color: '#3B82F6' },
-  { key: 'leg', label: 'Bacak', unit: 'cm', color: '#8B5CF6' },
+const LOWER_IS_BETTER: GoalMetricType[] = ['weight', 'body_fat_pct', 'waist']
+
+const METRICS: { key: GoalMetricType; label: string; unit: string }[] = [
+  { key: 'weight', label: 'Kilo', unit: 'kg' },
+  { key: 'body_fat_pct', label: 'Yağ %', unit: '%' },
+  { key: 'chest', label: 'Göğüs', unit: 'cm' },
+  { key: 'waist', label: 'Bel', unit: 'cm' },
+  { key: 'arm', label: 'Kol', unit: 'cm' },
+  { key: 'leg', label: 'Bacak', unit: 'cm' },
 ]
+
+function calcProgress(metric: GoalMetricType, current: number, target: number, start: number): number {
+  if (current === target) return 100
+  if (LOWER_IS_BETTER.includes(metric)) {
+    // Azalma hedefi: start'tan target'a ne kadar yaklaştın
+    const totalNeeded = start - target
+    if (totalNeeded <= 0) return current <= target ? 100 : 0
+    const achieved = start - current
+    return Math.min(100, Math.max(0, Math.round((achieved / totalNeeded) * 100)))
+  } else {
+    // Artış hedefi: start'tan target'a ne kadar yaklaştın
+    const totalNeeded = target - start
+    if (totalNeeded <= 0) return current >= target ? 100 : 0
+    const achieved = current - start
+    return Math.min(100, Math.max(0, Math.round((achieved / totalNeeded) * 100)))
+  }
+}
+
+function getRemainingText(metric: GoalMetricType, current: number, target: number, unit: string): string {
+  const diff = Math.abs(target - current)
+  const rounded = Math.round(diff * 10) / 10
+  if (LOWER_IS_BETTER.includes(metric)) {
+    return current <= target ? 'Hedefe ulaştın!' : `${rounded} ${unit} kaldı`
+  } else {
+    return current >= target ? 'Hedefe ulaştın!' : `${rounded} ${unit} kaldı`
+  }
+}
 
 interface GoalSetterProps {
   clientId: string
   trainerId: string
   goals: ClientGoal[]
   currentValues: Record<string, number | null>
+  startValues?: Record<string, number | null>
 }
 
-export default function GoalSetter({ clientId, trainerId, goals, currentValues }: GoalSetterProps) {
+export default function GoalSetter({ clientId, trainerId, goals, currentValues, startValues }: GoalSetterProps) {
   const router = useRouter()
   const [selectedMetric, setSelectedMetric] = useState<GoalMetricType | null>(null)
   const [targetValue, setTargetValue] = useState('')
@@ -81,15 +111,19 @@ export default function GoalSetter({ clientId, trainerId, goals, currentValues }
   return (
     <>
       <div className="grid grid-cols-3 gap-2">
-        {METRICS.map(({ key, label, unit, color }) => {
+        {METRICS.map(({ key, label, unit }) => {
           const goal = goals.find(g => g.metric_type === key)
           const current = currentValues[key]
+          const start = startValues?.[key] ?? current
           const hasGoal = !!goal
           const achieved = hasGoal && current !== null && (
-            ['weight', 'body_fat_pct', 'waist'].includes(key)
+            LOWER_IS_BETTER.includes(key)
               ? current <= goal.target_value
               : current >= goal.target_value
           )
+          const progress = hasGoal && current !== null && start !== null
+            ? calcProgress(key, current, goal.target_value, start)
+            : null
 
           return (
             <button
@@ -97,11 +131,11 @@ export default function GoalSetter({ clientId, trainerId, goals, currentValues }
               onClick={() => openModal(key)}
               className="p-3 rounded-xl border border-border bg-surface hover:bg-surface-hover transition-all text-left cursor-pointer"
               style={{
-                borderColor: achieved ? 'rgba(34,197,94,0.3)' : hasGoal ? `${color}33` : undefined,
+                borderColor: achieved ? 'rgba(34,197,94,0.3)' : undefined,
               }}
             >
               <div className="flex items-center gap-1.5 mb-1">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+                <div className="w-2 h-2 rounded-full bg-primary" />
                 <span className="text-[11px] font-medium text-text-secondary">{label}</span>
               </div>
               {current !== null ? (
@@ -117,13 +151,16 @@ export default function GoalSetter({ clientId, trainerId, goals, currentValues }
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
-                        width: achieved ? '100%' : '50%',
-                        backgroundColor: achieved ? '#22c55e' : color,
+                        width: `${achieved ? 100 : progress ?? 0}%`,
+                        backgroundColor: achieved ? '#22c55e' : '#DC2626',
                       }}
                     />
                   </div>
-                  <div className="text-[10px] mt-1" style={{ color: achieved ? '#22c55e' : color }}>
-                    {achieved ? 'Hedefe ulaştın!' : `Hedef: ${goal.target_value} ${unit}`}
+                  <div className={`text-[10px] mt-1 ${achieved ? 'text-success' : 'text-danger'}`}>
+                    {current !== null
+                      ? getRemainingText(key, current, goal.target_value, unit)
+                      : `Hedef: ${goal.target_value} ${unit}`
+                    }
                   </div>
                 </div>
               ) : (

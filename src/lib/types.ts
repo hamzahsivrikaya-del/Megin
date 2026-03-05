@@ -75,6 +75,9 @@ export interface Lesson {
   package_id: string
   client_id: string
   date: string
+  start_time: string | null
+  duration: number | null
+  attended: boolean
   notes: string | null
   created_at: string
   // joined
@@ -170,18 +173,16 @@ export interface MealLog {
 }
 
 // ── Blog ──
-export type BlogPostStatus = 'draft' | 'published'
-
 export interface BlogPost {
   id: string
   trainer_id: string
   title: string
-  slug: string
+  slug: string | null
   content: string
-  cover_image: string | null
-  status: BlogPostStatus
-  published_at: string | null
+  cover_image_url: string | null
+  published: boolean
   created_at: string
+  updated_at: string
 }
 
 // ── Bildirimler ──
@@ -193,11 +194,16 @@ export type NotificationType =
   | 'nutrition_reminder'
   | 'badge_earned'
   | 'client_action'
+  | 'lesson_scheduled'
+  | 'lesson_updated'
+  | 'lesson_cancelled'
+  | 'trainer_nutrition_summary'
 
 export interface Notification {
   id: string
-  user_id: string
+  user_id: string | null
   trainer_id: string
+  client_id: string | null
   type: NotificationType
   title: string
   message: string
@@ -319,14 +325,3 @@ export interface TourProgress {
   dismissed: boolean
 }
 
-// ── Blog ──
-export interface BlogPost {
-  id: string
-  trainer_id: string
-  title: string
-  content: string
-  cover_image_url: string | null
-  published: boolean
-  created_at: string
-  updated_at: string
-}
