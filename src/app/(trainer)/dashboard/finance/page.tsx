@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import { formatPrice, formatDate } from '@/lib/utils'
+import { getTrainerPlan } from '@/lib/subscription'
+import FeatureGate from '@/components/shared/FeatureGate'
 
 function FinanceSkeleton() {
   return (
@@ -31,6 +33,8 @@ export default async function FinancePage() {
 
   if (!trainer) redirect('/login')
 
+  const plan = await getTrainerPlan(supabase, trainer.id)
+
   const { data: packages } = await supabase
     .from('packages')
     .select('id, price, payment_status, status, start_date, client_id, total_lessons, used_lessons')
@@ -52,32 +56,34 @@ export default async function FinancePage() {
   ).size
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Finans</h1>
+    <FeatureGate plan={plan} feature="finance" role="trainer">
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">Finans</h1>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <div className="text-text-secondary text-sm">Toplam Gelir</div>
-          <div className="text-2xl font-bold mt-1">{formatPrice(totalRevenue) || '0 TL'}</div>
-        </Card>
-        <Card>
-          <div className="text-text-secondary text-sm">Ödenen</div>
-          <div className="text-2xl font-bold mt-1 text-success">{formatPrice(paidRevenue) || '0 TL'}</div>
-        </Card>
-        <Card>
-          <div className="text-text-secondary text-sm">Bekleyen</div>
-          <div className="text-2xl font-bold mt-1 text-warning">{formatPrice(pendingRevenue) || '0 TL'}</div>
-        </Card>
-        <Card>
-          <div className="text-text-secondary text-sm">Aktif Danışanlar</div>
-          <div className="text-2xl font-bold mt-1">{activeClients}</div>
-        </Card>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <div className="text-text-secondary text-sm">Toplam Gelir</div>
+            <div className="text-2xl font-bold mt-1">{formatPrice(totalRevenue) || '0 TL'}</div>
+          </Card>
+          <Card>
+            <div className="text-text-secondary text-sm">Ödenen</div>
+            <div className="text-2xl font-bold mt-1 text-success">{formatPrice(paidRevenue) || '0 TL'}</div>
+          </Card>
+          <Card>
+            <div className="text-text-secondary text-sm">Bekleyen</div>
+            <div className="text-2xl font-bold mt-1 text-warning">{formatPrice(pendingRevenue) || '0 TL'}</div>
+          </Card>
+          <Card>
+            <div className="text-text-secondary text-sm">Aktif Danışanlar</div>
+            <div className="text-2xl font-bold mt-1">{activeClients}</div>
+          </Card>
+        </div>
+
+        <Suspense fallback={<FinanceSkeleton />}>
+          <DeferredFinance trainerId={trainer.id} />
+        </Suspense>
       </div>
-
-      <Suspense fallback={<FinanceSkeleton />}>
-        <DeferredFinance trainerId={trainer.id} />
-      </Suspense>
-    </div>
+    </FeatureGate>
   )
 }
 

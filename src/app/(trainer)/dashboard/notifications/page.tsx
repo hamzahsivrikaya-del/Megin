@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import NotificationsManager from './NotificationsManager'
+import { getTrainerPlan } from '@/lib/subscription'
+import FeatureGate from '@/components/shared/FeatureGate'
 
 export default async function TrainerNotificationsPage() {
   const supabase = await createClient()
@@ -14,6 +16,8 @@ export default async function TrainerNotificationsPage() {
     .single()
 
   if (!trainer) redirect('/login')
+
+  const plan = await getTrainerPlan(supabase, trainer.id)
 
   const [
     { data: notifications },
@@ -35,10 +39,12 @@ export default async function TrainerNotificationsPage() {
   ])
 
   return (
-    <NotificationsManager
-      initialNotifications={notifications || []}
-      clients={clients || []}
-      trainerId={trainer.id}
-    />
+    <FeatureGate plan={plan} feature="push_notifications" role="trainer">
+      <NotificationsManager
+        initialNotifications={notifications || []}
+        clients={clients || []}
+        trainerId={trainer.id}
+      />
+    </FeatureGate>
   )
 }

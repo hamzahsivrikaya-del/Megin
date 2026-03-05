@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import CalendarClient from './CalendarClient'
+import { getTrainerPlan } from '@/lib/subscription'
+import FeatureGate from '@/components/shared/FeatureGate'
 
 export default async function CalendarPage() {
   const supabase = await createClient()
@@ -14,6 +16,8 @@ export default async function CalendarPage() {
     .maybeSingle()
 
   if (!trainer) redirect('/login')
+
+  const plan = await getTrainerPlan(supabase, trainer.id)
 
   // Aktif paketli danışanları çek
   const { data: activePackages } = await supabase
@@ -35,9 +39,11 @@ export default async function CalendarPage() {
   })
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Takvim</h1>
-      <CalendarClient clients={clients} trainerId={trainer.id} />
-    </div>
+    <FeatureGate plan={plan} feature="calendar" role="trainer">
+      <div className="space-y-4">
+        <h1 className="text-2xl font-bold">Takvim</h1>
+        <CalendarClient clients={clients} trainerId={trainer.id} />
+      </div>
+    </FeatureGate>
   )
 }
