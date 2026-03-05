@@ -5,12 +5,22 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import NotificationBell from './NotificationBell'
+import { hasFeatureAccess } from '@/lib/plans'
+import type { SubscriptionPlan } from '@/lib/types'
+
+interface NavItem {
+  href: string
+  label: string
+  feature?: string
+  icon: React.ReactNode
+}
 
 interface ClientNavbarProps {
   userName?: string
+  plan?: SubscriptionPlan
 }
 
-export default function ClientNavbar({ userName: initialName }: ClientNavbarProps) {
+export default function ClientNavbar({ userName: initialName, plan = 'free' }: ClientNavbarProps) {
   const router = useRouter()
   const [userName, setUserName] = useState(initialName || '')
 
@@ -39,6 +49,61 @@ export default function ClientNavbar({ userName: initialName }: ClientNavbarProp
     router.push('/login')
   }
 
+  const navItems: NavItem[] = [
+    {
+      href: '/app/program',
+      label: 'Programım',
+      icon: (
+        <svg className="w-5 h-5 sm:hidden" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z" />
+        </svg>
+      ),
+    },
+    {
+      href: '/app/haftalik-ozet',
+      label: 'Haftalık Özet',
+      feature: 'weekly_reports',
+      icon: (
+        <svg className="w-5 h-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+    {
+      href: '/app/beslenme',
+      label: 'Beslenme',
+      feature: 'nutrition',
+      icon: (
+        <svg className="w-5 h-5 sm:hidden" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 2v9a3 3 0 003 3v7a1 1 0 002 0v-7a3 3 0 003-3V2h-2v9a1 1 0 01-1 1h-2a1 1 0 01-1-1V2H7zM17 2v20a1 1 0 002 0v-8h1a2 2 0 002-2V5a3 3 0 00-3-3h-2z" />
+        </svg>
+      ),
+    },
+    {
+      href: '/app/rozetler',
+      label: 'Rozetler',
+      feature: 'badges',
+      icon: (
+        <svg className="w-5 h-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+        </svg>
+      ),
+    },
+    {
+      href: '/app/settings',
+      label: 'Profilim',
+      icon: (
+        <svg className="w-5 h-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+    },
+  ]
+
+  const visibleItems = navItems.filter(
+    (item) => !item.feature || hasFeatureAccess(plan, item.feature)
+  )
+
   return (
     <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur-sm border-b border-border">
       <div className="flex items-center justify-between h-14 px-4 md:px-6 max-w-5xl mx-auto">
@@ -55,60 +120,17 @@ export default function ClientNavbar({ userName: initialName }: ClientNavbarProp
           <NotificationBell notificationsHref="/app/notifications" />
           <span className="text-sm font-bold text-text-primary uppercase hidden sm:block">{userName}</span>
 
-          <Link
-            href="/app/program"
-            className="p-2 sm:p-0 text-sm text-text-secondary hover:text-text-primary transition-colors"
-            title="Programım"
-          >
-            <svg className="w-5 h-5 sm:hidden" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z" />
-            </svg>
-            <span className="hidden sm:inline">Programım</span>
-          </Link>
-
-          <Link
-            href="/app/haftalik-ozet"
-            className="p-2 sm:p-0 text-sm text-text-secondary hover:text-text-primary transition-colors"
-            title="Haftalık Özet"
-          >
-            <svg className="w-5 h-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <span className="hidden sm:inline">Haftalık Özet</span>
-          </Link>
-
-          <Link
-            href="/app/beslenme"
-            className="p-2 sm:p-0 text-sm text-text-secondary hover:text-text-primary transition-colors"
-            title="Beslenme"
-          >
-            <svg className="w-5 h-5 sm:hidden" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7 2v9a3 3 0 003 3v7a1 1 0 002 0v-7a3 3 0 003-3V2h-2v9a1 1 0 01-1 1h-2a1 1 0 01-1-1V2H7zM17 2v20a1 1 0 002 0v-8h1a2 2 0 002-2V5a3 3 0 00-3-3h-2z" />
-            </svg>
-            <span className="hidden sm:inline">Beslenme</span>
-          </Link>
-
-          <Link
-            href="/app/rozetler"
-            className="p-2 sm:p-0 text-sm text-text-secondary hover:text-text-primary transition-colors"
-            title="Rozetler"
-          >
-            <svg className="w-5 h-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-            <span className="hidden sm:inline">Rozetler</span>
-          </Link>
-
-          <Link
-            href="/app/settings"
-            className="p-2 sm:p-0 text-sm text-text-secondary hover:text-text-primary transition-colors"
-            title="Profilim"
-          >
-            <svg className="w-5 h-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="hidden sm:inline">Profilim</span>
-          </Link>
+          {visibleItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="p-2 sm:p-0 text-sm text-text-secondary hover:text-text-primary transition-colors"
+              title={item.label}
+            >
+              {item.icon}
+              <span className="hidden sm:inline">{item.label}</span>
+            </Link>
+          ))}
 
           <button
             onClick={handleLogout}
