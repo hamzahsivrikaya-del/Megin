@@ -40,6 +40,7 @@ export default function TodayAttendance({ attendees: initial, today, trainerId }
         client_id: att.clientId,
         trainer_id: trainerId,
         date: today,
+        attended: true,
       })
       .select('id')
       .single()

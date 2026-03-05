@@ -28,6 +28,7 @@ export interface CalendarEvent {
     duration: number
     notes: string | null
     clientName: string
+    attended: boolean
   }
 }
 
@@ -98,7 +99,7 @@ export default function CalendarClient({ clients, trainerId }: { clients: Client
 
     const { data: lessons } = await supabase
       .from('lessons')
-      .select('id, package_id, client_id, date, start_time, duration, notes, clients(full_name)')
+      .select('id, package_id, client_id, date, start_time, duration, notes, attended, clients(full_name)')
       .eq('trainer_id', trainerId)
       .gte('date', currentMonday)
       .lte('date', sunday)
@@ -129,6 +130,7 @@ export default function CalendarClient({ clients, trainerId }: { clients: Client
           duration: dur,
           notes: l.notes,
           clientName,
+          attended: l.attended ?? true,
         },
       }
     })
@@ -338,6 +340,7 @@ export default function CalendarClient({ clients, trainerId }: { clients: Client
                         const dur = event.extendedProps.duration || 60
                         const top = (sh - DAY_START) * WEEK_HOUR_HEIGHT + (sm / 60) * WEEK_HOUR_HEIGHT
                         const height = Math.max((dur / 60) * WEEK_HOUR_HEIGHT - 2, 28)
+                        const isAttended = event.extendedProps.attended
 
                         return (
                           <div
@@ -349,12 +352,13 @@ export default function CalendarClient({ clients, trainerId }: { clients: Client
                               right: 2,
                               top: top + 1,
                               height,
-                              background: '#FEF2F2',
+                              background: isAttended ? '#FEF2F2' : '#F9FAFB',
                               borderRadius: 4,
-                              borderLeft: '3px solid #F87171',
+                              borderLeft: isAttended ? '3px solid #F87171' : '3px solid #D1D5DB',
                               padding: '2px 3px',
                               overflow: 'hidden',
                               zIndex: 2,
+                              opacity: isAttended ? 1 : 0.7,
                             }}
                           >
                             <div
@@ -363,7 +367,7 @@ export default function CalendarClient({ clients, trainerId }: { clients: Client
                             >
                               {shortName(event.extendedProps.clientName)}
                             </div>
-                            <div className="text-[9px] font-semibold" style={{ color: '#DC2626' }}>
+                            <div className="text-[9px] font-semibold" style={{ color: isAttended ? '#DC2626' : '#9CA3AF' }}>
                               {timeStr}
                             </div>
                           </div>
@@ -496,6 +500,7 @@ export default function CalendarClient({ clients, trainerId }: { clients: Client
                 const endMin = sh * 60 + sm + dur
                 const eh = Math.floor(endMin / 60)
                 const em = endMin % 60
+                const isAttended = event.extendedProps.attended
 
                 return (
                   <div
@@ -507,8 +512,10 @@ export default function CalendarClient({ clients, trainerId }: { clients: Client
                       right: 8,
                       top: top + 1,
                       height: height - 3,
-                      background: 'linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%)',
-                      borderLeft: '4px solid #F87171',
+                      background: isAttended
+                        ? 'linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%)'
+                        : 'linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%)',
+                      borderLeft: isAttended ? '4px solid #F87171' : '4px solid #D1D5DB',
                       padding: '10px 14px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -517,11 +524,18 @@ export default function CalendarClient({ clients, trainerId }: { clients: Client
                       boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
                     }}
                   >
-                    <p className="text-[15px] font-bold text-text-primary mb-0.5">
-                      {event.extendedProps.clientName}
-                    </p>
-                    <div className="flex items-center gap-1 text-xs font-medium" style={{ color: '#DC2626' }}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.2" strokeLinecap="round">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <p className="text-[15px] font-bold text-text-primary">
+                        {event.extendedProps.clientName}
+                      </p>
+                      {!isAttended && (
+                        <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-[#F3F4F6] text-[#9CA3AF]">
+                          Planlandı
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 text-xs font-medium" style={{ color: isAttended ? '#DC2626' : '#9CA3AF' }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isAttended ? '#DC2626' : '#9CA3AF'} strokeWidth="2.2" strokeLinecap="round">
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12,6 12,12 16,14" />
                       </svg>

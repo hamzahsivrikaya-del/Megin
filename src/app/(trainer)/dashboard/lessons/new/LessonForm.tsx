@@ -74,6 +74,7 @@ export default function LessonForm({ activePackages, trainerId }: LessonFormProp
           trainer_id: trainerId,
           date,
           notes: notes.trim() || null,
+          attended: true,
         })
 
       if (insertError) {

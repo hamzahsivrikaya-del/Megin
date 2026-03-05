@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
 
       for (const client of uniqueClients) {
         try {
-          // Bu haftaki ders sayısı
+          // Bu haftaki ders sayısı (sadece yapıldı işaretlenen)
           const { count: lessonsCount } = await admin
             .from('lessons')
             .select('id', { count: 'exact', head: true })
@@ -123,6 +123,7 @@ export async function GET(request: NextRequest) {
             .eq('client_id', client.id)
             .gte('date', weekStart)
             .lte('date', weekEndStr)
+            .eq('attended', true)
 
           // Bu haftaki beslenme uyumu
           const { data: mealLogs } = await admin

@@ -47,20 +47,20 @@ export async function GET() {
       { data: earnedBadges },
       { count: mealLogCount },
     ] = await Promise.all([
-      // Toplam ders sayısı (sadece bugün ve öncesi — gelecek dersler sayılmaz)
+      // Toplam ders sayısı (sadece attended=true — eğitmen tarafından yapıldı işaretlenen)
       supabase
         .from('lessons')
         .select('id', { count: 'exact', head: true })
         .eq('client_id', client.id)
-        .lte('date', todayStr),
+        .eq('attended', true),
 
-      // Bu haftaki ders sayısı (sadece bugün ve öncesi)
+      // Bu haftaki ders sayısı (sadece attended=true)
       supabase
         .from('lessons')
         .select('id', { count: 'exact', head: true })
         .eq('client_id', client.id)
         .gte('date', mondayStr)
-        .lte('date', todayStr),
+        .eq('attended', true),
 
       // Haftalık raporlar (streak ve beslenme uyumu için)
       supabase

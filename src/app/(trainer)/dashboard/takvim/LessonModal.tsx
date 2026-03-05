@@ -72,6 +72,7 @@ export default function LessonModal({
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [togglingAttended, setTogglingAttended] = useState(false)
   const [error, setError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
 
@@ -140,6 +141,7 @@ export default function LessonModal({
         start_time: time,
         duration: Number(duration),
         notes: notes || null,
+        attended: false,
       })
 
       if (insertError) {
@@ -199,6 +201,57 @@ export default function LessonModal({
       notifyLessonChange([change])
       onSave(change)
     }
+  }
+
+  async function handleToggleAttended() {
+    if (!event) return
+    setTogglingAttended(true)
+    setError('')
+
+    const supabase = createClient()
+    const newAttended = !event.extendedProps.attended
+
+    const { error: updateError } = await supabase
+      .from('lessons')
+      .update({ attended: newAttended })
+      .eq('id', event.extendedProps.lessonId)
+
+    if (updateError) {
+      setError(updateError.message)
+      setTogglingAttended(false)
+      return
+    }
+
+    // Paket used_lessons güncelle
+    if (newAttended) {
+      // Yapıldı → used_lessons + 1
+      const client = clients.find((c) => c.clientId === event.extendedProps.clientId)
+      if (client) {
+        await supabase
+          .from('packages')
+          .update({ used_lessons: client.usedLessons + 1 })
+          .eq('id', client.packageId)
+      }
+    } else {
+      // Yapılmadı → used_lessons - 1
+      const client = clients.find((c) => c.clientId === event.extendedProps.clientId)
+      if (client && client.usedLessons > 0) {
+        await supabase
+          .from('packages')
+          .update({ used_lessons: client.usedLessons - 1 })
+          .eq('id', client.packageId)
+      }
+    }
+
+    setTogglingAttended(false)
+    onSave({
+      type: 'update',
+      clientId: event.extendedProps.clientId,
+      clientName: event.extendedProps.clientName,
+      date: event.extendedProps.date,
+      startTime: event.extendedProps.startTime || '10:00',
+      duration: event.extendedProps.duration || 60,
+    })
   }
 
   async function handleDelete() {
@@ -305,6 +358,34 @@ export default function LessonModal({
         />
 
         {error && <p className="text-sm text-danger">{error}</p>}
+
+        {mode === 'edit' && event && (
+          <button
+            onClick={handleToggleAttended}
+            disabled={togglingAttended}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-50"
+            style={{
+              background: event.extendedProps.attended ? '#F0FDF4' : '#FEF2F2',
+              color: event.extendedProps.attended ? '#16A34A' : '#DC2626',
+            }}
+          >
+            {event.extendedProps.attended ? (
+              <>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Yapıldı
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <circle cx="12" cy="12" r="10" />
+                </svg>
+                Yapıldı Olarak İşaretle
+              </>
+            )}
+          </button>
+        )}
 
         <div className="flex gap-3">
           <Button
