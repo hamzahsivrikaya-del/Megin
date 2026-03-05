@@ -6,6 +6,9 @@ import Badge from '@/components/ui/Badge'
 import { formatPrice, formatDate } from '@/lib/utils'
 import { getTrainerPlan } from '@/lib/subscription'
 import FeatureGate from '@/components/shared/FeatureGate'
+import { hasFeatureAccess } from '@/lib/plans'
+import { calculateForecast } from '@/lib/finance-forecast'
+import type { SubscriptionPlan } from '@/lib/types'
 
 function FinanceSkeleton() {
   return (
@@ -80,14 +83,14 @@ export default async function FinancePage() {
         </div>
 
         <Suspense fallback={<FinanceSkeleton />}>
-          <DeferredFinance trainerId={trainer.id} />
+          <DeferredFinance trainerId={trainer.id} plan={plan} />
         </Suspense>
       </div>
     </FeatureGate>
   )
 }
 
-async function DeferredFinance({ trainerId }: { trainerId: string }) {
+async function DeferredFinance({ trainerId, plan }: { trainerId: string; plan: SubscriptionPlan }) {
   const supabase = await createClient()
 
   const { data: packages } = await supabase
@@ -117,37 +120,117 @@ async function DeferredFinance({ trainerId }: { trainerId: string }) {
 
   const monthlyData = Array.from(monthMap.values()).sort((a, b) => b.month.localeCompare(a.month))
 
+  // Forecast hesaplama
+  const activeClientCount = new Set(
+    allPackages.filter(pkg => pkg.status === 'active').map(pkg => pkg.client_id)
+  ).size
+
+  const forecastInput = monthlyData.map(m => ({
+    month: m.month,
+    total: m.revenue,
+    paid: m.paid,
+    pending: m.pending,
+  }))
+
+  const forecast = calculateForecast(forecastInput, activeClientCount)
+
   return (
-    <Card>
-      <h3 className="text-lg font-semibold text-text-primary mb-4">Aylık Gelir</h3>
-      {monthlyData.length === 0 ? (
-        <p className="text-sm text-text-secondary">Henüz paket verisi yok.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-2 text-text-secondary font-medium">Ay</th>
-                <th className="text-right py-2 text-text-secondary font-medium">Gelir</th>
-                <th className="text-right py-2 text-text-secondary font-medium">Ödenen</th>
-                <th className="text-right py-2 text-text-secondary font-medium">Bekleyen</th>
-                <th className="text-right py-2 text-text-secondary font-medium">Paket</th>
-              </tr>
-            </thead>
-            <tbody>
-              {monthlyData.map((row) => (
-                <tr key={row.month} className="border-b border-border/50">
-                  <td className="py-3 font-medium">{row.month}</td>
-                  <td className="py-3 text-right font-medium">{formatPrice(row.revenue)}</td>
-                  <td className="py-3 text-right text-success">{formatPrice(row.paid)}</td>
-                  <td className="py-3 text-right text-warning">{formatPrice(row.pending)}</td>
-                  <td className="py-3 text-right">{row.count}</td>
+    <>
+      <Card>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Aylık Gelir</h3>
+        {monthlyData.length === 0 ? (
+          <p className="text-sm text-text-secondary">Henüz paket verisi yok.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 text-text-secondary font-medium">Ay</th>
+                  <th className="text-right py-2 text-text-secondary font-medium">Gelir</th>
+                  <th className="text-right py-2 text-text-secondary font-medium">Ödenen</th>
+                  <th className="text-right py-2 text-text-secondary font-medium">Bekleyen</th>
+                  <th className="text-right py-2 text-text-secondary font-medium">Paket</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {monthlyData.map((row) => (
+                  <tr key={row.month} className="border-b border-border/50">
+                    <td className="py-3 font-medium">{row.month}</td>
+                    <td className="py-3 text-right font-medium">{formatPrice(row.revenue)}</td>
+                    <td className="py-3 text-right text-success">{formatPrice(row.paid)}</td>
+                    <td className="py-3 text-right text-warning">{formatPrice(row.pending)}</td>
+                    <td className="py-3 text-right">{row.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
+      {hasFeatureAccess(plan, 'finance_forecast') && (
+        <>
+          <h3 className="text-lg font-semibold text-text-primary">Finansal Tahmin</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Card>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-text-secondary text-sm">Gelecek Ay Tahmini</div>
+                {forecast.trend !== 'stable' && (
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                    forecast.trend === 'up'
+                      ? 'bg-success/10 text-success'
+                      : 'bg-error/10 text-error'
+                  }`}>
+                    {forecast.trend === 'up' ? '\u2191' : '\u2193'} %{Math.abs(forecast.trendPercent)}
+                  </span>
+                )}
+              </div>
+              <div className={`text-2xl font-bold ${
+                forecast.trend === 'up'
+                  ? 'text-success'
+                  : forecast.trend === 'down'
+                    ? 'text-error'
+                    : 'text-text-primary'
+              }`}>
+                {formatPrice(forecast.nextMonth) || '0 TL'}
+              </div>
+              <div className="text-xs text-text-secondary mt-1">
+                Danışan başına ort. {formatPrice(forecast.avgRevenuePerClient) || '0 TL'}
+              </div>
+            </Card>
+
+            <Card>
+              <div className="text-text-secondary text-sm mb-2">3 Aylık Tahmin</div>
+              <div className="text-2xl font-bold text-text-primary">
+                {formatPrice(forecast.nextThreeMonths) || '0 TL'}
+              </div>
+              <div className="text-xs text-text-secondary mt-1">
+                Aylık ort. {formatPrice(Math.round(forecast.nextThreeMonths / 3)) || '0 TL'}
+              </div>
+            </Card>
+
+            <Card>
+              <div className="text-text-secondary text-sm mb-2">Tahsilat Riski</div>
+              <div className={`text-2xl font-bold ${
+                forecast.churnRisk > 30
+                  ? 'text-error'
+                  : forecast.churnRisk > 15
+                    ? 'text-warning'
+                    : 'text-success'
+              }`}>
+                %{forecast.churnRisk}
+              </div>
+              <div className="text-xs text-text-secondary mt-1">
+                {forecast.churnRisk > 30
+                  ? 'Yüksek risk - tahsilat takibi önerilir'
+                  : forecast.churnRisk > 15
+                    ? 'Orta risk - takip edin'
+                    : 'Düşük risk'}
+              </div>
+            </Card>
+          </div>
+        </>
       )}
-    </Card>
+    </>
   )
 }
