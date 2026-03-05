@@ -12,8 +12,9 @@ import { formatDate, formatDateShort, getPackageStatusLabel, formatPrice } from 
 import type {
   Client, Package, Measurement, Lesson,
   ClientMeal, MealLog, ProgressPhoto, ClientGoal,
-  Gender,
+  Gender, SubscriptionPlan,
 } from '@/lib/types'
+import { hasFeatureAccess } from '@/lib/plans'
 import Image from 'next/image'
 import MealPlanManager from './MealPlanManager'
 import DownloadPDFButton from '@/components/shared/DownloadPDFButton'
@@ -38,11 +39,12 @@ interface Props {
   photos: ProgressPhoto[]
   goals: ClientGoal[]
   dependents: DependentInfo[]
+  plan: SubscriptionPlan
 }
 
 export default function ClientDetail({
   client, trainerId, packages, measurements, lessons,
-  clientMeals, mealLogs, photos, goals, dependents,
+  clientMeals, mealLogs, photos, goals, dependents, plan,
 }: Props) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
@@ -281,12 +283,12 @@ export default function ClientDetail({
     setDeletingMealLogId(null)
   }
 
-  const tabs: { key: Tab; label: string; count?: number }[] = [
+  const tabs: { key: Tab; label: string; count?: number; feature?: string }[] = [
     { key: 'overview', label: 'Genel Bakış' },
     { key: 'measurements', label: 'Ölçümler', count: measurements.length },
     { key: 'packages', label: 'Paketler', count: packages.length },
     { key: 'lessons', label: 'Dersler', count: lessons.length },
-    { key: 'nutrition', label: 'Beslenme', count: mealLogs.length },
+    { key: 'nutrition', label: 'Beslenme', count: mealLogs.length, feature: 'nutrition' },
   ]
 
   return (
@@ -396,30 +398,41 @@ export default function ClientDetail({
 
           {/* Tab bar */}
           <div className="flex gap-0 -mb-px overflow-x-auto scrollbar-none">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                  activeTab === tab.key
-                    ? 'border-primary text-text-primary'
-                    : 'border-transparent text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                {tab.label}
-                {tab.count !== undefined && tab.count > 0 && (
-                  <span
-                    className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
-                      activeTab === tab.key
-                        ? 'bg-primary/15 text-primary'
-                        : 'bg-surface-hover text-text-secondary'
-                    }`}
-                  >
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            ))}
+            {tabs.map((tab) => {
+              const locked = tab.feature && !hasFeatureAccess(plan, tab.feature)
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => !locked && setActiveTab(tab.key)}
+                  className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
+                    locked
+                      ? 'border-transparent text-text-secondary/40 cursor-not-allowed'
+                      : activeTab === tab.key
+                        ? 'border-primary text-text-primary cursor-pointer'
+                        : 'border-transparent text-text-secondary hover:text-text-primary cursor-pointer'
+                  }`}
+                  disabled={!!locked}
+                >
+                  {tab.label}
+                  {locked && (
+                    <svg className="w-3 h-3 ml-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  )}
+                  {!locked && tab.count !== undefined && tab.count > 0 && (
+                    <span
+                      className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
+                        activeTab === tab.key
+                          ? 'bg-primary/15 text-primary'
+                          : 'bg-surface-hover text-text-secondary'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -585,7 +598,7 @@ export default function ClientDetail({
             )}
 
             {/* Bağlı Üyeler */}
-            <div className="rounded-xl border border-border p-5 bg-surface">
+            {hasFeatureAccess(plan, 'dependents') && <div className="rounded-xl border border-border p-5 bg-surface">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-[10px] text-text-secondary uppercase tracking-widest">Bağlı Üyeler</p>
                 <button
@@ -637,7 +650,7 @@ export default function ClientDetail({
               ) : !showAddDependent && (
                 <p className="text-sm text-text-tertiary">Bağlı üye yok</p>
               )}
-            </div>
+            </div>}
           </div>
         )}
 
@@ -745,7 +758,7 @@ export default function ClientDetail({
             )}
 
             {/* İlerleme Fotoğrafları */}
-            <div className="rounded-xl border border-border bg-surface p-4">
+            {hasFeatureAccess(plan, 'progress_photos') && <div className="rounded-xl border border-border bg-surface p-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-[10px] text-text-secondary uppercase tracking-widest font-semibold">İlerleme Fotoğrafları</p>
                 <div className="flex gap-2">
@@ -857,7 +870,7 @@ export default function ClientDetail({
               ) : (
                 <p className="text-sm text-text-secondary text-center py-6">Henüz ilerleme fotoğrafı yok</p>
               )}
-            </div>
+            </div>}
           </div>
         )}
 

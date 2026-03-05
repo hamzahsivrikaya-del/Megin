@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect, notFound } from 'next/navigation'
+import { getTrainerPlan } from '@/lib/subscription'
 import ClientDetail from './ClientDetail'
 
 export default async function ClientDetailPage({
@@ -20,6 +21,8 @@ export default async function ClientDetailPage({
     .maybeSingle()
 
   if (!trainer) redirect('/onboarding')
+
+  const plan = await getTrainerPlan(supabase, trainer.id)
 
   const { data: client } = await supabase
     .from('clients')
@@ -95,6 +98,7 @@ export default async function ClientDetailPage({
       photos={photos || []}
       goals={goals || []}
       dependents={dependents || []}
+      plan={plan}
     />
   )
 }
