@@ -45,14 +45,16 @@ const ALL_FEATURES: Record<SubscriptionPlan, string[]> = {
     'Haftalık otomatik raporlar',
     'Push bildirimler',
     'Finans ekranı (gelir özeti)',
-    'Fitness araçları (7 araç)',
+    'Rozet sistemi',
+    'Hedef belirleme',
+    'PDF rapor export',
   ],
   elite: [
     'Sınırsız danışan',
     'Pro planındaki tüm özellikler',
+    'Takvim (ders planlama)',
     'İlerleme fotoğrafları + slider',
-    'Rozet sistemi (23 rozet)',
-    'Blog',
+    'Blog sistemi',
     'Bağlı üye (veli-çocuk)',
     'Risk skoru',
     'Instagram paylaşım kartı',
@@ -154,7 +156,7 @@ export default function UpgradeClient({ currentPlan, plans }: Props) {
                     </li>
                     <li className="flex items-start gap-2 text-sm opacity-50">
                       {LOCK_ICON}
-                      <span>+8 özellik daha</span>
+                      <span>+12 özellik daha</span>
                     </li>
                   </>
                 )}
@@ -162,11 +164,11 @@ export default function UpgradeClient({ currentPlan, plans }: Props) {
                   <>
                     <li className="flex items-start gap-2 text-sm opacity-50">
                       {LOCK_ICON}
-                      <span>İlerleme fotoğrafları</span>
+                      <span>Takvim (ders planlama)</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm opacity-50">
                       {LOCK_ICON}
-                      <span>Rozet sistemi</span>
+                      <span>İlerleme fotoğrafları</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm opacity-50">
                       {LOCK_ICON}
