@@ -16,7 +16,7 @@ export default async function ClientDetailPage({
 
   const { data: trainer } = await supabase
     .from('trainers')
-    .select('id')
+    .select('id, full_name')
     .eq('user_id', session.user.id)
     .maybeSingle()
 
@@ -99,6 +99,7 @@ export default async function ClientDetailPage({
       goals={goals || []}
       dependents={dependents || []}
       plan={plan}
+      trainerName={trainer.full_name}
     />
   )
 }
