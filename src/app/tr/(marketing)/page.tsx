@@ -13,7 +13,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Megin — Kişisel Antrenörler İçin Platform',
   description:
-    'Üye takibi, antrenman programlama, beslenme yönetimi ve ilerleme raporları. Bir antrenör tarafından, antrenörler için geliştirildi. 5 üyeye kadar ücretsiz.',
+    'Üye takibi, antrenman programlama, beslenme yönetimi ve ilerleme raporları. Bir antrenör tarafından, antrenörler için geliştirildi. 3 üyeye kadar ücretsiz.',
   openGraph: {
     title: 'Megin — Kişisel Antrenörler İçin Platform',
     description:
@@ -45,7 +45,7 @@ const schemaData = {
     '@type': 'Offer',
     price: '0',
     priceCurrency: 'TRY',
-    description: '5 üyeye kadar ücretsiz',
+    description: '3 üyeye kadar ücretsiz',
   },
 }
 

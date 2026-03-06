@@ -6,7 +6,7 @@ import { tr } from '@/lib/i18n/tr'
 export const metadata: Metadata = {
   title: 'Fiyatlandırma | Megin',
   description:
-    'Kişisel antrenörler için sade ve dürüst fiyatlandırma. 5 üyeye kadar ücretsiz. Gizli ücret yok, sözleşme yok, istediğinizde iptal edin.',
+    'Kişisel antrenörler için sade ve dürüst fiyatlandırma. 3 üyeye kadar ücretsiz. Gizli ücret yok, sözleşme yok, istediğinizde iptal edin.',
   alternates: {
     languages: {
       en: '/pricing',

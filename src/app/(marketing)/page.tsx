@@ -13,7 +13,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Megin — The Platform for Personal Trainers',
   description:
-    'Client tracking, workout programming, nutrition management, and progress reports. Built by a trainer, for trainers. Free for up to 5 clients.',
+    'Client tracking, workout programming, nutrition management, and progress reports. Built by a trainer, for trainers. Free for up to 3 clients.',
   openGraph: {
     title: 'Megin — The Platform for Personal Trainers',
     description:
@@ -38,7 +38,7 @@ const jsonLdData = {
     '@type': 'Offer',
     price: '0',
     priceCurrency: 'USD',
-    description: 'Free for up to 5 clients',
+    description: 'Free for up to 3 clients',
   },
 }
 

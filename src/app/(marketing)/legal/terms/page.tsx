@@ -98,7 +98,7 @@ export default function TermsOfServicePage() {
               <li>All payments are processed securely through Stripe. We do not store your full card details.</li>
             </ul>
             <p>
-              The free plan includes access to core features for up to 5 clients. Feature availability may differ between plans.
+              The free plan includes access to core features for up to 3 clients. Feature availability may differ between plans.
             </p>
           </Section>
 

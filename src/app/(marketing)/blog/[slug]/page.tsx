@@ -195,7 +195,7 @@ export default async function MarketingBlogPostPage({
             Ready to level up your coaching?
           </h2>
           <p className="text-[#A8A29E] mt-4 max-w-xl mx-auto leading-relaxed">
-            Join trainers using Megin to manage clients, track progress, and grow their business — free for up to 5 clients.
+            Join trainers using Megin to manage clients, track progress, and grow their business — free for up to 3 clients.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup" className="mkt-cta-primary">

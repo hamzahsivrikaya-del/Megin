@@ -29,7 +29,7 @@ const TRUST_SIGNALS = [
         />
       </svg>
     ),
-    text: 'Free for up to 5 clients',
+    text: 'Free for up to 3 clients',
   },
   {
     icon: (
@@ -139,7 +139,7 @@ export default function SignupForm() {
                     Create your account
                   </h1>
                   <p className="text-sm text-[#6B7280] mt-2">
-                    Free forever for up to 5 clients.
+                    Free forever for up to 3 clients.
                   </p>
                 </div>
 

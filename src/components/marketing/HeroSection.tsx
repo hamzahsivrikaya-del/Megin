@@ -349,7 +349,7 @@ export default function HeroSection({ t, locale = 'en' }: HeroSectionProps) {
             <span className="mkt-trust-badge-icon">
               <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </span>
-            {locale === 'tr' ? '5 danışana kadar tamamen ücretsiz' : 'Free forever for up to 5 clients'}
+            {locale === 'tr' ? '3 danışana kadar tamamen ücretsiz' : 'Free forever for up to 3 clients'}
           </span>
         </div>
 

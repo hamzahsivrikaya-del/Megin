@@ -6,7 +6,7 @@ import { en } from '@/lib/i18n/en'
 export const metadata: Metadata = {
   title: 'Pricing | Megin',
   description:
-    'Simple, honest pricing for personal trainers. Free for up to 5 clients. No hidden fees, no contracts, cancel anytime.',
+    'Simple, honest pricing for personal trainers. Free for up to 3 clients. No hidden fees, no contracts, cancel anytime.',
 }
 
 export default function PricingPage() {
