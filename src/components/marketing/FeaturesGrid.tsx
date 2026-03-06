@@ -143,19 +143,19 @@ function NotificationMockup() {
 }
 
 const featureVisuals = [
-  { Mockup: ClientMockup, bg: 'from-red-50 to-orange-50', border: 'hover:border-red-200' },
-  { Mockup: WorkoutMockup, bg: 'from-orange-50 to-amber-50', border: 'hover:border-orange-200' },
-  { Mockup: NutritionMockup, bg: 'from-green-50 to-emerald-50', border: 'hover:border-green-200' },
-  { Mockup: ChartMockup, bg: 'from-blue-50 to-cyan-50', border: 'hover:border-blue-200' },
-  { Mockup: BadgeMockup, bg: 'from-amber-50 to-yellow-50', border: 'hover:border-amber-200' },
-  { Mockup: NotificationMockup, bg: 'from-purple-50 to-violet-50', border: 'hover:border-purple-200' },
+  { Mockup: ClientMockup, bg: 'from-red-50/80 to-orange-50/80' },
+  { Mockup: WorkoutMockup, bg: 'from-orange-50/80 to-amber-50/80' },
+  { Mockup: NutritionMockup, bg: 'from-green-50/80 to-emerald-50/80' },
+  { Mockup: ChartMockup, bg: 'from-blue-50/80 to-cyan-50/80' },
+  { Mockup: BadgeMockup, bg: 'from-amber-50/80 to-yellow-50/80' },
+  { Mockup: NotificationMockup, bg: 'from-purple-50/80 to-violet-50/80' },
 ]
 
 export default function FeaturesGrid({ t }: FeaturesGridProps) {
   const revealRef = useScrollReveal()
 
   return (
-    <section className="mkt-section py-16 sm:py-20 bg-white">
+    <section className="mkt-section py-20 sm:py-28 bg-white">
       <div className="mkt-container">
         {/* Heading */}
         <div className="text-center">
@@ -163,6 +163,7 @@ export default function FeaturesGrid({ t }: FeaturesGridProps) {
             <span className="text-[#0A0A0A] block">{t.features.title1}</span>
             <span className="text-gradient block">{t.features.title2}</span>
           </h2>
+          <div className="w-16 h-1 rounded-full bg-gradient-to-r from-[#DC2626] to-[#F97316] mx-auto mt-6" />
         </div>
 
         {/* Feature cards with visual mockups */}
@@ -173,26 +174,30 @@ export default function FeaturesGrid({ t }: FeaturesGridProps) {
           {t.features.items.map((item, index) => {
             const visual = featureVisuals[index]
             if (!visual) return null
-            const { Mockup, bg, border } = visual
+            const { Mockup, bg } = visual
             return (
               <div
                 key={item.title}
-                className={`mkt-reveal group relative rounded-2xl border border-gray-100 ${border} bg-white hover:shadow-xl hover:shadow-black/[0.04] hover:-translate-y-1 transition-all duration-300 overflow-hidden`}
+                className="mkt-reveal group relative rounded-2xl border border-gray-100 bg-white overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-black/[0.06] hover:-translate-y-2 hover:border-gray-200"
               >
                 {/* Visual preview area */}
-                <div className={`bg-gradient-to-br ${bg} px-5 sm:px-8 py-7 sm:py-10 flex items-center justify-center`}>
-                  <div className="w-full max-w-[260px]">
+                <div className={`bg-gradient-to-br ${bg} px-5 sm:px-8 py-8 sm:py-10 flex items-center justify-center relative overflow-hidden`}>
+                  <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+                  <div className="w-full max-w-[260px] relative">
                     <Mockup />
                   </div>
                 </div>
 
                 {/* Text area */}
-                <div className="px-5 py-4 sm:px-6 sm:py-5">
-                  <h3 className="text-base sm:text-lg font-bold text-[#0A0A0A]">{item.title}</h3>
-                  <p className="text-sm sm:text-[15px] text-[#6B7280] mt-1.5 leading-relaxed line-clamp-2">
+                <div className="px-5 py-5 sm:px-6 sm:py-6">
+                  <h3 className="text-base sm:text-lg font-bold text-[#0A0A0A] leading-tight">{item.title}</h3>
+                  <p className="text-sm text-[#6B7280] mt-2 leading-relaxed line-clamp-3">
                     {item.description}
                   </p>
                 </div>
+
+                {/* Bottom accent line on hover */}
+                <div className="h-0.5 w-0 bg-gradient-to-r from-[#DC2626] to-[#F97316] transition-all duration-500 group-hover:w-full" />
               </div>
             )
           })}
