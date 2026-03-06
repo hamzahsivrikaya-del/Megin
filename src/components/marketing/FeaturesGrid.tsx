@@ -178,10 +178,10 @@ export default function FeaturesGrid({ t }: FeaturesGridProps) {
             return (
               <div
                 key={item.title}
-                className="mkt-reveal group relative rounded-2xl border border-gray-100 bg-white overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-black/[0.06] hover:-translate-y-2 hover:border-gray-200"
+                className="mkt-reveal group relative flex flex-col rounded-2xl border border-gray-100 bg-white overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-black/[0.06] hover:-translate-y-2 hover:border-gray-200"
               >
                 {/* Visual preview area */}
-                <div className={`bg-gradient-to-br ${bg} px-5 sm:px-8 py-8 sm:py-10 flex items-center justify-center relative overflow-hidden`}>
+                <div className={`bg-gradient-to-br ${bg} px-5 sm:px-8 flex items-center justify-center relative overflow-hidden h-[160px] sm:h-[200px]`}>
                   <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
                   <div className="w-full max-w-[260px] relative">
                     <Mockup />
@@ -189,15 +189,15 @@ export default function FeaturesGrid({ t }: FeaturesGridProps) {
                 </div>
 
                 {/* Text area */}
-                <div className="px-5 py-5 sm:px-6 sm:py-6">
+                <div className="px-5 py-5 sm:px-6 sm:py-6 flex-1 flex flex-col">
                   <h3 className="text-base sm:text-lg font-bold text-[#0A0A0A] leading-tight">{item.title}</h3>
-                  <p className="text-sm text-[#6B7280] mt-2 leading-relaxed line-clamp-3">
+                  <p className="text-sm text-[#6B7280] mt-2 leading-relaxed line-clamp-3 flex-1">
                     {item.description}
                   </p>
                 </div>
 
                 {/* Bottom accent line on hover */}
-                <div className="h-0.5 w-0 bg-gradient-to-r from-[#DC2626] to-[#F97316] transition-all duration-500 group-hover:w-full" />
+                <div className="h-0.5 w-0 bg-gradient-to-r from-[#DC2626] to-[#F97316] transition-all duration-500 group-hover:w-full mt-auto" />
               </div>
             )
           })}

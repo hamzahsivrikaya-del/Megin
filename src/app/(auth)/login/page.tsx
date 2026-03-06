@@ -19,7 +19,7 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    // Türkçe karakterleri normalize et (ı→i, ş→s vb.)
+    // Turkce karakterleri normalize et
     const normalizedEmail = email.trim()
       .replace(/ı/g, 'i').replace(/İ/g, 'I')
       .replace(/ş/g, 's').replace(/Ş/g, 'S')
@@ -42,7 +42,6 @@ export default function LoginPage() {
         return
       }
 
-      // Kullanıcı rolüne göre yönlendir
       const { data: profile } = await supabase
         .from('users')
         .select('role')
@@ -57,86 +56,139 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Arka plan */}
-      <div className="absolute inset-0 bg-[#FAFAFA]" />
-      <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
-      <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-primary/4 rounded-full blur-[100px]" />
+    <div className="min-h-screen flex">
+      {/* Left — Dark branding panel */}
+      <div
+        className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-[#0A0A0A] px-16 py-10 relative overflow-hidden"
+        aria-hidden="true"
+      >
+        {/* Ambient glow */}
+        <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-[#DC2626]/[0.06] rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
-      {/* Geometrik pattern */}
-      <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="login-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-            <path d="M 60 0 L 0 60" stroke="#000000" strokeWidth="0.5" fill="none" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#login-grid)" />
-      </svg>
+        {/* Dot pattern */}
+        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-      <div className="relative w-full max-w-md">
-        {/* Logo + Başlık */}
-        <div className="text-center mb-10 animate-fade-up">
-          <h1 className="font-display text-6xl tracking-wider text-[#0A0A0A]">
-            MEGIN<span className="text-[#FF2D2D]">.</span>
-          </h1>
-          <div className="flex items-center justify-center gap-3 mt-3">
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-primary/50" />
-            <p className="text-xs text-text-secondary uppercase tracking-[0.3em]">The Platform for Personal Trainers</p>
-            <div className="h-px w-12 bg-gradient-to-l from-transparent to-primary/50" />
+        {/* Top */}
+        <div className="relative">
+          <Link href="/" className="font-display text-xl tracking-[0.15em] text-white">
+            MEGIN<span className="text-[#DC2626]">.</span>
+          </Link>
+        </div>
+
+        {/* Center */}
+        <div className="space-y-6 relative">
+          <h2 className="font-display text-5xl xl:text-6xl tracking-wide text-white uppercase leading-none">
+            WELCOME<br />
+            <span className="text-[#DC2626]">BACK.</span>
+          </h2>
+          <p className="text-white/50 text-base leading-relaxed max-w-sm">
+            Danisanlariniz sizi bekliyor. Giris yapin ve kaldığınız yerden devam edin.
+          </p>
+        </div>
+
+        {/* Bottom */}
+        <div className="border-t border-white/10 pt-6 relative">
+          <p className="text-xs text-white/20">
+            megin.io — personal trainer&apos;lar icin platform
+          </p>
+        </div>
+      </div>
+
+      {/* Right — Login form */}
+      <div className="w-full lg:w-1/2 flex flex-col bg-white px-6 py-10 sm:px-12 lg:px-16">
+        {/* Mobile logo */}
+        <div className="mb-10 lg:hidden">
+          <Link
+            href="/"
+            className="font-display text-xl tracking-[0.15em] text-[#0A0A0A]"
+          >
+            MEGIN<span className="text-[#DC2626]">.</span>
+          </Link>
+        </div>
+
+        <div className="flex-1 flex items-center">
+          <div className="w-full max-w-md">
+            <div className="mb-8">
+              <h1 className="font-display text-3xl sm:text-4xl tracking-wide text-[#0A0A0A] uppercase leading-tight">
+                Giris Yap
+              </h1>
+              <p className="text-sm text-[#6B7280] mt-2">
+                Hesabiniza erisin
+              </p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-5" noValidate>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
+                >
+                  E-posta
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="ornek@email.com"
+                  required
+                  autoComplete="email"
+                  className="w-full border border-[#E5E7EB] bg-white rounded-xl px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] transition-colors"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
+                >
+                  Sifre
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  className="w-full border border-[#E5E7EB] bg-white rounded-xl px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] transition-colors"
+                />
+              </div>
+
+              {error && (
+                <p className="text-sm text-[#DC2626] text-center">{error}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="mkt-cta-gradient w-full mt-2 rounded-xl"
+              >
+                {loading ? 'Giris yapiliyor...' : 'Giris Yap'}
+              </button>
+
+              <div className="text-center">
+                <Link
+                  href="/login/forgot-password"
+                  className="text-sm text-[#6B7280] hover:text-[#DC2626] transition-colors"
+                >
+                  Sifremi unuttum
+                </Link>
+              </div>
+            </form>
+
+            <p className="mt-8 text-sm text-center text-[#6B7280]">
+              Hesabiniz yok mu?{' '}
+              <Link
+                href="/signup"
+                className="font-semibold text-[#0A0A0A] hover:text-[#DC2626] transition-colors"
+              >
+                Kayit Ol
+              </Link>
+            </p>
           </div>
         </div>
-
-        {/* Login formu */}
-        <div className="animate-fade-up delay-200">
-          <form
-            onSubmit={handleLogin}
-            className="bg-surface/80 backdrop-blur-md rounded-2xl border border-border p-8 space-y-5 card-glow"
-          >
-            <div className="text-center mb-2">
-              <h3 className="text-lg font-semibold">Giriş Yap</h3>
-              <p className="text-sm text-text-secondary mt-1">Hesabınıza erişin</p>
-            </div>
-
-            <Input
-              label="E-posta"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ornek@email.com"
-              required
-              autoComplete="email"
-            />
-
-            <Input
-              label="Şifre"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              autoComplete="current-password"
-            />
-
-            {error && (
-              <p className="text-sm text-danger text-center animate-fade-in">{error}</p>
-            )}
-
-            <Button type="submit" loading={loading} className="w-full press-effect">
-              Giriş Yap
-            </Button>
-
-            <div className="text-center">
-              <Link href="/login/forgot-password" className="text-sm text-text-secondary hover:text-primary transition-colors">
-                Şifremi unuttum
-              </Link>
-            </div>
-          </form>
-        </div>
-
-        {/* Alt yazı */}
-        <p className="text-center text-xs text-text-secondary/50 mt-8 animate-fade-up delay-400">
-          megin.io
-        </p>
       </div>
     </div>
   )

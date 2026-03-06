@@ -16,13 +16,13 @@ const TRUST_SIGNALS = [
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
           d="M12 2L4 6v6c0 5.5 3.6 10.7 8 12 4.4-1.3 8-6.5 8-12V6l-8-4z"
-          stroke="#FF2D2D"
+          stroke="#DC2626"
           strokeWidth="1.5"
           strokeLinejoin="round"
         />
         <path
           d="M9 12l2 2 4-4"
-          stroke="#FF2D2D"
+          stroke="#DC2626"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -34,10 +34,10 @@ const TRUST_SIGNALS = [
   {
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="3" y="11" width="18" height="11" rx="1" stroke="#FF2D2D" strokeWidth="1.5" />
+        <rect x="3" y="11" width="18" height="11" rx="1" stroke="#DC2626" strokeWidth="1.5" />
         <path
           d="M7 11V7a5 5 0 0 1 10 0v4"
-          stroke="#FF2D2D"
+          stroke="#DC2626"
           strokeWidth="1.5"
           strokeLinecap="round"
         />
@@ -48,10 +48,10 @@ const TRUST_SIGNALS = [
   {
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="12" r="9" stroke="#FF2D2D" strokeWidth="1.5" />
+        <circle cx="12" cy="12" r="9" stroke="#DC2626" strokeWidth="1.5" />
         <path
           d="M9 12l2 2 4-4"
-          stroke="#FF2D2D"
+          stroke="#DC2626"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -92,7 +92,7 @@ export default function SignupForm() {
             className="font-display text-xl tracking-[0.15em] text-[#0A0A0A]"
             aria-label="Megin home"
           >
-            MEGIN<span className="text-[#FF2D2D]">.</span>
+            MEGIN<span className="text-[#DC2626]">.</span>
           </Link>
         </div>
 
@@ -100,7 +100,7 @@ export default function SignupForm() {
           <div className="w-full max-w-md">
             {submitted ? (
               <div className="text-center space-y-5">
-                <div className="w-14 h-14 rounded-full bg-[#FF2D2D]/10 flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto">
                   <svg
                     width="26"
                     height="26"
@@ -110,7 +110,7 @@ export default function SignupForm() {
                   >
                     <path
                       d="M5 13l4 4L19 7"
-                      stroke="#FF2D2D"
+                      stroke="#DC2626"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -126,7 +126,7 @@ export default function SignupForm() {
                 </p>
                 <p className="text-xs text-[#9CA3AF]">
                   In the meantime, check out our{' '}
-                  <Link href="/blog" className="text-[#FF2D2D] hover:underline">
+                  <Link href="/blog" className="text-[#DC2626] hover:underline">
                     blog
                   </Link>{' '}
                   for training tips and guides.
@@ -151,7 +151,7 @@ export default function SignupForm() {
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
                       Full Name{' '}
-                      <span className="text-[#FF2D2D]" aria-hidden="true">
+                      <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
                     </label>
@@ -164,7 +164,7 @@ export default function SignupForm() {
                       placeholder="Alex Johnson"
                       required
                       autoComplete="name"
-                      className="w-full border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF2D2D] transition-colors"
+                      className="w-full border border-[#E5E7EB] bg-white rounded-xl px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] transition-colors"
                     />
                   </div>
 
@@ -175,7 +175,7 @@ export default function SignupForm() {
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
                       Email Address{' '}
-                      <span className="text-[#FF2D2D]" aria-hidden="true">
+                      <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
                     </label>
@@ -188,7 +188,7 @@ export default function SignupForm() {
                       placeholder="alex@gymname.com"
                       required
                       autoComplete="email"
-                      className="w-full border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF2D2D] transition-colors"
+                      className="w-full border border-[#E5E7EB] bg-white rounded-xl px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] transition-colors"
                     />
                   </div>
 
@@ -199,7 +199,7 @@ export default function SignupForm() {
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
                       Password{' '}
-                      <span className="text-[#FF2D2D]" aria-hidden="true">
+                      <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
                     </label>
@@ -214,7 +214,7 @@ export default function SignupForm() {
                         required
                         minLength={8}
                         autoComplete="new-password"
-                        className="w-full border border-[#E5E7EB] bg-white px-4 py-3 pr-12 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF2D2D] transition-colors"
+                        className="w-full border border-[#E5E7EB] bg-white rounded-xl px-4 py-3 pr-12 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] transition-colors"
                       />
                       <button
                         type="button"
@@ -265,13 +265,13 @@ export default function SignupForm() {
                       onChange={handleChange}
                       placeholder="Peak Performance Gym"
                       autoComplete="organization"
-                      className="w-full border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF2D2D] transition-colors"
+                      className="w-full border border-[#E5E7EB] bg-white rounded-xl px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] transition-colors"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="mkt-cta-primary w-full mt-2"
+                    className="mkt-cta-gradient w-full mt-2 rounded-xl"
                   >
                     Create Free Account
                     <svg
@@ -293,11 +293,11 @@ export default function SignupForm() {
 
                   <p className="text-xs text-[#9CA3AF] text-center leading-relaxed">
                     By signing up you agree to our{' '}
-                    <Link href="/legal/terms" className="hover:text-[#FF2D2D] transition-colors underline">
+                    <Link href="/legal/terms" className="hover:text-[#DC2626] transition-colors underline">
                       Terms of Service
                     </Link>{' '}
                     and{' '}
-                    <Link href="/legal/privacy" className="hover:text-[#FF2D2D] transition-colors underline">
+                    <Link href="/legal/privacy" className="hover:text-[#DC2626] transition-colors underline">
                       Privacy Policy
                     </Link>
                     .
@@ -308,7 +308,7 @@ export default function SignupForm() {
                   Already have an account?{' '}
                   <Link
                     href="/login"
-                    className="font-semibold text-[#0A0A0A] hover:text-[#FF2D2D] transition-colors"
+                    className="font-semibold text-[#0A0A0A] hover:text-[#DC2626] transition-colors"
                   >
                     Log in
                   </Link>
@@ -321,23 +321,29 @@ export default function SignupForm() {
 
       {/* Right — Branding / Trust */}
       <div
-        className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-[#0A0A0A] px-16 py-10"
+        className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-[#0A0A0A] px-16 py-10 relative overflow-hidden"
         aria-hidden="true"
       >
+        {/* Ambient glow */}
+        <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-[#DC2626]/[0.06] rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+        {/* Dot pattern */}
+        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
         {/* Top area */}
-        <div>
-          <div className="inline-block border border-[#2A2A2A] px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FF2D2D]">
+        <div className="relative">
+          <div className="inline-block border border-white/10 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#DC2626]">
             Early Access
           </div>
         </div>
 
         {/* Center — headline */}
-        <div className="space-y-6">
+        <div className="space-y-6 relative">
           <h2 className="font-display text-5xl xl:text-6xl tracking-wide text-white uppercase leading-none">
             COACH SMARTER.<br />
-            <span className="text-[#FF2D2D]">GROW FASTER.</span>
+            <span className="text-[#DC2626]">GROW FASTER.</span>
           </h2>
-          <p className="text-[#6B7280] text-base leading-relaxed max-w-sm">
+          <p className="text-white/50 text-base leading-relaxed max-w-sm">
             Join personal trainers who use Megin to manage clients, track progress, and spend less time on admin.
           </p>
 
@@ -353,8 +359,8 @@ export default function SignupForm() {
         </div>
 
         {/* Bottom — decoration */}
-        <div className="border-t border-[#1A1A1A] pt-6">
-          <p className="text-xs text-[#374151]">
+        <div className="border-t border-white/10 pt-6 relative">
+          <p className="text-xs text-white/20">
             megin.io — built for personal trainers
           </p>
         </div>

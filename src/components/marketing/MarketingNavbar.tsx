@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
   UserCheck,
@@ -17,13 +18,28 @@ interface MarketingNavbarProps {
 const BUSINESS_ICONS = [UserCheck, Building2, Laptop]
 
 export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [darkHero, setDarkHero] = useState(false)
   const [useCasesOpen, setUseCasesOpen] = useState(false)
   const [mobileUseCasesOpen, setMobileUseCasesOpen] = useState(false)
   const t = getTranslations(locale)
   const megaMenuRef = useRef<HTMLDivElement>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Re-detect dark hero on every route change
+  useEffect(() => {
+    // Small delay to let the new page render
+    const timer = setTimeout(() => {
+      const firstSection = document.querySelector('main > section:first-child, main > div > section:first-child')
+      setDarkHero(!!firstSection?.classList.contains('mkt-section-dark-warm'))
+    }, 50)
+    return () => clearTimeout(timer)
+  }, [pathname])
+
+  // Whether nav text should be light (white)
+  const lightNav = darkHero && !scrolled && !open
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,7 +93,7 @@ export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link
           href={localePath('/', locale)}
-          className="font-display text-lg tracking-[0.15em] text-[#0A0A0A]"
+          className={`font-display text-lg tracking-[0.15em] transition-colors duration-300 ${lightNav ? 'text-white' : 'text-[#0A0A0A]'}`}
         >
           MEGIN<span className="text-[#DC2626]">.</span>
         </Link>
@@ -96,7 +112,7 @@ export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
               >
                 <Link
                   href={link.href}
-                  className="text-sm text-[#0A0A0A] hover:text-[#DC2626] transition-colors font-semibold relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-gradient-to-r after:from-[#DC2626] after:to-[#F97316] after:transition-all after:duration-300 hover:after:w-full inline-flex items-center gap-1"
+                  className={`text-sm hover:text-[#DC2626] transition-colors font-semibold relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-gradient-to-r after:from-[#DC2626] after:to-[#F97316] after:transition-all after:duration-300 hover:after:w-full inline-flex items-center gap-1 ${lightNav ? 'text-white/90' : 'text-[#0A0A0A]'}`}
                   aria-expanded={useCasesOpen}
                   aria-haspopup="true"
                 >
@@ -169,7 +185,7 @@ export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-[#0A0A0A] hover:text-[#DC2626] transition-colors font-semibold hidden md:block relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-gradient-to-r after:from-[#DC2626] after:to-[#F97316] after:transition-all after:duration-300 hover:after:w-full"
+                className={`text-sm hover:text-[#DC2626] transition-colors font-semibold hidden md:block relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-gradient-to-r after:from-[#DC2626] after:to-[#F97316] after:transition-all after:duration-300 hover:after:w-full ${lightNav ? 'text-white/90' : 'text-[#0A0A0A]'}`}
               >
                 {link.label}
               </Link>
@@ -180,15 +196,15 @@ export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
           <div className="hidden md:flex items-center gap-1 text-xs font-semibold">
             <Link
               href="/"
-              className={locale === 'en' ? 'text-[#DC2626]' : 'text-[#0A0A0A] hover:text-[#DC2626] transition-colors'}
+              className={locale === 'en' ? 'text-[#DC2626]' : `${lightNav ? 'text-white/70' : 'text-[#0A0A0A]'} hover:text-[#DC2626] transition-colors`}
               aria-label="Switch to English"
             >
               EN
             </Link>
-            <span className="text-gray-300">|</span>
+            <span className={lightNav ? 'text-white/30' : 'text-gray-300'}>|</span>
             <Link
               href="/tr"
-              className={locale === 'tr' ? 'text-[#DC2626]' : 'text-[#0A0A0A] hover:text-[#DC2626] transition-colors'}
+              className={locale === 'tr' ? 'text-[#DC2626]' : `${lightNav ? 'text-white/70' : 'text-[#0A0A0A]'} hover:text-[#DC2626] transition-colors`}
               aria-label="Turkce'ye gec"
             >
               TR
@@ -198,7 +214,7 @@ export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
           {/* Login link */}
           <Link
             href="/login"
-            className="text-sm font-semibold text-[#0A0A0A] hover:text-[#DC2626] transition-colors hidden md:block"
+            className={`text-sm font-semibold hover:text-[#DC2626] transition-colors hidden md:block ${lightNav ? 'text-white/90' : 'text-[#0A0A0A]'}`}
           >
             {t.nav.login}
           </Link>
@@ -211,7 +227,7 @@ export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
           {/* Mobile hamburger */}
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden p-2.5 -mr-2 text-[#57534E] hover:text-[#0A0A0A] transition-colors cursor-pointer"
+            className={`md:hidden p-2.5 -mr-2 transition-colors cursor-pointer ${lightNav ? 'text-white/80 hover:text-white' : 'text-[#57534E] hover:text-[#0A0A0A]'}`}
             aria-label="Menu"
             aria-expanded={open}
           >
