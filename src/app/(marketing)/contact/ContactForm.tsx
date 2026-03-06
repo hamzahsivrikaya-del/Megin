@@ -19,7 +19,7 @@ const CLIENT_COUNT_OPTIONS = [
 ]
 
 const INPUT_BASE =
-  'w-full border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 transition-colors'
+  'w-full border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 transition-colors rounded-xl'
 
 export default function ContactForm() {
   const [form, setForm] = useState<FormState>({
@@ -46,16 +46,17 @@ export default function ContactForm() {
   return (
     <>
       {/* Header */}
-      <section className="mkt-section pt-32 pb-16 bg-white">
-        <div className="mkt-container">
+      <section className="mkt-section pt-32 pb-16 mkt-section-dark-warm mkt-grain relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(220,38,38,0.15),transparent)] pointer-events-none" />
+        <div className="mkt-container relative">
           <div className="max-w-2xl">
             <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">
               Contact
             </p>
-            <h1 className="mkt-heading-xl text-4xl sm:text-5xl text-[#0A0A0A]">
+            <h1 className="mkt-heading-xl text-4xl sm:text-5xl text-white">
               LET&apos;S TALK
             </h1>
-            <p className="text-[#6B7280] mt-4 text-lg leading-relaxed">
+            <p className="text-white/60 mt-4 text-lg leading-relaxed">
               Have a question, a partnership idea, or just want to say hi? We read every message.
             </p>
           </div>
@@ -70,7 +71,7 @@ export default function ContactForm() {
             {/* Left — Form */}
             <div>
               {submitted ? (
-                <div className="border border-[#E5E7EB] p-10 text-center space-y-4">
+                <div className="border border-[#E5E7EB] p-10 rounded-xl text-center space-y-4">
                   <div className="w-12 h-12 rounded-full bg-[#DC2626]/10 flex items-center justify-center mx-auto">
                     <svg
                       width="22"
@@ -251,7 +252,7 @@ export default function ContactForm() {
                 <div className="space-y-5">
                   {/* Email */}
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 border border-[#E5E7EB] flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-10 h-10 bg-[#0A0A0A] border-0 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
                       <svg
                         width="18"
                         height="18"
@@ -265,12 +266,12 @@ export default function ContactForm() {
                           width="18"
                           height="14"
                           rx="1"
-                          stroke="#DC2626"
+                          stroke="#FFFFFF"
                           strokeWidth="1.5"
                         />
                         <path
                           d="M3 8l9 6 9-6"
-                          stroke="#DC2626"
+                          stroke="#FFFFFF"
                           strokeWidth="1.5"
                           strokeLinecap="round"
                         />
@@ -291,7 +292,7 @@ export default function ContactForm() {
 
                   {/* Response time */}
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 border border-[#E5E7EB] flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-10 h-10 bg-[#0A0A0A] border-0 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
                       <svg
                         width="18"
                         height="18"
@@ -299,10 +300,10 @@ export default function ContactForm() {
                         fill="none"
                         aria-hidden="true"
                       >
-                        <circle cx="12" cy="12" r="9" stroke="#DC2626" strokeWidth="1.5" />
+                        <circle cx="12" cy="12" r="9" stroke="#FFFFFF" strokeWidth="1.5" />
                         <path
                           d="M12 7v5l3 3"
-                          stroke="#DC2626"
+                          stroke="#FFFFFF"
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -328,7 +329,7 @@ export default function ContactForm() {
               <div className="border-t border-[#E5E7EB]" />
 
               {/* FAQ nudge */}
-              <div className="bg-[#F5F5F5] p-6">
+              <div className="bg-[#FAFAFA] p-6 rounded-xl border border-[#E5E7EB]">
                 <h3 className="text-sm font-bold text-[#0A0A0A] mb-2">
                   Looking for quick answers?
                 </h3>

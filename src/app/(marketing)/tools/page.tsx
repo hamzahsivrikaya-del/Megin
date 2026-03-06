@@ -56,12 +56,13 @@ export default function ToolsPage() {
   return (
     <>
       {/* Page header */}
-      <section className="mkt-section pt-32 pb-16 text-center bg-white">
-        <div className="mkt-container">
-          <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
+      <section className="mkt-section-dark-warm mkt-grain relative overflow-hidden pt-32 pb-16 text-center">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(220,38,38,0.15),transparent)] pointer-events-none" />
+        <div className="mkt-container relative">
+          <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-white">
             FREE FITNESS TOOLS
           </h1>
-          <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/60 mt-4 max-w-2xl mx-auto leading-relaxed">
             7 free calculators to help you and your clients make data-driven decisions.
             No sign-up required.
           </p>
@@ -76,11 +77,11 @@ export default function ToolsPage() {
               <Link
                 key={tool.slug}
                 href={`/tools/${tool.slug}`}
-                className="rounded-2xl bg-white border border-[#E5E7EB] p-8 hover-lift card-glow flex flex-col group"
+                className="rounded-2xl bg-white border border-[#E5E7EB] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/[0.06] hover:border-gray-200 flex flex-col group"
               >
                 {/* Icon */}
                 <div
-                  className="w-14 h-14 rounded-full bg-[#DC2626]/8 border border-[#E5E7EB] flex items-center justify-center text-2xl"
+                  className="w-14 h-14 rounded-full bg-[#0A0A0A] flex items-center justify-center text-2xl"
                   aria-hidden="true"
                 >
                   {tool.icon}
@@ -131,7 +132,7 @@ export default function ToolsPage() {
               and progress automatically — so you can focus on coaching.
             </p>
             <div className="mt-8">
-              <Link href="/signup" className="mkt-cta-primary">
+              <Link href="/signup" className="mkt-cta-gradient mkt-cta-glow">
                 Try Megin Free
                 <svg
                   width="16"
