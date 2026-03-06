@@ -257,19 +257,22 @@ export default function FeaturesPageContent({ t, locale }: FeaturesPageContentPr
   return (
     <>
       {/* Page header */}
-      <section className="mkt-section pt-32 pb-12 text-center bg-white">
-        <div className="mkt-container">
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#0A0A0A]">
+      <section className="mkt-section-dark-warm pt-32 sm:pt-40 pb-16 sm:pb-20 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(220,38,38,0.08),transparent)] pointer-events-none" />
+        <div className="mkt-container relative">
+          <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#DC2626] mb-4">Features</span>
+          <h1 className="mkt-heading-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
             {t.featuresPage.title}
           </h1>
-          <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto leading-relaxed text-lg">
+          <div className="w-16 h-1 rounded-full bg-gradient-to-r from-[#DC2626] to-[#F97316] mx-auto mt-6" />
+          <p className="text-white/60 mt-4 max-w-2xl mx-auto leading-relaxed text-lg">
             {t.featuresPage.subtitle}
           </p>
         </div>
       </section>
 
       {/* Feature sections — alternating layout */}
-      <section className="mkt-section bg-white pb-16 sm:pb-20" ref={revealRef}>
+      <section className="mkt-section bg-white py-20 sm:py-28" ref={revealRef}>
         <div className="mkt-container space-y-12 sm:space-y-16 lg:space-y-24">
           {t.featuresPage.items.map((feature, index) => {
             const Mockup = featureMockups[index]
@@ -284,14 +287,17 @@ export default function FeaturesPageContent({ t, locale }: FeaturesPageContentPr
               >
                 {/* Visual mockup side */}
                 <div className={isReversed ? 'lg:order-2' : ''}>
-                  <div className={`bg-gradient-to-br ${bg} rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12`}>
-                    <Mockup locale={locale} />
+                  <div className="relative">
+                    <div className="absolute -inset-2 bg-gradient-to-r from-[#DC2626]/[0.04] via-transparent to-[#F97316]/[0.04] rounded-3xl blur-xl pointer-events-none" />
+                    <div className={`relative bg-gradient-to-br ${bg} rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 border border-gray-100`}>
+                      <Mockup locale={locale} />
+                    </div>
                   </div>
                 </div>
 
                 {/* Text side */}
                 <div className={isReversed ? 'lg:order-1' : ''}>
-                  <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-[#0A0A0A]">
+                  <h2 className="mkt-heading-lg text-xl sm:text-2xl lg:text-3xl text-[#0A0A0A]">
                     {feature.title}
                   </h2>
                   <p className="text-[#6B7280] mt-2 sm:mt-3 leading-relaxed text-sm sm:text-base lg:text-lg">
@@ -315,13 +321,14 @@ export default function FeaturesPageContent({ t, locale }: FeaturesPageContentPr
       </section>
 
       {/* Final CTA */}
-      <section className="mkt-section py-20 text-center mkt-gradient-bg">
-        <div className="mkt-container">
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A0A0A]">
+      <section className="mkt-section-dark-warm py-24 sm:py-32 text-center relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-[#DC2626]/[0.06] rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="mkt-container relative">
+          <h2 className="mkt-heading-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
             {t.featuresPage.ctaTitle}
           </h2>
           <div className="mt-8">
-            <Link href={signupHref} className="mkt-cta-gradient">
+            <Link href={signupHref} className="mkt-cta-gradient mkt-cta-glow">
               {t.featuresPage.ctaButton}
               <ArrowRight className="w-4 h-4" />
             </Link>
