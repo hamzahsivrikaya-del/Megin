@@ -68,10 +68,10 @@ export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
         scrolled
-          ? 'bg-white/80 backdrop-blur-xl border-b border-gray-200/60 shadow-sm'
-          : 'bg-white/90 backdrop-blur-md border-b border-gray-200/80'
+          ? 'bg-white/90 backdrop-blur-xl border-b border-gray-200/60 shadow-sm shadow-black/[0.03]'
+          : 'bg-transparent border-b border-transparent'
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">

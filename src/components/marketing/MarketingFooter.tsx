@@ -115,14 +115,12 @@ export default function MarketingFooter({ locale }: MarketingFooterProps) {
               </h3>
               <ul className="flex flex-col gap-2.5">
                 <li>
-                  <span className="text-sm text-[#57534E]/50 cursor-default">
-                    Twitter <span className="text-xs">(Coming Soon)</span>
-                  </span>
-                </li>
-                <li>
-                  <span className="text-sm text-[#57534E]/50 cursor-default">
-                    Instagram <span className="text-xs">(Coming Soon)</span>
-                  </span>
+                  <Link
+                    href="/contact"
+                    className="text-sm text-[#57534E] hover:text-[#DC2626] transition-colors"
+                  >
+                    {locale === 'tr' ? 'İletişim' : 'Contact'}
+                  </Link>
                 </li>
               </ul>
             </div>
