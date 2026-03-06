@@ -49,17 +49,18 @@ export default function BadgeShowcase({ t, locale }: BadgeShowcaseProps) {
     .filter((b): b is ShowcaseBadge => b !== null)
 
   return (
-    <section className="mkt-section-dark-warm py-20 sm:py-28 relative overflow-hidden">
+    <section className="mkt-section-dark-warm mkt-grain py-20 sm:py-28 relative overflow-hidden">
       {/* Subtle dot pattern */}
       <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-      <div className="mkt-container relative">
+      <div className="mkt-section relative">
+      <div className="mkt-container">
         {/* Heading */}
         <div className="text-center mb-14">
           <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-white">
             {t.badges.title}
           </h2>
-          <p className="text-white/50 mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/60 mt-4 max-w-2xl mx-auto leading-relaxed">
             {t.badges.subtitle}
           </p>
         </div>
@@ -89,6 +90,7 @@ export default function BadgeShowcase({ t, locale }: BadgeShowcaseProps) {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </section>
   )

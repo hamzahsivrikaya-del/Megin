@@ -33,10 +33,13 @@ export default function TestimonialSection({ t }: TestimonialSectionProps) {
           {t.testimonials.items.map((item) => (
             <div
               key={item.name}
-              className="mkt-reveal relative bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E7EB] transition-all duration-500 hover:shadow-2xl hover:shadow-black/[0.06] hover:-translate-y-2 hover:border-gray-200 flex flex-col"
+              className="mkt-reveal group relative bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E7EB] transition-all duration-500 hover:shadow-2xl hover:shadow-black/[0.06] hover:-translate-y-2 hover:border-gray-200 flex flex-col overflow-hidden"
             >
+              {/* Bottom accent line on hover */}
+              <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-[#DC2626] to-[#F97316] transition-all duration-500 group-hover:w-full" />
+
               {/* Large decorative quote */}
-              <div className="text-[80px] leading-none font-serif text-[#DC2626]/[0.08] absolute top-3 left-5 select-none pointer-events-none" aria-hidden="true">
+              <div className="text-[80px] leading-none font-serif text-[#DC2626]/[0.08] absolute top-3 left-5 select-none pointer-events-none transition-opacity duration-500 group-hover:text-[#DC2626]/[0.12]" aria-hidden="true">
                 &ldquo;
               </div>
 

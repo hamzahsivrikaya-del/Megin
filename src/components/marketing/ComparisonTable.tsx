@@ -40,7 +40,7 @@ export default function ComparisonTable({ t }: ComparisonTableProps) {
                     Feature
                   </th>
                   <th className="text-center py-5 px-3 w-[28%]">
-                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-white bg-[#0A0A0A] rounded-full px-5 py-2 shadow-md">
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-white bg-[#0A0A0A] rounded-full px-5 py-2 shadow-lg shadow-black/20">
                       <Check className="w-4 h-4" />
                       {t.comparison.megin}
                     </span>

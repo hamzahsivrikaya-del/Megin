@@ -2,6 +2,7 @@
 
 import { Dumbbell, Utensils, TrendingUp } from 'lucide-react'
 import AnimatedCounter from '@/components/shared/AnimatedCounter'
+import { useScrollReveal } from '@/lib/hooks/useScrollReveal'
 import type { MarketingTranslations } from '@/lib/i18n/types'
 
 interface NumbersStripProps {
@@ -18,18 +19,19 @@ function parseStatValue(value: string): { num: number; suffix: string } {
 }
 
 export default function NumbersStrip({ t }: NumbersStripProps) {
+  const revealRef = useScrollReveal()
   return (
     <section className="py-20 sm:py-28 bg-white">
       <div className="mkt-section">
         <div className="mkt-container">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
+          <div ref={revealRef} className="mkt-stagger grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
             {t.numbers.items.map((item, index) => {
               const { num, suffix } = parseStatValue(item.value)
               const Icon = statIcons[index]
               return (
                 <div
                   key={item.label}
-                  className="rounded-2xl border border-[#E5E7EB] bg-[#FAFAFA] p-6 sm:p-8 lg:p-10 text-center transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-black/[0.04] hover:border-gray-200"
+                  className="mkt-reveal rounded-2xl border border-[#E5E7EB] bg-[#FAFAFA] p-6 sm:p-8 lg:p-10 text-center transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-black/[0.04] hover:border-gray-200"
                 >
                   <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#0A0A0A] flex items-center justify-center mx-auto mb-5 sm:mb-6">
                     <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />

@@ -1168,3 +1168,59 @@ input:-webkit-autofill {
   background: var(--gradient-warm);
   border-radius: 2px;
 }
+
+/* ═══════════════════════════════════ */
+/* Premium Texture & Depth Effects    */
+/* ═══════════════════════════════════ */
+
+/* Film grain overlay for dark sections — adds premium depth */
+.mkt-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+
+/* Floating mockup — gentle bob effect */
+@keyframes float-mockup {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float-mockup {
+  animation: float-mockup 5s ease-in-out infinite;
+}
+
+/* Pulse ring for emphasis */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+.mkt-pulse-ring {
+  animation: pulse-ring 3s ease-in-out infinite;
+}
+
+/* Typewriter reveal for dramatic text */
+@keyframes text-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.mkt-text-reveal {
+  animation: text-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Line draw animation */
+@keyframes line-draw {
+  from { width: 0; }
+  to { width: 100%; }
+}
+.mkt-line-draw {
+  animation: line-draw 0.6s ease-out both;
+}
+.mkt-line-draw.visible {
+  animation: line-draw 0.6s ease-out both;
+}

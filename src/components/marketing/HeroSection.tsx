@@ -73,7 +73,7 @@ function DashboardMockup({ locale }: { locale: 'en' | 'tr' }) {
   return (
     <div className="mt-16 sm:mt-20 max-w-4xl mx-auto animate-fade-up delay-500">
       {/* Outer glow wrapper */}
-      <div className="relative">
+      <div className="relative animate-float-mockup">
         {/* Glow behind card */}
         <div className="absolute -inset-4 bg-gradient-to-r from-[#DC2626]/[0.06] via-transparent to-[#F97316]/[0.06] rounded-3xl blur-2xl pointer-events-none" />
 
