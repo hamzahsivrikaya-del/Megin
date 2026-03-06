@@ -21,6 +21,7 @@ export const PLAN_CONFIGS: Record<SubscriptionPlan, PlanConfig> = {
       'PT Handle (public profil)',
     ],
     lockedFeatures: [
+      'habits',
       'measurement_charts',
       'nutrition',
       'weekly_reports',
@@ -43,6 +44,7 @@ export const PLAN_CONFIGS: Record<SubscriptionPlan, PlanConfig> = {
     clientLimit: 10,
     price: null,
     features: [
+      'Alışkanlık takibi',
       'Ölçüm grafikleri + trend analizi',
       'Beslenme takibi (öğün + foto)',
       'Haftalık otomatik raporlar',

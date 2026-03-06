@@ -272,6 +272,40 @@ export interface ProgressPhoto {
   created_at: string
 }
 
+// ── Alışkanlık Takibi ──
+export type HabitCategory = 'beslenme' | 'icecek' | 'egzersiz' | 'uyku' | 'oz_bakim'
+
+export interface HabitDefinition {
+  id: string
+  name: string
+  category: HabitCategory
+  icon: string
+  is_avoidance: boolean
+  order_num: number
+  created_at: string
+}
+
+export interface ClientHabit {
+  id: string
+  client_id: string
+  habit_id: string
+  custom_name: string | null
+  is_active: boolean
+  assigned_by: string | null
+  created_at: string
+  // joined
+  habit_definitions?: HabitDefinition
+}
+
+export interface HabitLog {
+  id: string
+  client_id: string
+  client_habit_id: string
+  date: string
+  completed: boolean
+  created_at: string
+}
+
 // ── Abonelik (SaaS) ──
 export type SubscriptionPlan = 'free' | 'pro' | 'elite'
 export type SubscriptionStatus = 'active' | 'cancelled' | 'past_due'

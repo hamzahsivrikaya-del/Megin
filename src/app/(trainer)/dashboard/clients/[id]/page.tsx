@@ -44,6 +44,8 @@ export default async function ClientDetailPage({
     { data: photos },
     { data: goals },
     { data: dependents },
+    { data: habitDefinitions },
+    { data: clientHabits },
   ] = await Promise.all([
     admin
       .from('packages')
@@ -84,6 +86,15 @@ export default async function ClientDetailPage({
       .select('id, full_name, avatar_url, created_at')
       .eq('parent_id', client.id)
       .order('created_at', { ascending: true }),
+    admin
+      .from('habit_definitions')
+      .select('*')
+      .order('category')
+      .order('order_num'),
+    admin
+      .from('client_habits')
+      .select('id, habit_id, custom_name, assigned_by, is_active, habit_definitions(name, category, icon)')
+      .eq('client_id', client.id),
   ])
 
   return (
@@ -98,6 +109,12 @@ export default async function ClientDetailPage({
       photos={photos || []}
       goals={goals || []}
       dependents={dependents || []}
+      habitDefinitions={habitDefinitions || []}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      clientHabits={(clientHabits || []).map((h: any) => ({
+        ...h,
+        habit_definitions: Array.isArray(h.habit_definitions) ? h.habit_definitions[0] : h.habit_definitions,
+      }))}
       plan={plan}
       trainerName={trainer.full_name}
     />

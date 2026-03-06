@@ -12,7 +12,7 @@ import { formatDate, formatDateShort, getPackageStatusLabel, formatPrice } from 
 import type {
   Client, Package, Measurement, Lesson,
   ClientMeal, MealLog, ProgressPhoto, ClientGoal,
-  Gender, SubscriptionPlan,
+  Gender, SubscriptionPlan, HabitDefinition,
 } from '@/lib/types'
 import { hasFeatureAccess } from '@/lib/plans'
 import Image from 'next/image'
@@ -22,7 +22,7 @@ import InstagramCard from '@/components/shared/InstagramCard'
 import { calculateRiskScore } from '@/lib/risk-score'
 import type { RiskResult } from '@/lib/risk-score'
 
-type Tab = 'overview' | 'measurements' | 'packages' | 'lessons' | 'nutrition'
+type Tab = 'overview' | 'measurements' | 'packages' | 'lessons' | 'nutrition' | 'habits'
 
 interface DependentInfo {
   id: string
@@ -42,13 +42,15 @@ interface Props {
   photos: ProgressPhoto[]
   goals: ClientGoal[]
   dependents: DependentInfo[]
+  habitDefinitions: HabitDefinition[]
+  clientHabits: { id: string; habit_id: string; custom_name: string | null; assigned_by: string | null; is_active: boolean; habit_definitions: { name: string; category: string; icon: string } }[]
   plan: SubscriptionPlan
   trainerName?: string
 }
 
 export default function ClientDetail({
   client, trainerId, packages, measurements, lessons,
-  clientMeals, mealLogs, photos, goals, dependents, plan, trainerName,
+  clientMeals, mealLogs, photos, goals, dependents, habitDefinitions, clientHabits: initialClientHabits, plan, trainerName,
 }: Props) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
@@ -63,6 +65,11 @@ export default function ClientDetail({
   })
   const [saving, setSaving] = useState(false)
   const [deletingClient, setDeletingClient] = useState(false)
+
+  // Habits
+  const [currentClientHabits, setCurrentClientHabits] = useState(initialClientHabits)
+  const [showHabitModal, setShowHabitModal] = useState(false)
+  const [assigningHabit, setAssigningHabit] = useState(false)
 
   // Dependents
   const [showAddDependent, setShowAddDependent] = useState(false)
@@ -334,6 +341,7 @@ export default function ClientDetail({
     { key: 'packages', label: 'Paketler', count: packages.length },
     { key: 'lessons', label: 'Dersler', count: lessons.length },
     { key: 'nutrition', label: 'Beslenme', count: mealLogs.length, feature: 'nutrition' },
+    { key: 'habits', label: 'Alışkanlıklar', count: initialClientHabits.filter(h => h.is_active).length, feature: 'habits' },
   ]
 
   return (
@@ -1275,6 +1283,100 @@ export default function ClientDetail({
                 <p className="text-lg">Henüz beslenme kaydı yok</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ALISKANLIKLAR */}
+        {activeTab === 'habits' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-text-primary">Alışkanlık Takibi</h3>
+              <Button size="sm" onClick={() => setShowHabitModal(true)}>Alışkanlık Ata</Button>
+            </div>
+
+            {currentClientHabits.filter(h => h.is_active).length > 0 ? (
+              <div className="space-y-2">
+                {currentClientHabits.filter(h => h.is_active).map(habit => (
+                  <div key={habit.id} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border bg-surface">
+                    <span className="text-xl">{habit.habit_definitions.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm font-semibold text-text-primary">
+                        {habit.custom_name || habit.habit_definitions.name}
+                      </span>
+                      <span className="ml-2 text-xs text-text-secondary capitalize">
+                        {habit.habit_definitions.category.replace('_', ' ')}
+                      </span>
+                      {habit.assigned_by && (
+                        <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">
+                          Atandı
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        const res = await fetch('/api/habits', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ action: 'deactivate', clientHabitId: habit.id }),
+                        })
+                        if (res.ok) {
+                          setCurrentClientHabits(prev => prev.map(h => h.id === habit.id ? { ...h, is_active: false } : h))
+                        }
+                      }}
+                      className="p-1.5 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-colors cursor-pointer"
+                      title="Kaldır"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-text-secondary">
+                <p className="text-lg">Henüz alışkanlık atanmadı</p>
+                <p className="text-sm mt-1">Danışana alışkanlık atamak için butona tıklayın</p>
+              </div>
+            )}
+
+            {/* Alışkanlık Ata Modal */}
+            <Modal open={showHabitModal} onClose={() => setShowHabitModal(false)} title="Alışkanlık Ata">
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {habitDefinitions
+                  .filter(def => !currentClientHabits.some(h => h.habit_id === def.id && h.is_active))
+                  .map(def => (
+                    <button
+                      key={def.id}
+                      disabled={assigningHabit}
+                      onClick={async () => {
+                        setAssigningHabit(true)
+                        const res = await fetch('/api/habits', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ action: 'assign', clientId: client.id, habitId: def.id }),
+                        })
+                        if (res.ok) {
+                          setCurrentClientHabits(prev => [...prev, {
+                            id: crypto.randomUUID(),
+                            habit_id: def.id,
+                            custom_name: null,
+                            assigned_by: trainerId,
+                            is_active: true,
+                            habit_definitions: { name: def.name, category: def.category, icon: def.icon },
+                          }])
+                        }
+                        setAssigningHabit(false)
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-border hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      <span className="text-xl">{def.icon}</span>
+                      <span className="text-sm font-medium text-text-primary">{def.name}</span>
+                      <span className="text-xs text-text-secondary ml-auto capitalize">{def.category.replace('_', ' ')}</span>
+                    </button>
+                  ))}
+              </div>
+            </Modal>
           </div>
         )}
 

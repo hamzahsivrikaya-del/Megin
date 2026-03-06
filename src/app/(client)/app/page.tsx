@@ -7,6 +7,9 @@ import Badge from '@/components/ui/Badge'
 import Link from 'next/link'
 import { formatDate, daysRemaining, getPackageStatusLabel, formatPrice } from '@/lib/utils'
 import type { ClientGoal, TourProgress } from '@/lib/types'
+import { getTrainerPlan } from '@/lib/subscription'
+import { hasFeatureAccess } from '@/lib/plans'
+import { createAdminClient } from '@/lib/supabase/admin'
 import BadgeStrip from '@/components/shared/BadgeStrip'
 import SpotlightTour from '@/components/shared/SpotlightTour'
 import { CLIENT_SPOTLIGHT_STEPS } from '@/lib/tour'
@@ -90,6 +93,33 @@ export default async function ClientDashboardPage() {
       .order('date')
       .order('start_time'),
   ])
+
+  // Alışkanlık verisi
+  const plan = await getTrainerPlan(supabase, client.trainer_id)
+  const habitsEnabled = hasFeatureAccess(plan, 'habits')
+  let habitWidget: { total: number; completed: number } | null = null
+
+  if (habitsEnabled) {
+    const admin = createAdminClient()
+    const { data: activeHabits } = await admin
+      .from('client_habits')
+      .select('id')
+      .eq('client_id', client.id)
+      .eq('is_active', true)
+
+    if (activeHabits && activeHabits.length > 0) {
+      const { data: todayLogs } = await admin
+        .from('habit_logs')
+        .select('completed')
+        .eq('client_id', client.id)
+        .eq('date', today)
+
+      habitWidget = {
+        total: activeHabits.length,
+        completed: todayLogs?.filter(l => l.completed).length || 0,
+      }
+    }
+  }
 
   const remaining = activePackage
     ? activePackage.total_lessons - activePackage.used_lessons
@@ -290,6 +320,45 @@ export default async function ClientDashboardPage() {
         </Card>
       </Link>
 
+      {/* Alışkanlık Takibi */}
+      {habitsEnabled && (habitWidget ? (
+        <Link href="/app/aliskanliklar" className="block">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 border border-amber-200/60 p-4 animate-fade-up">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{"🔥"}</span>
+                <div>
+                  <span className="text-sm font-bold text-text-primary">
+                    Bugün {habitWidget.completed}/{habitWidget.total}
+                  </span>
+                  <p className="text-xs text-text-secondary">Alışkanlık takibine git</p>
+                </div>
+              </div>
+              <svg className="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </Link>
+      ) : (
+        <Link href="/app/aliskanliklar/setup" className="block">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 p-5 shadow-lg shadow-orange-200/50 animate-fade-up">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">{"🔥"}</span>
+                <div>
+                  <h3 className="font-bold text-white text-lg">Yeni! Alışkanlık Takibi</h3>
+                  <p className="text-white/80 text-sm">Günlük alışkanlıklarını takip et, streak kır!</p>
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-white/80 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </Link>
+      ))}
+
       {/* Yaklaşan Dersler */}
       {upcomingLessons && upcomingLessons.length > 0 && (
         <Card className="border-primary/30 animate-fade-up delay-150">
@@ -307,18 +376,41 @@ export default async function ClientDashboardPage() {
                 ? 'Bugün'
                 : lessonDate.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' })
 
+              // Ders saati geçmiş mi?
+              let isPast = false
+              if (lesson.date < today) {
+                isPast = true
+              } else if (isToday && lesson.start_time) {
+                const [h, m] = lesson.start_time.split(':').map(Number)
+                const lessonMinutes = h * 60 + m + (lesson.duration || 60)
+                const now = new Date()
+                const nowMinutes = now.getHours() * 60 + now.getMinutes()
+                isPast = nowMinutes > lessonMinutes
+              }
+
               return (
                 <div key={lesson.id} className={`flex items-center justify-between px-3 py-2.5 rounded-lg ${
-                  isToday ? 'bg-primary/5 border border-primary/20' : 'bg-background'
+                  isPast
+                    ? 'bg-gray-50 border border-border opacity-60'
+                    : isToday
+                      ? 'bg-primary/5 border border-primary/20'
+                      : 'bg-background'
                 }`}>
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium ${isToday ? 'text-primary' : 'text-text-primary'}`}>
+                    <span className={`text-sm font-medium ${
+                      isPast ? 'text-text-tertiary' : isToday ? 'text-primary' : 'text-text-primary'
+                    }`}>
                       {dayLabel}
                     </span>
+                    {isPast && (
+                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-200 text-text-tertiary">
+                        Geçti
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     {lesson.start_time && (
-                      <span className="text-sm font-semibold text-text-primary">
+                      <span className={`text-sm font-semibold ${isPast ? 'text-text-tertiary' : 'text-text-primary'}`}>
                         {lesson.start_time.slice(0, 5)}
                       </span>
                     )}
