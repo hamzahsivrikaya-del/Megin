@@ -49,14 +49,17 @@ export default function BadgeShowcase({ t, locale }: BadgeShowcaseProps) {
     .filter((b): b is ShowcaseBadge => b !== null)
 
   return (
-    <section className="mkt-section py-16 sm:py-20 bg-white">
-      <div className="mkt-container">
+    <section className="mkt-section-dark-warm py-20 sm:py-28 relative overflow-hidden">
+      {/* Subtle dot pattern */}
+      <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
+      <div className="mkt-container relative">
         {/* Heading */}
         <div className="text-center mb-14">
-          <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
+          <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-white">
             {t.badges.title}
           </h2>
-          <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/50 mt-4 max-w-2xl mx-auto leading-relaxed">
             {t.badges.subtitle}
           </p>
         </div>
@@ -69,18 +72,18 @@ export default function BadgeShowcase({ t, locale }: BadgeShowcaseProps) {
           {showcaseBadges.map((badge) => (
             <div
               key={badge.id}
-              className="mkt-reveal group flex flex-col items-center gap-2.5 sm:gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-4 sm:p-5 transition-all duration-300 cursor-default hover:-translate-y-1 hover:shadow-lg hover:shadow-black/5"
+              className="mkt-reveal group flex flex-col items-center gap-3 rounded-2xl bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] p-5 sm:p-6 transition-all duration-500 cursor-default hover:-translate-y-2 hover:bg-white/[0.1] hover:border-white/[0.15]"
             >
               <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3"
                 style={{
                   background: badge.visual.gradient,
-                  boxShadow: `0 4px 14px -2px ${badge.visual.shadow},0.25)`,
+                  boxShadow: `0 8px 24px -4px ${badge.visual.shadow},0.3)`,
                 }}
               >
                 {badge.visual.emoji}
               </div>
-              <span className="text-xs font-semibold text-[#0A0A0A] text-center leading-tight">
+              <span className="text-xs font-semibold text-white/80 text-center leading-tight">
                 {locale === 'en' ? (BADGE_NAMES_EN[badge.id] || badge.name) : badge.name}
               </span>
             </div>
