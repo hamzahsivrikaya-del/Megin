@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-type Gender = 'male' | 'female'
+type Gender = 'erkek' | 'kadin'
 
 const categories = [
   { min: 0, max: 16, label: 'Aşırı Zayıf', color: 'text-blue-400', bg: 'bg-blue-500' },
@@ -16,7 +16,7 @@ const categories = [
 ]
 
 export default function BMICalculator() {
-  const [gender, setGender] = useState<Gender>('male')
+  const [gender, setGender] = useState<Gender>('erkek')
   const [weight, setWeight] = useState('')
   const [height, setHeight] = useState('')
   const [age, setAge] = useState('')
@@ -82,29 +82,29 @@ export default function BMICalculator() {
     <div className="w-full">
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Sol: Form */}
-        <div className="bg-surface/80 backdrop-blur-sm rounded-2xl border border-border p-6 sm:p-8 space-y-5">
+        <div className="bg-white rounded-2xl border border-[#E5E7EB] p-6 sm:p-8 space-y-5">
           {/* Cinsiyet */}
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2">Cinsiyet</label>
+            <label className="block text-sm font-medium text-[#6B7280] mb-2">Cinsiyet</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setGender('male')}
+                onClick={() => setGender('erkek')}
                 className={`py-3 rounded-xl text-sm font-medium transition-all ${
-                  gender === 'male'
-                    ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                    : 'bg-white/5 border border-border text-text-secondary hover:bg-white/10'
+                  gender === 'erkek'
+                    ? 'bg-[#0A0A0A] text-white shadow-lg shadow-black/20'
+                    : 'bg-[#FAFAFA] border border-[#E5E7EB] text-[#6B7280] hover:bg-gray-100'
                 }`}
               >
                 Erkek
               </button>
               <button
                 type="button"
-                onClick={() => setGender('female')}
+                onClick={() => setGender('kadin')}
                 className={`py-3 rounded-xl text-sm font-medium transition-all ${
-                  gender === 'female'
-                    ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                    : 'bg-white/5 border border-border text-text-secondary hover:bg-white/10'
+                  gender === 'kadin'
+                    ? 'bg-[#0A0A0A] text-white shadow-lg shadow-black/20'
+                    : 'bg-[#FAFAFA] border border-[#E5E7EB] text-[#6B7280] hover:bg-gray-100'
                 }`}
               >
                 Kadın
@@ -115,70 +115,70 @@ export default function BMICalculator() {
           {/* Kilo, Boy, Yaş */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">Kilo (kg)</label>
+              <label className="block text-sm font-medium text-[#6B7280] mb-2">Kilo (kg)</label>
               <input
                 type="number"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="75"
-                className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 text-text-primary text-center text-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/25 transition-colors placeholder:text-text-secondary/30"
+                className="w-full bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#0A0A0A] text-center text-lg focus:outline-none focus:border-[#DC2626]/50 focus:ring-1 focus:ring-[#DC2626]/25 transition-colors placeholder:text-[#6B7280]/30"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">Boy (cm)</label>
+              <label className="block text-sm font-medium text-[#6B7280] mb-2">Boy (cm)</label>
               <input
                 type="number"
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
                 placeholder="178"
-                className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 text-text-primary text-center text-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/25 transition-colors placeholder:text-text-secondary/30"
+                className="w-full bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#0A0A0A] text-center text-lg focus:outline-none focus:border-[#DC2626]/50 focus:ring-1 focus:ring-[#DC2626]/25 transition-colors placeholder:text-[#6B7280]/30"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">Yaş</label>
+              <label className="block text-sm font-medium text-[#6B7280] mb-2">Yaş</label>
               <input
                 type="number"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
                 placeholder="25"
-                className="w-full bg-white/5 border border-border rounded-xl px-4 py-3 text-text-primary text-center text-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/25 transition-colors placeholder:text-text-secondary/30"
+                className="w-full bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl px-4 py-3 text-[#0A0A0A] text-center text-lg focus:outline-none focus:border-[#DC2626]/50 focus:ring-1 focus:ring-[#DC2626]/25 transition-colors placeholder:text-[#6B7280]/30"
               />
             </div>
           </div>
 
           {error && (
-            <p className="text-sm text-danger text-center animate-fade-in">{error}</p>
+            <p className="text-sm text-[#DC2626] text-center animate-fade-in">{error}</p>
           )}
 
           <button
             onClick={calculate}
-            className="w-full py-4 bg-primary text-white rounded-xl text-lg font-semibold hover:bg-primary-hover transition-all hover:shadow-lg hover:shadow-primary/25 press-effect"
+            className="w-full py-4 bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white rounded-xl text-lg font-semibold hover:from-[#B91C1C] hover:to-[#EA580C] transition-all hover:shadow-lg hover:shadow-[#DC2626]/25 active:scale-[0.98]"
           >
             Hesapla
           </button>
 
-          <p className="text-xs text-text-secondary/40 text-center">
+          <p className="text-xs text-[#6B7280]/40 text-center">
             BMI kas kütlesini hesaba katmaz, sporcular için yanıltıcı olabilir
           </p>
         </div>
 
         {/* Sağ: Sonuçlar */}
-        <div className={`bg-surface/80 backdrop-blur-sm rounded-2xl border border-border p-6 sm:p-8 flex flex-col justify-center ${!result ? 'items-center' : ''}`}>
+        <div className={`bg-white rounded-2xl border border-[#E5E7EB] p-6 sm:p-8 flex flex-col justify-center ${!result ? 'items-center' : ''}`}>
           {!result ? (
             <div className="text-center py-8">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-primary/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-20 h-20 bg-[#DC2626]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-[#DC2626]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                 </svg>
               </div>
-              <p className="text-text-secondary text-sm">Kilo ve boyunuzu girip hesaplayın</p>
-              <p className="text-text-secondary/50 text-xs mt-2">Vücut Kitle İndeksi (BMI) formülü</p>
+              <p className="text-[#6B7280] text-sm">Kilo ve boyunuzu girip hesaplayın</p>
+              <p className="text-[#6B7280]/50 text-xs mt-2">Vücut Kitle İndeksi (BMI) formülü</p>
             </div>
           ) : (
             <div className="space-y-6 animate-fade-in">
               {/* BMI Değeri */}
               <div className="text-center">
-                <p className="text-sm text-text-secondary mb-1">Vücut Kitle İndeksiniz</p>
+                <p className="text-sm text-[#6B7280] mb-1">Vücut Kitle İndeksiniz</p>
                 <div className={`font-display text-6xl sm:text-7xl ${result.color}`}>{result.bmi}</div>
                 <p className={`text-lg font-semibold mt-2 ${result.color}`}>{result.category}</p>
               </div>
@@ -200,15 +200,15 @@ export default function BMICalculator() {
                   />
                 </div>
                 <div className="flex justify-between mt-1">
-                  <span className="text-xs text-text-secondary/40">15</span>
-                  <span className="text-xs text-text-secondary/40">40</span>
+                  <span className="text-xs text-[#6B7280]/40">15</span>
+                  <span className="text-xs text-[#6B7280]/40">40</span>
                 </div>
               </div>
 
               {/* Normal Aralık */}
-              <div className="bg-white/5 rounded-xl p-4 text-center">
-                <p className="text-xs text-text-secondary mb-1">Normal BMI aralığı için ideal kilonuz</p>
-                <p className="text-xl font-bold text-text-primary">
+              <div className="bg-[#FAFAFA] rounded-xl p-4 text-center">
+                <p className="text-xs text-[#6B7280] mb-1">Normal BMI aralığı için ideal kilonuz</p>
+                <p className="text-xl font-bold text-[#0A0A0A]">
                   {result.normalMin} — {result.normalMax} kg
                 </p>
               </div>
@@ -216,7 +216,7 @@ export default function BMICalculator() {
               {/* Fark */}
               {result.diff > 0 && (
                 <div className={`rounded-xl p-4 text-center ${result.bmi < 18.5 ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-orange-500/10 border border-orange-500/20'}`}>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-[#6B7280]">
                     {result.bmi < 18.5
                       ? `Normal aralığa ulaşmak için ${result.diff} kg almanız önerilir`
                       : `Normal aralığa ulaşmak için ${result.diff} kg vermeniz önerilir`
@@ -227,20 +227,20 @@ export default function BMICalculator() {
 
               {/* BMI Tablosu */}
               <div>
-                <p className="text-sm text-text-secondary mb-3 text-center">BMI Kategorileri</p>
+                <p className="text-sm text-[#6B7280] mb-3 text-center">BMI Kategorileri</p>
                 <div className="space-y-1.5">
                   {categories.filter((_, i) => i > 0 && i < 7).map((cat) => (
                     <div
                       key={cat.label}
                       className={`flex items-center justify-between px-4 py-2 rounded-lg transition-all ${
-                        result.category === cat.label ? 'bg-white/10 border border-white/10' : 'bg-white/3'
+                        result.category === cat.label ? 'bg-[#DC2626]/5 border border-[#DC2626]/15' : 'bg-[#FAFAFA]/60'
                       }`}
                     >
                       <div className="flex items-center gap-2">
                         <div className={`w-2.5 h-2.5 rounded-full ${cat.bg}`} />
-                        <span className="text-sm text-text-primary">{cat.label}</span>
+                        <span className="text-sm text-[#0A0A0A]">{cat.label}</span>
                       </div>
-                      <span className="text-xs text-text-secondary">{cat.min} — {cat.max}</span>
+                      <span className="text-xs text-[#6B7280]">{cat.min} — {cat.max}</span>
                     </div>
                   ))}
                 </div>

@@ -21,7 +21,7 @@ function getCategory(fatPct: number, gender: Gender) {
   }
 }
 
-const inputCls = 'w-full bg-background border border-border rounded-lg px-4 py-3 pr-12 text-text-primary text-base outline-none focus:border-primary transition-colors [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+const inputCls = 'w-full bg-[#FAFAFA] border border-[#E5E7EB] rounded-lg px-4 py-3 pr-12 text-[#0A0A0A] text-base outline-none focus:border-[#DC2626] transition-colors [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
 
 export default function NavyBodyFatCalculator() {
   const [gender, setGender] = useState<Gender>('erkek')
@@ -94,18 +94,18 @@ export default function NavyBodyFatCalculator() {
     <Card>
       <CardHeader>
         <CardTitle>U.S. Navy Vücut Yağ Hesaplayıcı</CardTitle>
-        <p className="text-xs text-text-secondary">Çevre ölçümleriyle vücut yağ oranı tahmini</p>
+        <p className="text-xs text-[#6B7280]">Çevre ölçümleriyle vücut yağ oranı tahmini</p>
       </CardHeader>
 
       {/* Cinsiyet Toggle */}
-      <div className="flex bg-background rounded-lg p-1 gap-1 mt-2 mb-5">
+      <div className="flex bg-[#FAFAFA] rounded-lg p-1 gap-1 mt-2 mb-5">
         <button
           type="button"
           onClick={() => handleGenderChange('erkek')}
           className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
             gender === 'erkek'
-              ? 'bg-surface text-primary border border-border'
-              : 'text-text-secondary hover:text-text-primary'
+              ? 'bg-white text-[#DC2626] border border-[#E5E7EB]'
+              : 'text-[#6B7280] hover:text-[#0A0A0A]'
           }`}
         >
           Erkek
@@ -115,8 +115,8 @@ export default function NavyBodyFatCalculator() {
           onClick={() => handleGenderChange('kadin')}
           className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
             gender === 'kadin'
-              ? 'bg-surface text-primary border border-border'
-              : 'text-text-secondary hover:text-text-primary'
+              ? 'bg-white text-[#DC2626] border border-[#E5E7EB]'
+              : 'text-[#6B7280] hover:text-[#0A0A0A]'
           }`}
         >
           Kadın
@@ -126,7 +126,7 @@ export default function NavyBodyFatCalculator() {
       {/* Boy + Kilo */}
       <div className="grid grid-cols-2 gap-3 mb-5">
         <div>
-          <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Boy</label>
+          <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-2">Boy</label>
           <div className="relative">
             <input
               type="number"
@@ -137,11 +137,11 @@ export default function NavyBodyFatCalculator() {
               max={230}
               className={inputCls}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary">cm</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6B7280]">cm</span>
           </div>
         </div>
         <div>
-          <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Kilo</label>
+          <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-2">Kilo</label>
           <div className="relative">
             <input
               type="number"
@@ -152,7 +152,7 @@ export default function NavyBodyFatCalculator() {
               max={250}
               className={inputCls}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary">kg</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6B7280]">kg</span>
           </div>
         </div>
       </div>
@@ -161,13 +161,13 @@ export default function NavyBodyFatCalculator() {
       <div className="h-px bg-border mb-5" />
 
       {/* Çevre Ölçümleri */}
-      <div className="text-xs font-semibold text-primary uppercase tracking-widest mb-4">
+      <div className="text-xs font-semibold text-[#DC2626] uppercase tracking-widest mb-4">
         Çevre Ölçümleri (cm)
       </div>
 
       <div className={`grid ${gender === 'kadin' ? 'grid-cols-3' : 'grid-cols-2'} gap-3 mb-6`}>
         <div>
-          <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Boyun</label>
+          <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-2">Boyun</label>
           <div className="relative">
             <input
               type="number"
@@ -178,11 +178,11 @@ export default function NavyBodyFatCalculator() {
               max={60}
               className={inputCls}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary">cm</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6B7280]">cm</span>
           </div>
         </div>
         <div>
-          <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Bel</label>
+          <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-2">Bel</label>
           <div className="relative">
             <input
               type="number"
@@ -193,12 +193,12 @@ export default function NavyBodyFatCalculator() {
               max={180}
               className={inputCls}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary">cm</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6B7280]">cm</span>
           </div>
         </div>
         {gender === 'kadin' && (
           <div>
-            <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Kalça</label>
+            <label className="block text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-2">Kalça</label>
             <div className="relative">
               <input
                 type="number"
@@ -209,7 +209,7 @@ export default function NavyBodyFatCalculator() {
                 max={180}
                 className={inputCls}
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-secondary">cm</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6B7280]">cm</span>
             </div>
           </div>
         )}
@@ -219,31 +219,31 @@ export default function NavyBodyFatCalculator() {
       <button
         type="button"
         onClick={hesapla}
-        className="w-full py-3.5 rounded-lg bg-primary text-white font-semibold text-sm cursor-pointer hover:bg-primary/90 active:scale-[0.98] transition-all"
+        className="w-full py-3.5 rounded-lg bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white font-semibold text-sm cursor-pointer hover:from-[#B91C1C] hover:to-[#EA580C] active:scale-[0.98] transition-all"
       >
         Hesapla
       </button>
 
       {/* Hata */}
-      {error && <p className="text-sm text-danger mt-3">{error}</p>}
+      {error && <p className="text-sm text-[#DC2626] mt-3">{error}</p>}
 
       {/* Sonuç */}
       {result && (
-        <div className="mt-6 bg-background border border-border rounded-xl p-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="mt-6 bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl p-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex justify-between items-center mb-3">
-            <span className="text-sm text-text-secondary">Vücut Yağ Yüzdesi</span>
-            <span className="text-2xl font-bold text-primary">{result.fatPct.toFixed(1)}%</span>
+            <span className="text-sm text-[#6B7280]">Vücut Yağ Yüzdesi</span>
+            <span className="text-2xl font-bold text-[#DC2626]">{result.fatPct.toFixed(1)}%</span>
           </div>
           <div className="flex justify-between items-center mb-3">
-            <span className="text-sm text-text-secondary">Yağ Kütlesi</span>
-            <span className="text-lg font-semibold text-blue-500">{result.fatKg.toFixed(1)} kg</span>
+            <span className="text-sm text-[#6B7280]">Yağ Kütlesi</span>
+            <span className="text-lg font-semibold text-blue-600">{result.fatKg.toFixed(1)} kg</span>
           </div>
           <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-text-secondary">Yağsız Kütle</span>
-            <span className="text-lg font-semibold text-blue-500">{result.leanKg.toFixed(1)} kg</span>
+            <span className="text-sm text-[#6B7280]">Yağsız Kütle</span>
+            <span className="text-lg font-semibold text-blue-600">{result.leanKg.toFixed(1)} kg</span>
           </div>
           <div>
-            <span className="text-sm text-text-secondary">Kategori</span>
+            <span className="text-sm text-[#6B7280]">Kategori</span>
             <br />
             {category && (
               <span className={`inline-block mt-2 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide ${category.cls}`}>
@@ -255,7 +255,7 @@ export default function NavyBodyFatCalculator() {
       )}
 
       {/* Uyarı */}
-      <p className="text-[11px] text-text-secondary mt-5 leading-relaxed">
+      <p className="text-[11px] text-[#6B7280] mt-5 leading-relaxed">
         Bu hesaplayıcı U.S. Navy formülünü kullanır. Kaliper cihazı gerektirmez, sadece mezura ile ölçüm yapılır. Sonuçlar klinik tanı değil, yönlendirici bir ölçümdür.
       </p>
     </Card>
