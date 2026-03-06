@@ -62,11 +62,21 @@ export default function NavyBodyFatCalculator() {
     setError('')
 
     // U.S. Navy formülü (cm cinsinden)
+    const waistNeckDiff = gender === 'erkek'
+      ? belVal - boyunVal
+      : belVal + kalcaVal - boyunVal
+
+    if (waistNeckDiff <= 0) {
+      setError('Bel ölçüsü boyun ölçüsünden büyük olmalı.')
+      setResult(null)
+      return
+    }
+
     let fatPct: number
     if (gender === 'erkek') {
-      fatPct = 86.010 * Math.log10(belVal - boyunVal) - 70.041 * Math.log10(boyVal) + 36.76
+      fatPct = 86.010 * Math.log10(waistNeckDiff) - 70.041 * Math.log10(boyVal) + 36.76
     } else {
-      fatPct = 163.205 * Math.log10(belVal + kalcaVal - boyunVal) - 97.684 * Math.log10(boyVal) - 78.387
+      fatPct = 163.205 * Math.log10(waistNeckDiff) - 97.684 * Math.log10(boyVal) - 78.387
     }
 
     // Sınırla

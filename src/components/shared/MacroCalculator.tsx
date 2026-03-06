@@ -120,7 +120,7 @@ export default function MacroCalculator() {
 
     const protein = Math.round(w * proteinPerKg)
     const fat = Math.round((calories * fatRatio) / 9)
-    const carbs = Math.round((calories - protein * 4 - fat * 9) / 4)
+    const carbs = Math.max(0, Math.round((calories - protein * 4 - fat * 9) / 4))
 
     setResult({
       bmr: Math.round(bmr),

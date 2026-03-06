@@ -63,7 +63,7 @@ export default function WaterCalculator() {
     const min = Math.round((w * 30) / 100) / 10
     const max = Math.round((w * 50) / 100) / 10
 
-    // Günlük içme planı
+    // Günlük içme planı (çarpanlar toplamı = 8.0)
     const perOccasion = Math.round(ml / 8)
     const breakdown = [
       { time: 'Sabah uyanınca', amount: `${Math.round(perOccasion * 1.2)} ml` },
@@ -75,6 +75,14 @@ export default function WaterCalculator() {
       { time: 'Antrenman sonrası', amount: `${Math.round(perOccasion * 1.5)} ml` },
       { time: 'Akşam yemeği ile', amount: `${Math.round(perOccasion * 0.5)} ml` },
     ]
+    // Planı hedef toplamına normalize et
+    const planTotal = breakdown.reduce((sum, b) => sum + parseInt(b.amount), 0)
+    if (planTotal > 0) {
+      const factor = ml / planTotal
+      breakdown.forEach((b, i) => {
+        breakdown[i] = { ...b, amount: `${Math.round(parseInt(b.amount) * factor)} ml` }
+      })
+    }
 
     setResult({ liters, glasses, min, max, breakdown })
   }

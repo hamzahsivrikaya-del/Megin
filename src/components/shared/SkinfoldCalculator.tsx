@@ -79,7 +79,7 @@ export default function SkinfoldCalculator() {
       density = 1.0994921 - 0.0009929 * sum + 0.0000023 * sum2 - 0.0001392 * yasVal
     }
 
-    const fatPct = (4.95 / density - 4.5) * 100
+    const fatPct = Math.max(2, (4.95 / density - 4.5) * 100)
     const fatKg = (fatPct / 100) * kiloVal
     const leanKg = kiloVal - fatKg
 

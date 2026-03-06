@@ -30,8 +30,8 @@ export default function IdealWeightCalculator() {
       return
     }
 
-    if (h < 100 || h > 250) {
-      setError('Boy 100-250 cm arasında olmalı')
+    if (h < 140 || h > 250) {
+      setError('Boy 140-250 cm arasında olmalı')
       return
     }
 
