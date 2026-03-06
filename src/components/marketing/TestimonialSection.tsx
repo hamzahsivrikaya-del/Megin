@@ -8,66 +8,58 @@ interface TestimonialSectionProps {
   t: MarketingTranslations
 }
 
-const avatarColors = [
-  'from-[#DC2626] to-[#F97316]',
-  'from-[#F97316] to-[#D97706]',
-  'from-[#D97706] to-[#DC2626]',
-]
-
 export default function TestimonialSection({ t }: TestimonialSectionProps) {
   const revealRef = useScrollReveal()
 
   return (
-    <section className="mkt-section py-16 sm:py-20 bg-white">
+    <section className="mkt-section py-20 sm:py-28 bg-[#FAFAFA]">
       <div className="mkt-container">
         {/* Heading */}
         <div className="text-center">
-          <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl">
-            <span className="text-[#0A0A0A] block">{t.testimonials.title}</span>
+          <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
+            {t.testimonials.title}
           </h2>
           <p className="text-[#6B7280] mt-4 max-w-xl mx-auto leading-relaxed">
             {t.testimonials.subtitle}
           </p>
+          <div className="w-16 h-1 rounded-full bg-gradient-to-r from-[#DC2626] to-[#F97316] mx-auto mt-6" />
         </div>
 
-        {/* Testimonial grid */}
+        {/* Cards */}
         <div
           ref={revealRef}
-          className="mkt-stagger grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-12 sm:mt-16"
+          className="mkt-stagger grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 mt-14 sm:mt-16"
         >
-          {t.testimonials.items.map((item, index) => (
+          {t.testimonials.items.map((item) => (
             <div
               key={item.name}
-              className="mkt-reveal mkt-testimonial-card flex flex-col"
+              className="mkt-reveal relative bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E7EB] transition-all duration-500 hover:shadow-2xl hover:shadow-black/[0.06] hover:-translate-y-2 hover:border-gray-200 flex flex-col"
             >
+              {/* Large decorative quote */}
+              <div className="text-[80px] leading-none font-serif text-[#DC2626]/[0.08] absolute top-3 left-5 select-none pointer-events-none" aria-hidden="true">
+                &ldquo;
+              </div>
+
               {/* Stars */}
-              <div className="flex gap-0.5">
+              <div className="flex gap-0.5 relative">
                 {Array.from({ length: item.rating }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-4 h-4 fill-[#F59E0B] text-[#F59E0B]"
-                  />
+                  <Star key={i} className="w-4 h-4 fill-[#F59E0B] text-[#F59E0B]" />
                 ))}
               </div>
 
               {/* Quote */}
-              <blockquote className="mt-4 text-[#374151] leading-relaxed flex-1">
+              <blockquote className="mt-5 text-[#374151] leading-relaxed flex-1 relative text-[15px]">
                 &ldquo;{item.quote}&rdquo;
               </blockquote>
 
               {/* Author */}
-              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-[#F3F4F6]">
-                {/* Avatar placeholder */}
-                <div
-                  className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-white font-bold text-sm`}
-                >
+              <div className="flex items-center gap-3 mt-6 pt-5 border-t border-[#F3F4F6]">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#0A0A0A] to-[#374151] flex items-center justify-center text-white font-bold text-sm shadow-md shadow-black/10">
                   {item.name.charAt(0)}
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-[#0A0A0A]">
-                    {item.name}
-                  </div>
-                  <div className="text-xs text-[#6B7280]">{item.role}</div>
+                  <div className="text-sm font-bold text-[#0A0A0A]">{item.name}</div>
+                  <div className="text-xs text-[#9CA3AF]">{item.role}</div>
                 </div>
               </div>
             </div>
