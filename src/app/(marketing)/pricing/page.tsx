@@ -13,31 +13,35 @@ export default function PricingPage() {
   const t = en
   return (
     <>
-      {/* Page header */}
-      <section className="mkt-section pt-32 pb-16 text-center bg-white">
-        <div className="mkt-container">
-          <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
+      {/* Dark hero header */}
+      <section className="mkt-section-dark-warm pt-32 sm:pt-40 pb-16 sm:pb-20 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(220,38,38,0.08),transparent)] pointer-events-none" />
+        <div className="mkt-container relative">
+          <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#DC2626] mb-4">Pricing</span>
+          <h1 className="mkt-heading-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
             {t.pricing.title.toUpperCase()}
           </h1>
-          <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/60 mt-4 max-w-2xl mx-auto leading-relaxed">
             {t.pricing.subtitle}
           </p>
+          <div className="w-16 h-1 rounded-full bg-gradient-to-r from-[#DC2626] to-[#F97316] mx-auto mt-6" />
         </div>
       </section>
 
       {/* Pricing cards */}
-      <section className="mkt-section pb-20 bg-white">
+      <section className="mkt-section py-16 sm:py-20 bg-[#FAFAFA]">
         <div className="mkt-container">
           <PricingCards t={t} />
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="mkt-section py-20 mkt-gradient-bg">
+      <section className="mkt-section py-20 sm:py-28 bg-white">
         <div className="mkt-container max-w-3xl mx-auto">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-12">
+          <h2 className="mkt-heading-lg text-2xl sm:text-3xl md:text-4xl text-[#0A0A0A] text-center mb-4">
             {t.pricing.faq.title}
           </h2>
+          <div className="w-16 h-1 rounded-full bg-gradient-to-r from-[#DC2626] to-[#F97316] mx-auto mb-12" />
           <FAQAccordion items={t.pricing.faq.items} />
         </div>
       </section>
