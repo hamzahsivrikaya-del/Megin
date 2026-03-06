@@ -19,7 +19,7 @@ export default function FAQAccordion({ items }: FAQAccordionProps) {
   }
 
   return (
-    <div role="list" aria-label="Frequently asked questions">
+    <div role="list" aria-label="Frequently asked questions" className="space-y-1">
       {items.map((item, index) => {
         const isOpen = openIndex === index
         const answerId = `faq-answer-${index}`
@@ -28,7 +28,11 @@ export default function FAQAccordion({ items }: FAQAccordionProps) {
         return (
           <div
             key={item.question}
-            className="border-b border-[#E5E7EB]"
+            className={`rounded-xl border transition-all duration-300 ${
+              isOpen
+                ? 'border-[#DC2626]/20 bg-white shadow-md shadow-red-500/[0.03]'
+                : 'border-[#E5E7EB] bg-white hover:border-gray-300'
+            }`}
             role="listitem"
           >
             <button
@@ -36,30 +40,21 @@ export default function FAQAccordion({ items }: FAQAccordionProps) {
               aria-expanded={isOpen}
               aria-controls={answerId}
               onClick={() => toggle(index)}
-              className="w-full flex justify-between items-center py-5 text-left cursor-pointer"
+              className="w-full flex justify-between items-center px-6 py-5 text-left cursor-pointer"
             >
-              <span className="text-base font-semibold text-[#0A0A0A] pr-4">
+              <span className={`text-base font-semibold pr-4 transition-colors duration-300 ${isOpen ? 'text-[#0A0A0A]' : 'text-[#374151]'}`}>
                 {item.question}
               </span>
               <span
-                className="flex-shrink-0 text-[#6B7280] transition-transform duration-300"
-                style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  isOpen
+                    ? 'bg-[#0A0A0A] text-white rotate-180'
+                    : 'bg-[#F5F5F5] text-[#6B7280]'
+                }`}
                 aria-hidden="true"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5 7.5L10 12.5L15 7.5"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
             </button>
@@ -68,10 +63,16 @@ export default function FAQAccordion({ items }: FAQAccordionProps) {
               id={answerId}
               role="region"
               aria-labelledby={buttonId}
-              className="overflow-hidden transition-[max-height] duration-300"
-              style={{ maxHeight: isOpen ? '500px' : '0px' }}
+              className="grid transition-all duration-300"
+              style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
             >
-              <p className="pb-5 text-[#6B7280] leading-relaxed">{item.answer}</p>
+              <div className="overflow-hidden">
+                <div className="px-6 pb-5">
+                  {/* Red accent line */}
+                  <div className="w-8 h-0.5 bg-gradient-to-r from-[#DC2626] to-[#F97316] rounded-full mb-3" />
+                  <p className="text-[#6B7280] leading-relaxed text-[15px]">{item.answer}</p>
+                </div>
+              </div>
             </div>
           </div>
         )
