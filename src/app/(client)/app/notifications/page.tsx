@@ -49,6 +49,13 @@ export default async function ClientNotificationsPage() {
     nutrition_reminder: 'Beslenme',
     badge_earned: 'Rozet',
     inactive: 'Hatırlatma',
+    habit_reminder: 'Hatırlatma',
+    streak_at_risk: 'Seri Uyarısı',
+    streak_celebration: 'Tebrikler',
+    program_assigned: 'Yeni Program',
+    lesson_scheduled: 'Ders',
+    lesson_updated: 'Ders',
+    lesson_cancelled: 'Ders İptali',
   }
 
   return (

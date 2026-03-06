@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import ClientNavbar from '@/components/shared/ClientNavbar'
+import Heartbeat from '@/components/shared/Heartbeat'
 import { getTrainerPlan } from '@/lib/subscription'
 
 export default async function ClientLayout({
@@ -34,6 +35,7 @@ export default async function ClientLayout({
 
   return (
     <div className="min-h-screen bg-background">
+      <Heartbeat />
       <ClientNavbar userName={client?.full_name || ''} plan={plan} />
       <main className="p-4 md:p-6 max-w-5xl mx-auto">
         {children}

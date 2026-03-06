@@ -42,7 +42,7 @@ export const PLAN_CONFIGS: Record<SubscriptionPlan, PlanConfig> = {
   pro: {
     name: 'Pro',
     clientLimit: 10,
-    price: null,
+    price: 400,
     features: [
       'Alışkanlık takibi',
       'Ölçüm grafikleri + trend analizi',
@@ -67,7 +67,7 @@ export const PLAN_CONFIGS: Record<SubscriptionPlan, PlanConfig> = {
   elite: {
     name: 'Elite',
     clientLimit: -1,
-    price: null,
+    price: 800,
     features: [
       'Takvim (ders planlama)',
       'İlerleme fotoğrafları + slider',

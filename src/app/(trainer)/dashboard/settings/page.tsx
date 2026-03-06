@@ -56,6 +56,16 @@ export default function TrainerProfilePage() {
   const [tourStepStatus, setTourStepStatus] = useState<Record<string, boolean>>({})
   const [trainerPlan, setTrainerPlan] = useState<SubscriptionPlan>('free')
 
+  // Bildirim tercihleri
+  const [notifPrefs, setNotifPrefs] = useState({
+    client_habits_completed: true,
+    client_streak_milestone: true,
+    client_inactive: true,
+    daily_summary: true,
+    trainer_nutrition_summary: true,
+    low_lessons: true,
+  })
+
   useEffect(() => {
     async function load() {
       const supabase = createClient()
@@ -115,6 +125,13 @@ export default function TrainerProfilePage() {
           complete_profile: !!(trainer.bio || trainer.phone),
         })
       }
+      // Bildirim tercihleri
+      const prefsRes = await fetch('/api/notification-preferences')
+      if (prefsRes.ok) {
+        const prefsData = await prefsRes.json()
+        if (prefsData.preferences) setNotifPrefs(prefsData.preferences)
+      }
+
       setLoading(false)
     }
     load()
@@ -526,6 +543,49 @@ export default function TrainerProfilePage() {
           </div>
         </Card>
       )}
+      {/* Bildirim Tercihleri */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Bildirim Tercihleri</CardTitle>
+        </CardHeader>
+        <div className="space-y-3">
+          {([
+            { key: 'client_habits_completed', label: 'Alışkanlık Tamamlama', desc: 'Danışan tüm alışkanlıklarını tamamladığında' },
+            { key: 'client_streak_milestone', label: 'Streak Milestone', desc: 'Danışan 7, 14, 30 günlük seriye ulaştığında' },
+            { key: 'client_inactive', label: 'İnaktif Danışan', desc: '3+ gündür giriş yapmayan danışan uyarısı' },
+            { key: 'daily_summary', label: 'Günlük Özet', desc: 'Her akşam günün aktivite özeti' },
+            { key: 'trainer_nutrition_summary', label: 'Beslenme Özeti', desc: 'Günlük beslenme giriş durumu' },
+            { key: 'low_lessons', label: 'Ders Paketi Uyarısı', desc: 'Danışanın ders paketi azaldığında' },
+          ] as const).map(item => (
+            <div key={item.key} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+              <div>
+                <p className="text-sm font-medium text-text-primary">{item.label}</p>
+                <p className="text-xs text-text-secondary">{item.desc}</p>
+              </div>
+              <button
+                onClick={async () => {
+                  const newVal = !notifPrefs[item.key]
+                  setNotifPrefs(prev => ({ ...prev, [item.key]: newVal }))
+                  await fetch('/api/notification-preferences', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [item.key]: newVal }),
+                  })
+                }}
+                className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${
+                  notifPrefs[item.key] ? 'bg-primary' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                    notifPrefs[item.key] ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   )
 }

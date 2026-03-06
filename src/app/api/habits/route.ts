@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { notifyTrainer, notifyClient } from '@/lib/trainer-notify'
 
 async function getAuthUser() {
   const supabase = await createClient()
@@ -193,6 +194,12 @@ export async function POST(request: NextRequest) {
       )
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // Bildirim kontrolleri (arka planda, response'u bekletmeden)
+    if (completed) {
+      checkHabitNotifications(admin, client.id, client.trainer_id, date).catch(() => {})
+    }
+
     return NextResponse.json({ ok: true })
   }
 
@@ -272,4 +279,130 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ error: 'Geçersiz action' }, { status: 400 })
+}
+
+// Alışkanlık tamamlama + streak milestone bildirimleri
+async function checkHabitNotifications(
+  admin: ReturnType<typeof createAdminClient>,
+  clientId: string,
+  trainerId: string,
+  date: string
+) {
+  // Trainer + client bilgilerini al
+  const { data: trainerData } = await admin
+    .from('trainers')
+    .select('id, user_id')
+    .eq('id', trainerId)
+    .maybeSingle()
+  if (!trainerData) return
+
+  const { data: clientData } = await admin
+    .from('clients')
+    .select('id, user_id, full_name')
+    .eq('id', clientId)
+    .maybeSingle()
+  if (!clientData) return
+
+  // Aktif alışkanlık sayısı
+  const { count: totalHabits } = await admin
+    .from('client_habits')
+    .select('id', { count: 'exact', head: true })
+    .eq('client_id', clientId)
+    .eq('is_active', true)
+
+  // Bugün tamamlanan sayısı
+  const { count: completedToday } = await admin
+    .from('habit_logs')
+    .select('id', { count: 'exact', head: true })
+    .eq('client_id', clientId)
+    .eq('date', date)
+    .eq('completed', true)
+
+  if (!totalHabits || !completedToday) return
+
+  // Tüm alışkanlıklar tamamlandı mı?
+  if (completedToday >= totalHabits) {
+    // Dedup: bugün bu bildirim gitti mi?
+    const { data: existing } = await admin
+      .from('notifications')
+      .select('id')
+      .eq('trainer_id', trainerId)
+      .eq('client_id', clientId)
+      .eq('type', 'client_habits_completed')
+      .gte('sent_at', `${date}T00:00:00`)
+      .limit(1)
+
+    if (!existing || existing.length === 0) {
+      await notifyTrainer({
+        trainerId: trainerData.id,
+        trainerUserId: trainerData.user_id,
+        type: 'client_habits_completed',
+        title: 'Alışkanlıklar Tamamlandı',
+        message: `${clientData.full_name} bugün tüm alışkanlıklarını tamamladı!`,
+        clientId,
+      })
+    }
+
+    // Streak hesapla
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    const { data: recentLogs } = await admin
+      .from('habit_logs')
+      .select('date, completed')
+      .eq('client_id', clientId)
+      .gte('date', ninetyDaysAgo)
+      .order('date', { ascending: false })
+
+    if (recentLogs) {
+      const dates = [...new Set(recentLogs.map(l => l.date))].sort((a, b) => b.localeCompare(a))
+      let streak = 0
+      for (const d of dates) {
+        if (d > date) continue
+        const dayCompleted = recentLogs.filter(l => l.date === d && l.completed).length
+        if (dayCompleted >= totalHabits) streak++
+        else if (d === date) continue
+        else break
+      }
+
+      // Milestone kontrolü (7, 14, 30)
+      const milestones = [7, 14, 30]
+      for (const milestone of milestones) {
+        if (streak === milestone) {
+          // Dedup
+          const { data: existingMilestone } = await admin
+            .from('notifications')
+            .select('id')
+            .eq('trainer_id', trainerId)
+            .eq('client_id', clientId)
+            .eq('type', 'client_streak_milestone')
+            .gte('sent_at', `${date}T00:00:00`)
+            .limit(1)
+
+          if (!existingMilestone || existingMilestone.length === 0) {
+            await notifyTrainer({
+              trainerId: trainerData.id,
+              trainerUserId: trainerData.user_id,
+              type: 'client_streak_milestone',
+              title: 'Streak Milestone!',
+              message: `${clientData.full_name} ${milestone} günlük seriye ulaştı!`,
+              clientId,
+              data: { milestone },
+            })
+
+            // Danışana da kutlama
+            if (clientData.user_id) {
+              await notifyClient({
+                clientUserId: clientData.user_id,
+                trainerId: trainerData.id,
+                clientId,
+                type: 'streak_celebration',
+                title: 'Tebrikler!',
+                message: `${milestone} günlük seriye ulaştın! Harika gidiyorsun!`,
+                data: { milestone },
+              })
+            }
+          }
+        }
+      }
+    }
+  }
 }

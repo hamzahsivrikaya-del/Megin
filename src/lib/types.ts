@@ -198,6 +198,25 @@ export type NotificationType =
   | 'lesson_updated'
   | 'lesson_cancelled'
   | 'trainer_nutrition_summary'
+  | 'client_habits_completed'
+  | 'client_streak_milestone'
+  | 'client_inactive'
+  | 'daily_summary'
+  | 'habit_reminder'
+  | 'streak_at_risk'
+  | 'streak_celebration'
+  | 'program_assigned'
+
+export interface TrainerNotificationPreferences {
+  id: string
+  trainer_id: string
+  client_habits_completed: boolean
+  client_streak_milestone: boolean
+  client_inactive: boolean
+  daily_summary: boolean
+  trainer_nutrition_summary: boolean
+  low_lessons: boolean
+}
 
 export interface Notification {
   id: string

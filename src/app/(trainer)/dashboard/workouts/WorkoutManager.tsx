@@ -236,6 +236,15 @@ export default function WorkoutManager({ initialWorkouts, clients, initialWeek, 
       }
     }
 
+    // Danışana bildirim gönder
+    if (selectedClient && workoutType === 'client') {
+      fetch('/api/program-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: selectedClient }),
+      }).catch(() => {})
+    }
+
     // Reload
     const reloaded = await fetchWorkouts(weekStart, selectedClient)
     setWorkouts(reloaded)
