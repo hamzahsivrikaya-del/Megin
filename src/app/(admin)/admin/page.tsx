@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card'
+import StatCard from '@/components/ui/StatCard'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
@@ -56,27 +57,21 @@ export default async function AdminDashboard() {
 
       {/* İstatistik Kartları */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="text-center !p-4">
-          <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-primary/10 to-orange-500/10 flex items-center justify-center">
-            <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          </div>
-          <span className="text-2xl font-bold text-text-primary">{activeMembers || 0}</span>
-          <span className="block text-xs text-text-secondary mt-0.5">Danışan</span>
-        </Card>
-        <Card className="text-center !p-4">
-          <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-primary/10 to-orange-500/10 flex items-center justify-center">
-            <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-          </div>
-          <span className="text-2xl font-bold text-text-primary">{weeklyLessons?.length || 0}</span>
-          <span className="block text-xs text-text-secondary mt-0.5">Haftalık Ders</span>
-        </Card>
-        <Card className="text-center !p-4">
-          <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-primary/10 to-orange-500/10 flex items-center justify-center">
-            <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-          </div>
-          <span className="text-2xl font-bold text-text-primary">{todayLessons?.length || 0}</span>
-          <span className="block text-xs text-text-secondary mt-0.5">Bugün</span>
-        </Card>
+        <StatCard
+          icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
+          value={activeMembers || 0}
+          label="Danışan"
+        />
+        <StatCard
+          icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>}
+          value={weeklyLessons?.length || 0}
+          label="Haftalık Ders"
+        />
+        <StatCard
+          icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>}
+          value={todayLessons?.length || 0}
+          label="Bugün"
+        />
       </div>
 
       {/* Hızlı Aksiyonlar */}
@@ -123,7 +118,7 @@ export default async function AdminDashboard() {
       <MemberSearch />
 
       {/* Bugünün Ders Programı */}
-      <Card className="">
+      <Card glow>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Bugünün Programı</CardTitle>
@@ -137,7 +132,7 @@ export default async function AdminDashboard() {
             {[...todayLessons]
               .sort((a, b) => (String((a as Record<string, unknown>).start_time || '')).localeCompare(String((b as Record<string, unknown>).start_time || '')))
               .map((lesson: Record<string, unknown>) => (
-                <div key={lesson.id as string} className="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-hover">
+                <div key={lesson.id as string} className="flex items-center justify-between list-item-hover bg-surface-hover/50">
                   <span className="text-sm font-medium text-text-primary">
                     {(lesson.users as Record<string, string>)?.full_name}
                   </span>
@@ -262,7 +257,7 @@ async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, u
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card className="">
+      <Card glow>
         <CardHeader>
           <CardTitle>Paket Uyarıları</CardTitle>
         </CardHeader>
@@ -273,7 +268,7 @@ async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, u
               const isCompleted = pkg.status === 'completed'
               return (
                 <li key={pkg.user_id}>
-                  <Link href={`/admin/members/${pkg.user_id}`} className="flex items-center justify-between py-2 px-1 -mx-1 rounded-lg hover:bg-surface-hover active:bg-surface-hover transition-colors">
+                  <Link href={`/admin/members/${pkg.user_id}`} className="flex items-center justify-between list-item-hover">
                     <span className="text-sm text-text-primary">
                       {((pkg.users as unknown) as { full_name: string })?.full_name}
                     </span>
@@ -290,7 +285,7 @@ async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, u
         )}
       </Card>
 
-      <Card className="">
+      <Card glow>
         <CardHeader>
           <CardTitle>Bugün Gelen Üyeler</CardTitle>
         </CardHeader>
