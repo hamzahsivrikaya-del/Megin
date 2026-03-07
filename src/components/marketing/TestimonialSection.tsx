@@ -19,7 +19,7 @@ export default function TestimonialSection({ t }: TestimonialSectionProps) {
       <div className="mkt-container relative">
         {/* Heading */}
         <div className="text-center">
-          <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
+          <h2 className="heading-display text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
             {t.testimonials.title}
           </h2>
           <p className="text-[#6B7280] mt-4 max-w-xl mx-auto leading-relaxed">

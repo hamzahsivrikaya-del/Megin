@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="space-y-4">
-      <h2 className="mkt-heading-lg text-lg sm:text-xl text-[#0A0A0A]">{title}</h2>
+      <h2 className="heading-display text-lg sm:text-xl text-[#0A0A0A]">{title}</h2>
       <div className="space-y-3 text-[#374151] text-sm sm:text-base leading-relaxed">
         {children}
       </div>
@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
           <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">
             Legal
           </p>
-          <h1 className="mkt-heading-xl text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
+          <h1 className="heading-display-xl text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
             PRIVACY POLICY
           </h1>
           <p className="text-sm text-[#9CA3AF] mt-4">Last updated: March 2026</p>

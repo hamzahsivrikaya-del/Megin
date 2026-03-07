@@ -39,7 +39,7 @@ export default function UseCaseSection({
         </p>
 
         {/* Title */}
-        <h2 className={`mkt-reveal mkt-heading-lg text-3xl sm:text-4xl md:text-5xl mt-4 ${dark ? 'text-white' : 'text-[#0A0A0A]'}`}>
+        <h2 className={`mkt-reveal heading-display text-3xl sm:text-4xl md:text-5xl mt-4 ${dark ? 'text-white' : 'text-[#0A0A0A]'}`}>
           {title}
         </h2>
 
@@ -77,7 +77,7 @@ export default function UseCaseSection({
 
         {/* CTA */}
         <div className="mkt-reveal mt-12">
-          <Link href="/signup" className="mkt-cta-gradient mkt-cta-glow">
+          <Link href="/signup" className="cta-gradient cta-glow">
             Get Started Free
             <ArrowRight className="w-4 h-4" />
           </Link>

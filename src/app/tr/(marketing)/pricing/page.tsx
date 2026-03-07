@@ -21,7 +21,7 @@ export default function TurkishPricingPage() {
     <>
       <section className="mkt-section pt-32 pb-16 text-center bg-white">
         <div className="mkt-container">
-          <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
+          <h1 className="heading-display-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
             {t.pricing.title.toUpperCase()}
           </h1>
           <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto leading-relaxed">
@@ -38,7 +38,7 @@ export default function TurkishPricingPage() {
 
       <section className="mkt-section py-20 mkt-gradient-bg">
         <div className="mkt-container max-w-3xl mx-auto">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-12">
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-12">
             {t.pricing.faq.title}
           </h2>
           <FAQAccordion items={t.pricing.faq.items} />

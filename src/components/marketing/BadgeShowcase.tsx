@@ -57,7 +57,7 @@ export default function BadgeShowcase({ t, locale }: BadgeShowcaseProps) {
       <div className="mkt-container">
         {/* Heading */}
         <div className="text-center mb-14">
-          <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-white">
+          <h2 className="heading-display text-3xl sm:text-4xl md:text-5xl text-white">
             {t.badges.title}
           </h2>
           <p className="text-white/60 mt-4 max-w-2xl mx-auto leading-relaxed">

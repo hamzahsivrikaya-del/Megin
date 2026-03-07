@@ -34,14 +34,14 @@ export default function PersonalTrainersPage() {
             <User className="w-8 h-8 text-white" />
           </div>
           <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">{segment.label}</p>
-          <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-white">
+          <h1 className="heading-display-xl text-4xl sm:text-5xl md:text-6xl text-white">
             {segment.title}
           </h1>
           <p className="text-white/70 mt-4 text-lg leading-relaxed max-w-2xl mx-auto">
             {segment.heroDescription}
           </p>
           <div className="mt-8">
-            <Link href="/signup" className="mkt-cta-gradient mkt-cta-glow">
+            <Link href="/signup" className="cta-gradient cta-glow">
               Get Started Free <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -60,7 +60,7 @@ export default function PersonalTrainersPage() {
       {/* 3. Features Grid — unique icons per feature */}
       <section className="mkt-section py-20 bg-[#FAFAFA]">
         <div className="mkt-container">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-12">Key Features</h2>
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-12">Key Features</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 max-w-5xl mx-auto">
             {segment.extendedFeatures.map((f, i) => {
               const Icon = FEATURE_ICONS[i] ?? Check
@@ -104,7 +104,7 @@ export default function PersonalTrainersPage() {
       {/* 5. Comparison — responsive grid */}
       <section className="mkt-section py-20 bg-[#FAFAFA]">
         <div className="mkt-container max-w-3xl mx-auto">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-10">Before &amp; After Megin</h2>
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-10">Before &amp; After Megin</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-[#6B7280] mb-4">Before Megin</p>
@@ -135,7 +135,7 @@ export default function PersonalTrainersPage() {
       {/* 6. Pricing */}
       <section className="mkt-section py-20 bg-white">
         <div className="mkt-container">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-3">{en.pricing.title}</h2>
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-3">{en.pricing.title}</h2>
           <p className="text-[#6B7280] text-center mb-10">{en.pricing.subtitle}</p>
           <PricingCards t={t} />
         </div>
@@ -144,7 +144,7 @@ export default function PersonalTrainersPage() {
       {/* 7. FAQ */}
       <section className="mkt-section py-20 bg-[#FAFAFA]">
         <div className="mkt-container max-w-3xl mx-auto">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-10">Frequently Asked Questions</h2>
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-10">Frequently Asked Questions</h2>
           <FAQAccordion items={segment.faqItems} />
         </div>
       </section>

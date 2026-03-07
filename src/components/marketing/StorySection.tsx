@@ -17,7 +17,7 @@ export default function StorySection({ t }: StorySectionProps) {
       <div className="mkt-section relative">
         <div ref={revealRef} className="mkt-container mkt-stagger">
           {/* Heading */}
-          <h2 className="mkt-reveal mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-center">
+          <h2 className="mkt-reveal heading-display text-3xl sm:text-4xl md:text-5xl text-center">
             <span className="text-white block">{t.story.heading1}</span>
             <span className="text-gradient block">{t.story.heading2}</span>
           </h2>

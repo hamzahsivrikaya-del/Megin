@@ -2,6 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import type { MarketingTranslations } from '@/lib/i18n/types'
+
+interface ContactFormProps {
+  t: MarketingTranslations
+}
 
 interface FormState {
   name: string
@@ -10,18 +15,11 @@ interface FormState {
   clientCount: string
 }
 
-const CLIENT_COUNT_OPTIONS = [
-  { value: '', label: 'Select an option' },
-  { value: '1-5', label: '1 – 5 clients' },
-  { value: '6-15', label: '6 – 15 clients' },
-  { value: '16-30', label: '16 – 30 clients' },
-  { value: '30+', label: '30+ clients' },
-]
-
 const INPUT_BASE =
   'w-full border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 transition-colors rounded-xl'
 
-export default function ContactForm() {
+export default function ContactForm({ t }: ContactFormProps) {
+  const { contact } = t
   const [form, setForm] = useState<FormState>({
     name: '',
     email: '',
@@ -51,13 +49,13 @@ export default function ContactForm() {
         <div className="mkt-container relative">
           <div className="max-w-2xl">
             <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">
-              Contact
+              {contact.badge}
             </p>
-            <h1 className="mkt-heading-xl text-4xl sm:text-5xl text-white">
-              LET&apos;S TALK
+            <h1 className="heading-display-xl text-4xl sm:text-5xl text-white">
+              {contact.title}
             </h1>
             <p className="text-white/60 mt-4 text-lg leading-relaxed">
-              Have a question, a partnership idea, or just want to say hi? We read every message.
+              {contact.subtitle}
             </p>
           </div>
         </div>
@@ -89,11 +87,11 @@ export default function ContactForm() {
                       />
                     </svg>
                   </div>
-                  <h2 className="mkt-heading-lg text-xl text-[#0A0A0A]">
-                    Message sent!
+                  <h2 className="heading-display text-xl text-[#0A0A0A]">
+                    {contact.successTitle}
                   </h2>
                   <p className="text-[#6B7280] text-sm leading-relaxed">
-                    Thanks for reaching out, {firstName}. We&apos;ll get back to you within 1–2 business days.
+                    {contact.successMessage.replace('{name}', firstName)}
                   </p>
                   <button
                     onClick={() => {
@@ -102,7 +100,7 @@ export default function ContactForm() {
                     }}
                     className="text-sm font-semibold text-[#DC2626] hover:underline mt-2 cursor-pointer"
                   >
-                    Send another message
+                    {contact.sendAnother}
                   </button>
                 </div>
               ) : (
@@ -113,7 +111,7 @@ export default function ContactForm() {
                       htmlFor="name"
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
-                      Full Name{' '}
+                      {contact.nameLabel}{' '}
                       <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
@@ -124,7 +122,7 @@ export default function ContactForm() {
                       type="text"
                       value={form.name}
                       onChange={handleChange}
-                      placeholder="Alex Johnson"
+                      placeholder={contact.namePlaceholder}
                       required
                       autoComplete="name"
                       className={INPUT_BASE}
@@ -137,7 +135,7 @@ export default function ContactForm() {
                       htmlFor="email"
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
-                      Email Address{' '}
+                      {contact.emailLabel}{' '}
                       <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
@@ -148,7 +146,7 @@ export default function ContactForm() {
                       type="email"
                       value={form.email}
                       onChange={handleChange}
-                      placeholder="alex@gymname.com"
+                      placeholder={contact.emailPlaceholder}
                       required
                       autoComplete="email"
                       className={INPUT_BASE}
@@ -161,9 +159,9 @@ export default function ContactForm() {
                       htmlFor="clientCount"
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
-                      How many clients do you have?{' '}
+                      {contact.clientCountLabel}{' '}
                       <span className="text-[#9CA3AF] font-normal normal-case tracking-normal">
-                        (optional)
+                        {contact.clientCountOptional}
                       </span>
                     </label>
                     <select
@@ -173,7 +171,7 @@ export default function ContactForm() {
                       onChange={handleChange}
                       className={INPUT_BASE + ' cursor-pointer'}
                     >
-                      {CLIENT_COUNT_OPTIONS.map((opt) => (
+                      {contact.clientCountOptions.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
                         </option>
@@ -187,7 +185,7 @@ export default function ContactForm() {
                       htmlFor="message"
                       className="block text-xs font-bold uppercase tracking-wider text-[#0A0A0A] mb-2"
                     >
-                      Message{' '}
+                      {contact.messageLabel}{' '}
                       <span className="text-[#DC2626]" aria-hidden="true">
                         *
                       </span>
@@ -198,7 +196,7 @@ export default function ContactForm() {
                       rows={6}
                       value={form.message}
                       onChange={handleChange}
-                      placeholder="Tell us what's on your mind..."
+                      placeholder={contact.messagePlaceholder}
                       required
                       className={INPUT_BASE + ' resize-none'}
                     />
@@ -206,9 +204,9 @@ export default function ContactForm() {
 
                   <button
                     type="submit"
-                    className="mkt-cta-gradient w-full sm:w-auto"
+                    className="cta-gradient w-full sm:w-auto"
                   >
-                    Send Message
+                    {contact.sendButton}
                     <svg
                       width="16"
                       height="16"
@@ -231,14 +229,14 @@ export default function ContactForm() {
               {/* Or get started */}
               {!submitted && (
                 <p className="mt-6 text-sm text-[#6B7280]">
-                  Just want to try the platform?{' '}
+                  {contact.tryPlatform}{' '}
                   <Link
                     href="/signup"
                     className="font-semibold text-[#DC2626] hover:underline"
                   >
-                    Get started free
+                    {contact.getStartedFree}
                   </Link>{' '}
-                  — no credit card needed.
+                  {contact.tryPlatformSuffix}
                 </p>
               )}
             </div>
@@ -246,8 +244,8 @@ export default function ContactForm() {
             {/* Right — Contact info */}
             <div className="space-y-8 lg:pt-2">
               <div>
-                <h2 className="mkt-heading-lg text-xl text-[#0A0A0A] mb-6">
-                  Get in touch
+                <h2 className="heading-display text-xl text-[#0A0A0A] mb-6">
+                  {contact.getInTouch}
                 </h2>
                 <div className="space-y-5">
                   {/* Email */}
@@ -312,13 +310,13 @@ export default function ContactForm() {
                     </div>
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF] mb-1">
-                        Response time
+                        {contact.responseTimeLabel}
                       </p>
                       <p className="text-sm text-[#0A0A0A] font-semibold">
-                        Within 1–2 business days
+                        {contact.responseTimeValue}
                       </p>
                       <p className="text-xs text-[#6B7280] mt-0.5">
-                        Monday – Friday, 9am – 6pm GMT+3
+                        {contact.responseTimeNote}
                       </p>
                     </div>
                   </div>
@@ -331,16 +329,16 @@ export default function ContactForm() {
               {/* FAQ nudge */}
               <div className="bg-[#FAFAFA] p-6 rounded-xl border border-[#E5E7EB]">
                 <h3 className="text-sm font-bold text-[#0A0A0A] mb-2">
-                  Looking for quick answers?
+                  {contact.faqNudgeTitle}
                 </h3>
                 <p className="text-sm text-[#6B7280] leading-relaxed mb-4">
-                  Most common questions about pricing, plans, and features are covered in our FAQ.
+                  {contact.faqNudgeText}
                 </p>
                 <Link
                   href="/pricing#faq"
                   className="text-sm font-bold text-[#DC2626] flex items-center gap-1.5 hover:gap-2.5 transition-all"
                 >
-                  View FAQ
+                  {contact.faqNudgeLink}
                   <svg
                     width="14"
                     height="14"

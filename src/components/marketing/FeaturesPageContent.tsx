@@ -261,7 +261,7 @@ export default function FeaturesPageContent({ t, locale }: FeaturesPageContentPr
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(220,38,38,0.08),transparent)] pointer-events-none" />
         <div className="mkt-container relative">
           <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#DC2626] mb-4">Features</span>
-          <h1 className="mkt-heading-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
+          <h1 className="heading-display-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
             {t.featuresPage.title}
           </h1>
           <div className="w-16 h-1 rounded-full bg-gradient-to-r from-[#DC2626] to-[#F97316] mx-auto mt-6" />
@@ -297,7 +297,7 @@ export default function FeaturesPageContent({ t, locale }: FeaturesPageContentPr
 
                 {/* Text side */}
                 <div className={isReversed ? 'lg:order-1' : ''}>
-                  <h2 className="mkt-heading-lg text-xl sm:text-2xl lg:text-3xl text-[#0A0A0A]">
+                  <h2 className="heading-display text-xl sm:text-2xl lg:text-3xl text-[#0A0A0A]">
                     {feature.title}
                   </h2>
                   <p className="text-[#6B7280] mt-2 sm:mt-3 leading-relaxed text-sm sm:text-base lg:text-lg">
@@ -324,11 +324,11 @@ export default function FeaturesPageContent({ t, locale }: FeaturesPageContentPr
       <section className="mkt-section-dark-warm py-24 sm:py-32 text-center relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-[#DC2626]/[0.06] rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
         <div className="mkt-container relative">
-          <h2 className="mkt-heading-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
+          <h2 className="heading-display-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
             {t.featuresPage.ctaTitle}
           </h2>
           <div className="mt-8">
-            <Link href={signupHref} className="mkt-cta-gradient mkt-cta-glow">
+            <Link href={signupHref} className="cta-gradient cta-glow">
               {t.featuresPage.ctaButton}
               <ArrowRight className="w-4 h-4" />
             </Link>

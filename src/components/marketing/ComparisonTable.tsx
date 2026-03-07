@@ -21,7 +21,7 @@ export default function ComparisonTable({ t }: ComparisonTableProps) {
       <div className="mkt-container">
         {/* Heading */}
         <div className="text-center mb-14 sm:mb-16">
-          <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
+          <h2 className="heading-display text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
             {t.comparison.title}
           </h2>
           <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto leading-relaxed">

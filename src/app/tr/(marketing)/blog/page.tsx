@@ -67,7 +67,7 @@ export default async function TurkishBlogPage() {
             <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">
               Blog
             </p>
-            <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
+            <h1 className="heading-display-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
               ANTRENÖRLER İÇİN KAYNAKLAR
             </h1>
             <p className="text-[#6B7280] mt-4 text-lg leading-relaxed">
@@ -132,7 +132,7 @@ export default async function TurkishBlogPage() {
                       <span className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-4 block">
                         Öne Çıkan
                       </span>
-                      <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] group-hover:text-[#DC2626] transition-colors leading-tight">
+                      <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] group-hover:text-[#DC2626] transition-colors leading-tight">
                         {featuredPost.title}
                       </h2>
                       <p className="text-[#6B7280] mt-4 leading-relaxed text-base">
@@ -210,7 +210,7 @@ export default async function TurkishBlogPage() {
                       </div>
 
                       <div className="p-6">
-                        <h2 className="mkt-heading-lg text-lg text-[#0A0A0A] group-hover:text-[#DC2626] transition-colors leading-tight">
+                        <h2 className="heading-display text-lg text-[#0A0A0A] group-hover:text-[#DC2626] transition-colors leading-tight">
                           {post.title}
                         </h2>
                         <p className="text-[#6B7280] mt-3 text-sm leading-relaxed line-clamp-3">

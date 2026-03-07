@@ -20,14 +20,14 @@ export default function CTASection({ t }: CTASectionProps) {
       <div className="mkt-section relative">
       <div ref={revealRef} className="mkt-container mkt-stagger text-center">
         {/* Bigger, bolder heading */}
-        <h2 className="mkt-reveal mkt-heading-xl text-[clamp(2rem,6vw,4.5rem)] leading-[0.95] text-white">
+        <h2 className="mkt-reveal heading-display-xl text-[clamp(2rem,6vw,4.5rem)] leading-[0.95] text-white">
           {t.cta.title1}
           <br />
           <span className="text-gradient">{t.cta.title2}</span>
         </h2>
 
         <div className="mkt-reveal mt-12">
-          <Link href="/signup" className="mkt-cta-gradient mkt-cta-glow text-base px-10 py-5 rounded-2xl">
+          <Link href="/signup" className="cta-gradient cta-glow text-base px-10 py-5 rounded-2xl">
             {t.cta.button}
             <ArrowRight className="w-5 h-5" />
           </Link>

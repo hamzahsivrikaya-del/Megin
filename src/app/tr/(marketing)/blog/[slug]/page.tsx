@@ -131,7 +131,7 @@ export default async function TurkishBlogPostPage({
           )}
 
           <header className="mb-10">
-            <h1 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A] leading-tight">
+            <h1 className="heading-display text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A] leading-tight">
               {post.title}
             </h1>
             {post.published_at && (
@@ -143,7 +143,7 @@ export default async function TurkishBlogPostPage({
 
           {/* Blog content: sanitized admin-only HTML - no user input */}
           <div
-            className="text-[#1A1A1A] leading-relaxed [&_h1]:mkt-heading-lg [&_h1]:text-2xl [&_h1]:mt-10 [&_h1]:mb-4 [&_h2]:mkt-heading-lg [&_h2]:text-xl [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:mb-5 [&_p]:text-[#374151] [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-5 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-5 [&_li]:mb-2 [&_li]:text-[#374151] [&_img]:w-full [&_img]:my-8 [&_strong]:font-bold [&_strong]:text-[#0A0A0A] [&_em]:italic [&_a]:text-[#DC2626] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[#DC2626] [&_blockquote]:pl-4 [&_blockquote]:my-6 [&_blockquote]:text-[#57534E] [&_blockquote]:italic"
+            className="text-[#1A1A1A] leading-relaxed [&_h1]:heading-display [&_h1]:text-2xl [&_h1]:mt-10 [&_h1]:mb-4 [&_h2]:heading-display [&_h2]:text-xl [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:mb-5 [&_p]:text-[#374151] [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-5 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-5 [&_li]:mb-2 [&_li]:text-[#374151] [&_img]:w-full [&_img]:my-8 [&_strong]:font-bold [&_strong]:text-[#0A0A0A] [&_em]:italic [&_a]:text-[#DC2626] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[#DC2626] [&_blockquote]:pl-4 [&_blockquote]:my-6 [&_blockquote]:text-[#57534E] [&_blockquote]:italic"
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
         </div>
@@ -151,14 +151,14 @@ export default async function TurkishBlogPostPage({
 
       <section className="mkt-section py-20 mkt-section-dark">
         <div className="mkt-container text-center">
-          <h2 className="mkt-heading-lg text-3xl sm:text-4xl text-white">
+          <h2 className="heading-display text-3xl sm:text-4xl text-white">
             Antrenorlugunuzu bir ust seviyeye tasimaya hazir misiniz?
           </h2>
           <p className="text-[#A8A29E] mt-4 max-w-xl mx-auto leading-relaxed">
             Musterileri yonetmek, ilerlemeyi takip etmek ve isini buyutmek icin Megin kullanan antrenorlere katilin.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup" className="mkt-cta-primary">
+            <Link href="/signup" className="cta-primary">
               Ucretsiz Basla
               <svg
                 width="16"
@@ -176,7 +176,7 @@ export default async function TurkishBlogPostPage({
                 />
               </svg>
             </Link>
-            <Link href="/tr/blog" className="mkt-cta-ghost border-[#374151] text-white hover:border-[#DC2626]">
+            <Link href="/tr/blog" className="cta-ghost border-[#374151] text-white hover:border-[#DC2626]">
               Daha Fazla Makale
             </Link>
           </div>

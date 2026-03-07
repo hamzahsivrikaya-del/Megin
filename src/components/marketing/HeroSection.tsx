@@ -354,7 +354,7 @@ export default function HeroSection({ t, locale = 'en' }: HeroSectionProps) {
         </div>
 
         {/* Main heading */}
-        <h1 className="mkt-heading-xl text-[clamp(2.8rem,8vw,6rem)] leading-[0.9] animate-fade-up delay-100">
+        <h1 className="heading-display-xl text-[clamp(2.8rem,8vw,6rem)] leading-[0.9] animate-fade-up delay-100">
           <span className="text-[#0A0A0A] block">{t.hero.title1}</span>
           <span className="text-gradient block mt-1 sm:mt-2">{t.hero.title2}</span>
         </h1>
@@ -366,11 +366,11 @@ export default function HeroSection({ t, locale = 'en' }: HeroSectionProps) {
 
         {/* CTA Buttons */}
         <div className="mt-10 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up delay-300">
-          <Link href="/signup" className="mkt-cta-gradient mkt-cta-glow">
+          <Link href="/signup" className="cta-gradient cta-glow">
             {t.hero.cta}
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link href="/features" className="mkt-cta-ghost rounded-xl">
+          <Link href="/features" className="cta-ghost rounded-xl">
             {secondaryCta}
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>

@@ -33,14 +33,14 @@ export default function TurkishGymStudiosPage() {
             <Building2 className="w-8 h-8 text-white" />
           </div>
           <p className="text-xs font-bold tracking-widest uppercase text-[#DC2626] mb-3">{segment.label}</p>
-          <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
+          <h1 className="heading-display-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
             {segment.title}
           </h1>
           <p className="text-[#6B7280] mt-4 text-lg leading-relaxed max-w-2xl mx-auto">
             {segment.heroDescription}
           </p>
           <div className="mt-8">
-            <Link href="/signup" className="mkt-cta-gradient">
+            <Link href="/signup" className="cta-gradient">
               Ücretsiz Başla <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -59,7 +59,7 @@ export default function TurkishGymStudiosPage() {
       {/* 3. Features Grid — unique icons */}
       <section className="mkt-section py-20 bg-[#FAFAFA]">
         <div className="mkt-container">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-12">Temel Özellikler</h2>
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-12">Temel Özellikler</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 max-w-5xl mx-auto">
             {segment.extendedFeatures.map((f, i) => {
               const Icon = FEATURE_ICONS[i] ?? Check
@@ -101,7 +101,7 @@ export default function TurkishGymStudiosPage() {
       {/* 5. Comparison — responsive */}
       <section className="mkt-section py-20 bg-[#FAFAFA]">
         <div className="mkt-container max-w-3xl mx-auto">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-10">Megin Öncesi &amp; Sonrası</h2>
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-10">Megin Öncesi &amp; Sonrası</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-[#6B7280] mb-4">Megin Öncesi</p>
@@ -132,7 +132,7 @@ export default function TurkishGymStudiosPage() {
       {/* 6. Pricing */}
       <section className="mkt-section py-20 bg-white">
         <div className="mkt-container">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-3">{tr.pricing.title}</h2>
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-3">{tr.pricing.title}</h2>
           <p className="text-[#6B7280] text-center mb-10">{tr.pricing.subtitle}</p>
           <PricingCards t={tr} />
         </div>
@@ -141,7 +141,7 @@ export default function TurkishGymStudiosPage() {
       {/* 7. FAQ */}
       <section className="mkt-section py-20 bg-[#FAFAFA]">
         <div className="mkt-container max-w-3xl mx-auto">
-          <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-10">Sık Sorulan Sorular</h2>
+          <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A] text-center mb-10">Sık Sorulan Sorular</h2>
           <FAQAccordion items={segment.faqItems} />
         </div>
       </section>

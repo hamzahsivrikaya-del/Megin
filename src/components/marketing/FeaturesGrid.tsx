@@ -159,7 +159,7 @@ export default function FeaturesGrid({ t }: FeaturesGridProps) {
       <div className="mkt-container">
         {/* Heading */}
         <div className="text-center">
-          <h2 className="mkt-heading-lg text-3xl sm:text-4xl md:text-5xl">
+          <h2 className="heading-display text-3xl sm:text-4xl md:text-5xl">
             <span className="text-[#0A0A0A] block">{t.features.title1}</span>
             <span className="text-gradient block">{t.features.title2}</span>
           </h2>

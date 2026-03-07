@@ -21,7 +21,7 @@ export default function UseCasesPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(220,38,38,0.08),transparent)] pointer-events-none" />
         <div className="mkt-container relative">
           <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#DC2626] mb-4">Use Cases</span>
-          <h1 className="mkt-heading-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
+          <h1 className="heading-display-xl text-[clamp(2rem,6vw,4rem)] leading-[0.95] text-white">
             BUILT FOR HOW YOU TRAIN
           </h1>
           <p className="text-white/60 mt-4 max-w-2xl mx-auto leading-relaxed">

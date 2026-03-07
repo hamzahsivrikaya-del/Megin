@@ -220,7 +220,7 @@ export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
           </Link>
 
           {/* Get Started button */}
-          <Link href="/signup" className="mkt-cta-gradient text-xs py-2.5 px-5 rounded-full">
+          <Link href="/signup" className="cta-gradient text-xs py-2.5 px-5 rounded-full">
             {t.nav.getStarted}
           </Link>
 

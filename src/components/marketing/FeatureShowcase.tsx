@@ -25,7 +25,7 @@ export default function FeatureShowcase({
         {icon}
       </div>
       {/* Title */}
-      <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-[#0A0A0A]">
+      <h2 className="heading-display text-2xl sm:text-3xl text-[#0A0A0A]">
         {title}
       </h2>
       <p className="text-[#6B7280] mt-3 leading-relaxed text-lg">{description}</p>

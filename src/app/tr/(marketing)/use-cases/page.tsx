@@ -24,7 +24,7 @@ export default function TurkishUseCasesPage() {
     <>
       <section className="mkt-section pt-32 pb-16 text-center bg-white">
         <div className="mkt-container">
-          <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
+          <h1 className="heading-display-xl text-4xl sm:text-5xl md:text-6xl text-[#0A0A0A]">
             ÇALIŞMA ŞEKLİNİZE GÖRE
           </h1>
           <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto leading-relaxed">

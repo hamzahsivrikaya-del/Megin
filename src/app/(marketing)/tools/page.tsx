@@ -59,7 +59,7 @@ export default function ToolsPage() {
       <section className="mkt-section-dark-warm mkt-grain relative overflow-hidden pt-32 pb-16 text-center">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(220,38,38,0.15),transparent)] pointer-events-none" />
         <div className="mkt-container relative">
-          <h1 className="mkt-heading-xl text-4xl sm:text-5xl md:text-6xl text-white">
+          <h1 className="heading-display-xl text-4xl sm:text-5xl md:text-6xl text-white">
             FREE FITNESS TOOLS
           </h1>
           <p className="text-white/60 mt-4 max-w-2xl mx-auto leading-relaxed">
@@ -124,7 +124,7 @@ export default function ToolsPage() {
       <section className="mkt-section py-20 bg-white">
         <div className="mkt-container">
           <div className="rounded-2xl bg-[#0A0A0A] px-8 py-12 sm:px-12 sm:py-16 text-center">
-            <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-white">
+            <h2 className="heading-display text-2xl sm:text-3xl text-white">
               Track all these metrics for your clients automatically
             </h2>
             <p className="text-white/60 mt-3 text-sm sm:text-base max-w-lg mx-auto">
@@ -132,7 +132,7 @@ export default function ToolsPage() {
               and progress automatically — so you can focus on coaching.
             </p>
             <div className="mt-8">
-              <Link href="/signup" className="mkt-cta-gradient mkt-cta-glow">
+              <Link href="/signup" className="cta-gradient cta-glow">
                 Try Megin Free
                 <svg
                   width="16"

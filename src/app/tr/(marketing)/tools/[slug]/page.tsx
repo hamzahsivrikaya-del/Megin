@@ -104,7 +104,7 @@ export default async function TurkishToolPage({ params }: ToolPageProps) {
             Tüm Ücretsiz Araçlar
           </Link>
 
-          <h1 className="mkt-heading-xl text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
+          <h1 className="heading-display-xl text-3xl sm:text-4xl md:text-5xl text-[#0A0A0A]">
             {meta.title.toUpperCase()}
           </h1>
           <p className="text-[#6B7280] mt-3 text-base leading-relaxed max-w-xl">
@@ -122,7 +122,7 @@ export default async function TurkishToolPage({ params }: ToolPageProps) {
       <section className="mkt-section py-20 bg-white">
         <div className="mkt-container">
           <div className="rounded-2xl bg-[#0A0A0A] px-8 py-12 sm:px-12 sm:py-16 text-center">
-            <h2 className="mkt-heading-lg text-2xl sm:text-3xl text-white">
+            <h2 className="heading-display text-2xl sm:text-3xl text-white">
               Müşterilerinizin metriklerini Megin ile otomatik takip edin
             </h2>
             <p className="text-white/60 mt-3 text-sm sm:text-base max-w-lg mx-auto">
@@ -130,7 +130,7 @@ export default async function TurkishToolPage({ params }: ToolPageProps) {
               ve beslenmesini tek bir yerde takip eder.
             </p>
             <div className="mt-8">
-              <Link href="/signup" className="mkt-cta-primary">
+              <Link href="/signup" className="cta-primary">
                 Megin&apos;i Ücretsiz Dene
                 <svg
                   width="16"

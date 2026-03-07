@@ -81,64 +81,6 @@ function ProTierIcon() {
 
 const tierIcons = [FreeTierIcon, PlusTierIcon, ProTierIcon]
 
-/* ── Locked features per tier (features from higher tiers shown as locked) ── */
-
-const lockedFeatures: string[][] = [
-  ['Ölçüm grafikleri', 'Beslenme takibi', 'Haftalık raporlar', 'Push bildirimler', 'Takvim'],
-  ['İlerleme fotoğrafları', 'Blog sistemi', 'Risk skoru', 'Instagram kartı'],
-  [],
-]
-
-/* ── Comparison Table Data ── */
-
-type FeatureValue = boolean | string
-
-interface ComparisonCategory {
-  name: string
-  features: Array<{
-    name: string
-    values: [FeatureValue, FeatureValue, FeatureValue]
-  }>
-}
-
-const comparisonData: ComparisonCategory[] = [
-  {
-    name: 'Temel',
-    features: [
-      { name: 'Danışan ekleme', values: ['3', '10', 'Sınırsız'] },
-      { name: 'Temel antrenman programı', values: [true, true, true] },
-      { name: 'Ders sayısı takibi', values: [true, true, true] },
-      { name: 'Temel ölçüm', values: [true, true, true] },
-      { name: 'PT Handle', values: [true, true, true] },
-    ],
-  },
-  {
-    name: 'Gelişmiş',
-    features: [
-      { name: 'Ölçüm grafikleri', values: [false, true, true] },
-      { name: 'Beslenme takibi', values: [false, true, true] },
-      { name: 'Haftalık raporlar', values: [false, true, true] },
-      { name: 'Push bildirimler', values: [false, true, true] },
-      { name: 'Finans ekranı', values: [false, true, true] },
-      { name: 'Rozet sistemi', values: [false, true, true] },
-      { name: 'Hedef belirleme', values: [false, true, true] },
-      { name: 'PDF rapor export', values: [false, true, true] },
-    ],
-  },
-  {
-    name: 'Premium',
-    features: [
-      { name: 'Takvim', values: [false, false, true] },
-      { name: 'İlerleme fotoğrafları', values: [false, false, true] },
-      { name: 'Blog sistemi', values: [false, false, true] },
-      { name: 'Bağlı üye', values: [false, false, true] },
-      { name: 'Risk skoru', values: [false, false, true] },
-      { name: 'Instagram kartı', values: [false, false, true] },
-      { name: 'Finans tahmini', values: [false, false, true] },
-    ],
-  },
-]
-
 const tierNames = ['Free', 'Plus', 'Pro']
 
 /* ── Component ── */
@@ -193,7 +135,7 @@ export default function PricingCards({ t }: PricingCardsProps) {
           const ctaLabel = ctaLabels[index]
           const ctaHref = ctaHrefs[index]
           const TierIcon = tierIcons[index]
-          const locked = lockedFeatures[index]
+          const locked = pricing.lockedFeatures[index]
 
           return (
             <div
@@ -308,10 +250,10 @@ export default function PricingCards({ t }: PricingCardsProps) {
                     className={[
                       'w-full justify-center transition-transform duration-300 group-hover:scale-[1.02]',
                       isHighlighted
-                        ? 'mkt-cta-gradient mkt-cta-glow'
+                        ? 'cta-gradient cta-glow'
                         : isDark
-                          ? 'mkt-cta-primary'
-                          : 'mkt-cta-ghost',
+                          ? 'cta-primary'
+                          : 'cta-ghost',
                     ].join(' ')}
                   >
                     {ctaLabel}
@@ -334,10 +276,10 @@ export default function PricingCards({ t }: PricingCardsProps) {
       {/* ── Feature Comparison Table ── */}
       <div className="mt-20 sm:mt-24">
         <h3 className="text-2xl sm:text-3xl font-display font-bold text-center text-[#0A0A0A] mb-3">
-          Tüm Özellikleri Karşılaştır
+          {pricing.comparisonTitle}
         </h3>
         <p className="text-center text-[#6B7280] text-sm mb-10">
-          Hangi plan sana uygun? Detaylı karşılaştırma tablosu ile incele.
+          {pricing.comparisonSubtitle}
         </p>
 
         {/* Scrollable wrapper */}
@@ -347,7 +289,7 @@ export default function PricingCards({ t }: PricingCardsProps) {
             <thead>
               <tr>
                 <th className="sticky left-0 z-10 bg-[#FAFAFA] text-left text-sm font-semibold text-[#6B7280] py-4 px-4 sm:px-6 w-[200px] sm:w-[260px]">
-                  Özellik
+                  {pricing.featureLabel}
                 </th>
                 {tierNames.map((name, i) => (
                   <th
@@ -371,7 +313,7 @@ export default function PricingCards({ t }: PricingCardsProps) {
             </thead>
 
             <tbody>
-              {comparisonData.map((category, catIdx) => (
+              {pricing.comparisonCategories.map((category, catIdx) => (
                 <>
                   {/* Category header */}
                   <tr key={`cat-${catIdx}`}>
@@ -425,10 +367,10 @@ export default function PricingCards({ t }: PricingCardsProps) {
               className={[
                 'text-center text-sm',
                 i === 1
-                  ? 'mkt-cta-gradient mkt-cta-glow'
+                  ? 'cta-gradient cta-glow'
                   : i === 2
-                    ? 'mkt-cta-primary'
-                    : 'mkt-cta-ghost',
+                    ? 'cta-primary'
+                    : 'cta-ghost',
               ].join(' ')}
             >
               {ctaLabels[i]}
