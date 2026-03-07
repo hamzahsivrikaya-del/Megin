@@ -199,7 +199,7 @@ export default function UpgradeClient({ currentPlan, plans }: Props) {
                     onClick={() => setSelectedPlan(planKey)}
                     className={`w-full py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                       isHighlighted
-                        ? 'bg-primary text-white hover:bg-primary-dark'
+                        ? 'bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white shadow-sm hover:shadow-lg hover:shadow-red-500/20'
                         : 'bg-text-primary text-white hover:bg-text-primary/90'
                     }`}
                   >

@@ -21,7 +21,7 @@ export default function AdminLayoutClient({ children, userName }: AdminLayoutCli
 
       {/* Ana içerik */}
       <main className="md:ml-64 min-h-screen">
-        <div className="p-4 md:p-6 pt-16 md:pt-6">
+        <div className="p-4 md:p-6 pt-16 md:pt-6 pb-safe">
           {children}
         </div>
       </main>

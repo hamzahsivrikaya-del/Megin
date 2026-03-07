@@ -152,7 +152,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        <Button type="submit" fullWidth loading={loading} size="lg">
+        <Button type="submit" fullWidth loading={loading} size="lg" variant="gradient">
           Giriş Yap
         </Button>
       </form>

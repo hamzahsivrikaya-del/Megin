@@ -66,7 +66,7 @@ export default function OnlineCoachesPage() {
               const Icon = FEATURE_ICONS[i] ?? Check
               return (
                 <div key={f.title} className="bg-white rounded-xl border border-[#E5E7EB] p-5 sm:p-6 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/[0.06] hover:border-gray-200">
-                  <div className="w-10 h-10 rounded-xl bg-[#0A0A0A] flex items-center justify-center mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#DC2626] to-[#F97316] flex items-center justify-center mb-4 shadow-md shadow-red-500/10">
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-base font-bold text-[#0A0A0A]">{f.title}</h3>
@@ -81,7 +81,7 @@ export default function OnlineCoachesPage() {
       {/* 4. Testimonial with avatar + stars */}
       <section className="mkt-section py-16 bg-white">
         <div className="mkt-container max-w-3xl mx-auto text-center">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#0A0A0A] to-[#374151] flex items-center justify-center mx-auto mb-5">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#DC2626] to-[#F97316] flex items-center justify-center mx-auto mb-5 shadow-lg shadow-red-500/10">
             <span className="text-lg font-bold text-white">
               {segment.testimonialName.split(' ').map((n: string) => n[0]).join('')}
             </span>

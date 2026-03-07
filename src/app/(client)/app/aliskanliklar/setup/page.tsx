@@ -38,7 +38,7 @@ export default async function HabitSetupPage() {
 
   return (
     <FeatureGate plan={plan} feature="habits" role="client">
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-4 py-6 panel-section-enter">
         <SetupClient definitions={definitions || []} existingIds={existingIds} hasExisting={existingIds.length > 0} />
       </div>
     </FeatureGate>

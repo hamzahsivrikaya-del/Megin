@@ -75,7 +75,7 @@ export default function AraclarPage() {
               <Link
                 key={tool.href}
                 href={tool.href}
-                className="group bg-primary hover:bg-primary-hover rounded-xl p-7 transition-all active:scale-[0.97] shadow-sm hover:shadow-md"
+                className="group bg-gradient-to-r from-[#DC2626] to-[#F97316] rounded-xl p-7 transition-all active:scale-[0.97] shadow-sm hover:shadow-lg hover:shadow-red-500/20"
               >
                 <div className="flex flex-col gap-4">
                   <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">

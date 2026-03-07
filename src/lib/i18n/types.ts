@@ -127,6 +127,45 @@ export interface MarketingTranslations {
         answer: string
       }>
     }
+    lockedFeatures: string[][]
+    comparisonTitle: string
+    comparisonSubtitle: string
+    featureLabel: string
+    comparisonCategories: Array<{
+      name: string
+      features: Array<{
+        name: string
+        values: [boolean | string, boolean | string, boolean | string]
+      }>
+    }>
+  }
+  contact: {
+    badge: string
+    title: string
+    subtitle: string
+    nameLabel: string
+    namePlaceholder: string
+    emailLabel: string
+    emailPlaceholder: string
+    clientCountLabel: string
+    clientCountOptional: string
+    clientCountOptions: Array<{ value: string; label: string }>
+    messageLabel: string
+    messagePlaceholder: string
+    sendButton: string
+    successTitle: string
+    successMessage: string
+    sendAnother: string
+    tryPlatform: string
+    getStartedFree: string
+    tryPlatformSuffix: string
+    getInTouch: string
+    responseTimeLabel: string
+    responseTimeValue: string
+    responseTimeNote: string
+    faqNudgeTitle: string
+    faqNudgeText: string
+    faqNudgeLink: string
   }
   featuresPage: {
     title: string

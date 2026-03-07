@@ -32,7 +32,7 @@ export default async function HaftalikOzetPage() {
 
   return (
     <FeatureGate plan={plan} feature="weekly_reports" role="client">
-      <div className="space-y-6">
+      <div className="space-y-6 panel-section-enter">
         <div>
           <Link href="/app" className="text-sm text-text-secondary hover:text-primary transition-colors">
             {'←'} Geri

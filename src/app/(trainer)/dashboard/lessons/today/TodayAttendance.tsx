@@ -141,7 +141,7 @@ export default function TodayAttendance({ attendees: initial, today, trainerId }
                       <button
                         onClick={() => markDone(att)}
                         disabled={isLoading}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-primary hover:bg-primary-dark transition-colors cursor-pointer disabled:opacity-50"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-gradient-to-r from-[#DC2626] to-[#F97316] shadow-sm hover:shadow-lg hover:shadow-red-500/20 transition-colors cursor-pointer disabled:opacity-50"
                       >
                         {isLoading ? 'Kaydediliyor...' : 'Ders Yap'}
                       </button>

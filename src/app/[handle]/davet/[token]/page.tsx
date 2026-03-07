@@ -57,7 +57,7 @@ export default async function InvitePage({ params }: PageProps) {
             </p>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center w-full rounded-xl bg-primary px-6 py-3 text-base font-medium text-white hover:bg-primary-dark transition-colors"
+              className="inline-flex items-center justify-center w-full rounded-xl bg-gradient-to-r from-[#DC2626] to-[#F97316] px-6 py-3 text-base font-medium text-white shadow-sm hover:shadow-lg hover:shadow-red-500/20 transition-all"
             >
               Giriş Yap
             </Link>

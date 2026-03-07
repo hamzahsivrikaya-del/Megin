@@ -191,7 +191,7 @@ export default function HabitsClient() {
   const fireGlow = generalStreak >= 7 ? 'drop-shadow-[0_0_12px_rgba(251,146,60,0.5)]' : ''
 
   return (
-    <div className="space-y-5 pb-6">
+    <div className="space-y-5 pb-6 panel-section-enter">
       {/* Streak hero */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 border border-amber-200/60 p-5">
         <div className="flex items-center justify-between">

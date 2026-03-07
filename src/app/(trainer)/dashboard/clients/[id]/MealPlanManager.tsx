@@ -172,7 +172,7 @@ export default function MealPlanManager({ clientId, trainerId, initialMeals, ini
                     <button
                       onClick={() => handleEditSave(meal.id)}
                       disabled={saving || !editName.trim()}
-                      className="px-2 py-1 rounded-md bg-primary text-white text-xs font-medium hover:bg-primary-hover transition-colors cursor-pointer disabled:opacity-40"
+                      className="px-2 py-1 rounded-md bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white shadow-sm hover:shadow-lg hover:shadow-red-500/20 text-xs font-medium transition-colors cursor-pointer disabled:opacity-40"
                     >
                       Kaydet
                     </button>
@@ -262,7 +262,7 @@ export default function MealPlanManager({ clientId, trainerId, initialMeals, ini
           <button
             onClick={handleAdd}
             disabled={saving || !newName.trim()}
-            className="px-3 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default whitespace-nowrap"
+            className="px-3 py-2 rounded-lg bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white shadow-sm hover:shadow-lg hover:shadow-red-500/20 text-sm font-medium transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default whitespace-nowrap"
           >
             {saving ? (
               <span className="flex items-center gap-1.5">
@@ -305,7 +305,7 @@ export default function MealPlanManager({ clientId, trainerId, initialMeals, ini
             <button
               onClick={handleNutritionNoteSave}
               disabled={savingNote}
-              className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-medium hover:bg-primary-hover transition-colors cursor-pointer disabled:opacity-40"
+              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white shadow-sm hover:shadow-lg hover:shadow-red-500/20 text-xs font-medium transition-colors cursor-pointer disabled:opacity-40"
             >
               {savingNote ? 'Kaydediliyor...' : 'Notu Kaydet'}
             </button>

@@ -228,7 +228,7 @@ export default function TodayAttendance({
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all active:scale-95 cursor-pointer
                         ${isLoading
                           ? 'bg-primary/30 text-primary/50 cursor-wait'
-                          : 'bg-primary text-white hover:bg-primary/90'
+                          : 'bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white shadow-sm hover:shadow-lg hover:shadow-red-500/20'
                         }`}
                     >
                       {isLoading ? '...' : 'Ders Ekle'}

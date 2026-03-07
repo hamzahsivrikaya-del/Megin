@@ -479,7 +479,7 @@ export default function RichTextEditor({ content, onChange }: Props) {
                   <button
                     type="button"
                     onClick={addImageFromUrl}
-                    className="px-3 py-1.5 bg-primary text-white text-xs rounded-lg hover:bg-primary-hover transition-colors cursor-pointer flex-shrink-0"
+                    className="px-3 py-1.5 bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white text-xs rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer flex-shrink-0"
                   >
                     Ekle
                   </button>

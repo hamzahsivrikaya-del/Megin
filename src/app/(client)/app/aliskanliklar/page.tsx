@@ -35,7 +35,7 @@ export default async function HabitsPage() {
 
   return (
     <FeatureGate plan={plan} feature="habits" role="client">
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-4 py-6 panel-section-enter">
         <HabitsClient />
       </div>
     </FeatureGate>

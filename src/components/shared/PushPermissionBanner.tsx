@@ -55,7 +55,7 @@ export default function PushPermissionBanner() {
       </div>
       <button
         onClick={handleEnable}
-        className="shrink-0 px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-hover transition-colors cursor-pointer"
+        className="shrink-0 px-4 py-2 bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer"
       >
         Aç
       </button>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ContactForm from './ContactForm'
+import { en } from '@/lib/i18n/en'
 
 export const metadata: Metadata = {
   title: 'Contact — Megin',
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 }
 
 export default function ContactPage() {
-  return <ContactForm />
+  return <ContactForm t={en} />
 }

@@ -223,7 +223,7 @@ export default function RozetlerClient() {
   }
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 panel-section-enter">
       {/* Share Overlay */}
       {shareBadge && (
         <ShareOverlay

@@ -37,7 +37,7 @@ export default function FeatureGate({ plan, feature, children, role = 'trainer' 
       {role === 'trainer' && (
         <Link
           href={upgradeLink}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white font-semibold shadow-sm hover:shadow-lg hover:shadow-red-500/20 transition-all"
         >
           {upgradeName} Planına Geç
         </Link>

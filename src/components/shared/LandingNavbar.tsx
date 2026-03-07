@@ -34,7 +34,7 @@ export default function LandingNavbar() {
           ))}
           <Link
             href="/login"
-            className="text-sm px-4 py-2 bg-primary text-white font-semibold hover:bg-primary-hover transition-colors press-effect"
+            className="text-sm px-4 py-2 bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white font-semibold shadow-sm hover:shadow-md transition-all press-effect rounded-lg"
           >
             Üye Girişi
           </Link>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ContactForm from '@/app/(marketing)/contact/ContactForm'
+import { tr } from '@/lib/i18n/tr'
 
 export const metadata: Metadata = {
   title: 'İletişim — Megin',
@@ -19,5 +20,5 @@ export const metadata: Metadata = {
 }
 
 export default function TurkishContactPage() {
-  return <ContactForm />
+  return <ContactForm t={tr} />
 }

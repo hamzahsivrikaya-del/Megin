@@ -2,8 +2,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen flex">
       {/* Sol taraf — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-red-900" />
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#DC2626] via-[#E04E2C] to-[#F97316]" />
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-white/20 blur-3xl" />
           <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-white/10 blur-3xl" />

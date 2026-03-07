@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
               </p>
               <Link
                 href="/login/forgot-password"
-                className="inline-block px-6 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                className="inline-block px-6 py-2 bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all"
               >
                 Tekrar Sıfırlama Linki Gönder
               </Link>

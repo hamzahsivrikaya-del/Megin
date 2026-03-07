@@ -254,7 +254,7 @@ export default function SpotlightTour({ steps, tourProgress, table, onComplete }
               </button>
               <button
                 onClick={handleNext}
-                className="px-4 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors"
+                className="px-4 py-1.5 bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all"
               >
                 {currentStep >= steps.length - 1 ? 'Tamamla' : 'Sonraki'}
               </button>
