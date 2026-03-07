@@ -793,9 +793,7 @@ input:-webkit-autofill {
 
 /* ── Unified Heading System ── */
 
-.heading-display,
-.mkt-heading-lg,
-.panel-heading {
+.heading-display {
   font-family: var(--font-oswald), var(--font-display), Impact, sans-serif;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -803,16 +801,14 @@ input:-webkit-autofill {
   color: var(--color-text-primary);
 }
 
-.heading-display-xl,
-.mkt-heading-xl {
+.heading-display-xl {
   font-family: var(--font-oswald), var(--font-display), Impact, sans-serif;
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 0.95;
 }
 
-.heading-gradient,
-.panel-heading-gradient {
+.heading-gradient {
   font-family: var(--font-oswald), var(--font-display), Impact, sans-serif;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -825,39 +821,33 @@ input:-webkit-autofill {
 
 /* ── Unified CTA/Button System ── */
 
-.cta-primary,
-.mkt-cta-primary {
+.cta-primary {
   @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider transition-all;
   background: #FF2D2D;
   color: #FFFFFF;
   border-radius: 12px;
 }
-.cta-primary:hover,
-.mkt-cta-primary:hover {
+.cta-primary:hover {
   background: #E01F1F;
   transform: translateY(-1px);
   box-shadow: 0 8px 24px -4px rgba(255, 45, 45, 0.3);
 }
-.cta-primary:active,
-.mkt-cta-primary:active {
+.cta-primary:active {
   transform: scale(0.97);
 }
 
-.cta-ghost,
-.mkt-cta-ghost {
+.cta-ghost {
   @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider transition-all;
   background: transparent;
   border: 2px solid #E5E7EB;
   color: #0A0A0A;
   border-radius: 12px;
 }
-.cta-ghost:hover,
-.mkt-cta-ghost:hover {
+.cta-ghost:hover {
   border-color: #FF2D2D;
   color: #FF2D2D;
 }
-.cta-ghost:active,
-.mkt-cta-ghost:active {
+.cta-ghost:active {
   transform: scale(0.97);
 }
 
@@ -919,9 +909,7 @@ input:-webkit-autofill {
   background-clip: text;
 }
 
-.cta-gradient,
-.mkt-cta-gradient,
-.btn-warm-gradient {
+.cta-gradient {
   background: var(--gradient-warm);
   color: #FFFFFF;
   border-radius: 12px;
@@ -936,15 +924,11 @@ input:-webkit-autofill {
   padding: 1rem 2rem;
   border: none;
 }
-.cta-gradient:hover,
-.mkt-cta-gradient:hover,
-.btn-warm-gradient:hover {
+.cta-gradient:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 32px -4px rgba(220, 38, 38, 0.3), 0 4px 12px -2px rgba(249, 115, 22, 0.2);
 }
-.cta-gradient:active,
-.mkt-cta-gradient:active,
-.btn-warm-gradient:active {
+.cta-gradient:active {
   transform: scale(0.97);
 }
 
@@ -1158,8 +1142,7 @@ input:-webkit-autofill {
   0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
   50% { box-shadow: 0 0 40px 8px rgba(220, 38, 38, 0.15); }
 }
-.cta-glow,
-.mkt-cta-glow {
+.cta-glow {
   animation: cta-glow 3s ease-in-out infinite;
 }
 
@@ -1192,13 +1175,11 @@ input:-webkit-autofill {
 }
 
 /* Emphasized heading line — red underline accent */
-.heading-accent,
-.mkt-heading-accent {
+.heading-accent {
   position: relative;
   display: inline-block;
 }
-.heading-accent::after,
-.mkt-heading-accent::after {
+.heading-accent::after {
   content: '';
   position: absolute;
   bottom: -6px;
@@ -1316,7 +1297,7 @@ input:-webkit-autofill {
 }
 
 /* ── Panel Design System (LP ile birebir uyumlu) ── */
-/* panel-heading, panel-heading-gradient → Unified Heading System'e taşındı */
+/* Heading/CTA classes → see Unified Heading/CTA System above */
 
 /* LP ile aynı Card stili — 12px radius, warm hover */
 .panel-card {
@@ -1381,7 +1362,6 @@ input:-webkit-autofill {
   box-shadow: 0 0 8px rgba(255, 45, 45, 0.4);
 }
 
-/* btn-warm-gradient → Unified CTA/Button System'e taşındı */
 
 /* PWA safe area */
 .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
