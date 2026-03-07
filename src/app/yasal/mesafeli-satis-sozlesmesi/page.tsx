@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Mesafeli Satış Sözleşmesi | Hamza Sivrikaya',
+  title: 'Mesafeli Satış Sözleşmesi | Megin',
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -27,11 +27,8 @@ export default function MesafeliSatisSozlesmesi() {
           <div>
             <p className="text-xs font-medium text-[#A8A29E] uppercase tracking-wider mb-2">Satıcı</p>
             <div className="space-y-1">
-              <p><span className="font-medium text-[#1A1A1A]">Ünvan:</span> Hamza Hakkı Sivrikaya (Şahıs Şirketi)</p>
-              <p><span className="font-medium text-[#1A1A1A]">Adres:</span> Antalya, Türkiye</p>
-              <p><span className="font-medium text-[#1A1A1A]">E-posta:</span> hamzahsivrikaya@gmail.com</p>
-              <p><span className="font-medium text-[#1A1A1A]">Telefon:</span> +90 545 681 47 76</p>
-              <p><span className="font-medium text-[#1A1A1A]">Web Sitesi:</span> www.hamzasivrikaya.com</p>
+              <p><span className="font-medium text-[#1A1A1A]">Ünvan:</span> Megin</p>
+              <p><span className="font-medium text-[#1A1A1A]">Web Sitesi:</span> www.megin.ai</p>
             </div>
           </div>
           <div>
@@ -66,7 +63,7 @@ export default function MesafeliSatisSozlesmesi() {
       <Section title="Madde 6 — Cayma Hakkı">
         <p>Alıcı, hizmet sözleşmesinin kurulmasından itibaren 14 (on dört) gün içinde gerekçesiz olarak cayma hakkını kullanabilir.</p>
         <p>Cayma hakkı, Alıcı&apos;nın onayıyla hizmet ifa edilmeye başlandıktan sonra kullanılamaz (6502 s.K. m.15).</p>
-        <p>Cayma bildirimi hamzahsivrikaya@gmail.com adresine yazılı olarak iletilmelidir.</p>
+        <p>Cayma bildirimi info@megin.ai adresine yazılı olarak iletilmelidir.</p>
         <p>Cayma hakkının kullanılması halinde ödenen tutar 14 gün içinde iade edilir.</p>
       </Section>
 
@@ -80,7 +77,7 @@ export default function MesafeliSatisSozlesmesi() {
       </Section>
 
       <Section title="Madde 9 — Bildirimler">
-        <p>Taraflar arasındaki yazışmalar e-posta (hamzahsivrikaya@gmail.com) veya web sitesindeki iletişim formu aracılığıyla yapılır. E-posta yazışmaları HMK m.193 kapsamında delil niteliğindedir.</p>
+        <p>Taraflar arasındaki yazışmalar e-posta (info@megin.ai) veya web sitesindeki iletişim formu aracılığıyla yapılır. E-posta yazışmaları HMK m.193 kapsamında delil niteliğindedir.</p>
       </Section>
 
       <Section title="Madde 10 — Yetkili Mahkeme">

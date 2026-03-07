@@ -416,7 +416,7 @@ export async function GET(
         {/* Footer */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
           <div style={{ fontSize: '18px', color: '#444' }}>{weekLabel}</div>
-          <div style={{ fontSize: '22px', color: '#DC2626', fontWeight: 600 }}>@hamzasivrikayaa</div>
+          <div style={{ fontSize: '22px', color: '#DC2626', fontWeight: 600 }}>megin.ai</div>
         </div>
       </div>
     ),

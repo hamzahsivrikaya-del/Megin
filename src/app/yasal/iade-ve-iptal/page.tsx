@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'İade ve İptal Politikası | Hamza Sivrikaya',
+  title: 'İade ve İptal Politikası | Megin',
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -23,15 +23,14 @@ export default function IadeVeIptal() {
       </div>
 
       <Section title="1. Genel Bilgi">
-        <p>Hamza Hakkı Sivrikaya (Şahıs Şirketi) olarak müşteri memnuniyetini ve yasal haklarını ön planda tutmaktayız. Aşağıdaki iade ve iptal koşulları, kişisel antrenörlük hizmetimize özgü olarak belirlenmiştir.</p>
+        <p>Megin olarak müşteri memnuniyetini ve yasal haklarını ön planda tutmaktayız. Aşağıdaki iade ve iptal koşulları, kişisel antrenörlük hizmetimize özgü olarak belirlenmiştir.</p>
       </Section>
 
       <Section title="2. Hizmet Başlamadan Önce İade (Cayma Hakkı)">
         <p>Ödeme tarihinden itibaren 14 (on dört) gün içinde ve hizmet henüz başlamadan cayma hakkınızı kullanarak tam iade talep edebilirsiniz.</p>
         <p>İade talebi yazılı olarak iletilmelidir:</p>
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 space-y-1">
-          <p><span className="font-medium text-[#1A1A1A]">E-posta:</span> hamzahsivrikaya@gmail.com</p>
-          <p><span className="font-medium text-[#1A1A1A]">Telefon:</span> +90 545 681 47 76</p>
+          <p><span className="font-medium text-[#1A1A1A]">E-posta:</span> info@megin.ai</p>
         </div>
         <p>Onaylanan cayma talepleri 14 iş günü içinde ödeme yönteminize iade edilir.</p>
       </Section>
@@ -86,9 +85,7 @@ export default function IadeVeIptal() {
 
       <Section title="8. İletişim">
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 space-y-1">
-          <p><span className="font-medium text-[#1A1A1A]">E-posta:</span> hamzahsivrikaya@gmail.com</p>
-          <p><span className="font-medium text-[#1A1A1A]">Telefon:</span> +90 545 681 47 76</p>
-          <p><span className="font-medium text-[#1A1A1A]">Web:</span> www.hamzasivrikaya.com</p>
+          <p><span className="font-medium text-[#1A1A1A]">Web:</span> www.megin.ai</p>
         </div>
       </Section>
     </div>

@@ -6,10 +6,10 @@ import type { Workout } from '@/lib/types'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Haftalık Antrenman Programı | Hamza Sivrikaya',
+  title: 'Haftalık Antrenman Programı | Megin',
   description: 'Her hafta güncellenen ücretsiz antrenman programı. Pazartesi-Cumartesi antrenman, Pazar aktif dinlenme.',
   openGraph: {
-    title: 'Haftalık Antrenman Programı | Hamza Sivrikaya',
+    title: 'Haftalık Antrenman Programı | Megin',
     description: 'Her hafta güncellenen ücretsiz antrenman programı.',
   },
 }

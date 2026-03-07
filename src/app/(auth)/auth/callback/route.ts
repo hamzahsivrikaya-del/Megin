@@ -11,9 +11,13 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (!error) {
+    if (error) {
+      console.error('[auth/callback] exchangeCodeForSession failed:', error.message, error.status)
+    }
+
+    if (!error && data.session) {
       // next parametresi varsa oraya yönlendir (örn: davet linki)
       if (safeNext) {
         return NextResponse.redirect(`${origin}${safeNext}`)
@@ -23,6 +27,7 @@ export async function GET(request: Request) {
       const { data: { user } } = await supabase.auth.getUser()
 
       if (user) {
+        // Trainer mı kontrol et
         const { data: trainer } = await supabase
           .from('trainers')
           .select('id, onboarding_completed')
@@ -30,18 +35,30 @@ export async function GET(request: Request) {
           .maybeSingle()
 
         if (trainer) {
-          // Trainer: onboarding tamamlandıysa dashboard, yoksa onboarding
           const destination = trainer.onboarding_completed
             ? '/dashboard'
             : '/onboarding'
           return NextResponse.redirect(`${origin}${destination}`)
         }
 
-        // Trainer değil — client olarak /app'e yönlendir
-        return NextResponse.redirect(`${origin}/app`)
+        // Client mı kontrol et
+        const { data: client } = await supabase
+          .from('clients')
+          .select('id, onboarding_completed')
+          .eq('user_id', user.id)
+          .maybeSingle()
+
+        if (client) {
+          const destination = client.onboarding_completed
+            ? '/app'
+            : '/app/onboarding'
+          return NextResponse.redirect(`${origin}${destination}`)
+        }
+
+        // Ne trainer ne client — yeni kullanıcı, trainer onboarding'e yönlendir
+        return NextResponse.redirect(`${origin}/onboarding`)
       }
 
-      // Fallback: yeni kayıt — onboarding'e yönlendir
       return NextResponse.redirect(`${origin}/onboarding`)
     }
   }

@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
   // Bağlı üye ise sahte email/şifre oluştur
   const isDependent = !!parent_id
-  const email = isDependent ? `child-${crypto.randomUUID()}@hamzapt.local` : sanitizedEmail
+  const email = isDependent ? `child-${crypto.randomUUID()}@megin.local` : sanitizedEmail
   const password = isDependent ? crypto.randomUUID() : rawPassword
 
   if (!full_name || typeof full_name !== 'string' || full_name.length < 2 || full_name.length > 100) {

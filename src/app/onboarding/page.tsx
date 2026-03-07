@@ -229,7 +229,7 @@ export default function OnboardingPage() {
                 </div>
                 <Input
                   label="Ad Soyad"
-                  placeholder="Hamza Sivrikaya"
+                  placeholder="Ad Soyad"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   autoFocus
@@ -248,7 +248,7 @@ export default function OnboardingPage() {
               <div className="mt-8">
                 <Input
                   label="Kullanıcı Adı"
-                  placeholder="hamza"
+                  placeholder="kullaniciadi"
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
                   error={usernameError}

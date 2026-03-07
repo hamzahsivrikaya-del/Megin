@@ -5,4 +5,4 @@ Disallow: /dashboard
 Disallow: /api
 Disallow: /login
 
-Sitemap: https://hamzasivrikaya.com/sitemap.xml
+Sitemap: https://megin.ai/sitemap.xml

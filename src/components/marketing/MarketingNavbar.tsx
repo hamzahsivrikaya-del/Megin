@@ -12,12 +12,12 @@ import { getTranslations, localePath } from '@/lib/i18n'
 import type { Locale } from '@/lib/i18n/types'
 
 interface MarketingNavbarProps {
-  locale: Locale
+  locale?: Locale
 }
 
 const BUSINESS_ICONS = [UserCheck, Building2, Laptop]
 
-export default function MarketingNavbar({ locale }: MarketingNavbarProps) {
+export default function MarketingNavbar({ locale = 'tr' }: MarketingNavbarProps) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)

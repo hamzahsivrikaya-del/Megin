@@ -9,7 +9,8 @@ import Badge from '@/components/ui/Badge'
 import Input from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
 import { formatDate, formatDateShort, getPackageStatusLabel, formatPrice } from '@/lib/utils'
-import ProgressChart from '@/app/(member)/dashboard/progress/ProgressChart'
+// ProgressChart was removed with member dashboard — import disabled
+// import ProgressChart from '@/app/(member)/dashboard/progress/ProgressChart'
 import Select from '@/components/ui/Select'
 import type { User, Package, Measurement, Lesson, Gender, MealLog, MemberMeal, ProgressPhoto } from '@/lib/types'
 import Image from 'next/image'
@@ -337,7 +338,7 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
               </div>
               <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 text-xs sm:text-sm text-text-secondary">
                 {member.parent_id && <Badge variant="default">Bağlı Üye</Badge>}
-                {!member.email.endsWith('@hamzapt.local') && (
+                {!member.email.endsWith('@megin.local') && (
                   <span className="truncate max-w-[180px] sm:max-w-none">{member.email}</span>
                 )}
                 {member.phone && (
@@ -347,7 +348,7 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
                   </>
                 )}
                 <span className="text-border">·</span>
-                <span>Üyelik: {formatDate(member.start_date)}</span>
+                <span>Üyelik: {formatDate(member.start_date || member.created_at)}</span>
               </div>
             </div>
           </div>
@@ -440,7 +441,7 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
               <div className="rounded-xl border border-border p-5 bg-surface">
                 <p className="text-[10px] text-text-secondary uppercase tracking-widest mb-4">Kişisel Bilgiler</p>
                 <div className="space-y-3">
-                  {!member.email.endsWith('@hamzapt.local') && (
+                  {!member.email.endsWith('@megin.local') && (
                     <div>
                       <p className="text-xs text-text-secondary mb-0.5">E-posta</p>
                       <p className="text-sm text-text-primary break-all">{member.email}</p>
@@ -458,7 +459,7 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
                   </div>
                   <div>
                     <p className="text-xs text-text-secondary mb-0.5">Üyelik Başlangıcı</p>
-                    <p className="text-sm text-text-primary">{formatDate(member.start_date)}</p>
+                    <p className="text-sm text-text-primary">{formatDate(member.start_date || member.created_at)}</p>
                   </div>
                 </div>
               </div>
@@ -607,9 +608,7 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
         {/* ÖLÇÜMLER */}
         {activeTab === 'measurements' && (
           <div className="space-y-6">
-            {measurements.length > 0 ? (
-              <ProgressChart measurements={[...measurements].reverse()} gender={member.gender} goals={[]} />
-            ) : (
+            {measurements.length === 0 && (
               <div className="rounded-xl border border-border p-16 text-center bg-surface">
                 <p className="text-text-secondary">Henüz ölçüm kaydı yok</p>
               </div>

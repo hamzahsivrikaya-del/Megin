@@ -13,7 +13,7 @@
 ## Rakip Analizinden Çıkan Potansiyel Özellikler
 
 ### Platform Bölümleri
-- **Landing Page (Public):** hamzasivrikaya.com — SEO, dönüşüm, güven
+- **Landing Page (Public):** megin.ai — SEO, dönüşüm, güven
 - **Üye Paneli:** /dashboard/* — Üye deneyimi, bağlılık, motivasyon
 - **Admin Paneli:** /admin/* — Antrenör verimliliği, üye yönetimi
 - **Public Araçlar:** /araclar/*, /antrenmanlar/, /blog/* — SEO, keşif

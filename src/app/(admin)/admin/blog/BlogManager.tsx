@@ -49,8 +49,8 @@ export default function BlogManager({ initialPosts }: { initialPosts: BlogPost[]
       setForm({
         title: post.title,
         content: post.content,
-        status: post.status,
-        cover_image: post.cover_image || '',
+        status: post.published ? 'published' : 'draft',
+        cover_image: post.cover_image_url || '',
       })
     } else {
       setEditingPost(null)
@@ -72,9 +72,8 @@ export default function BlogManager({ initialPosts }: { initialPosts: BlogPost[]
       title: form.title,
       slug,
       content: form.content,
-      status: form.status,
-      cover_image: form.cover_image || null,
-      published_at: form.status === 'published' ? new Date().toISOString() : null,
+      published: form.status === 'published',
+      cover_image_url: form.cover_image || null,
     }
 
     if (editingPost) {
@@ -133,8 +132,8 @@ export default function BlogManager({ initialPosts }: { initialPosts: BlogPost[]
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium">{post.title}</h3>
-                    <Badge variant={post.status === 'published' ? 'success' : 'default'}>
-                      {post.status === 'published' ? 'Yayında' : 'Taslak'}
+                    <Badge variant={post.published ? 'success' : 'default'}>
+                      {post.published ? 'Yayında' : 'Taslak'}
                     </Badge>
                   </div>
                   <p className="text-sm text-text-secondary mt-1">
@@ -160,7 +159,7 @@ export default function BlogManager({ initialPosts }: { initialPosts: BlogPost[]
         open={showEditor}
         onClose={() => setShowEditor(false)}
         title={editingPost ? 'Yazıyı Düzenle' : 'Yeni Yazı'}
-        size="xl"
+        size="lg"
       >
         <form onSubmit={handleSave} className="space-y-4">
           <Input

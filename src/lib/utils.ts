@@ -104,6 +104,53 @@ export function cn(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(' ')
 }
 
+// ── Takvim Ek Helpers ──
+export function getTodayDayIndex(): number {
+  const day = new Date().getDay()
+  return day === 0 ? 6 : day - 1 // Pazartesi=0 ... Pazar=6
+}
+
+export function formatWeekRange(mondayStr: string): string {
+  const monday = new Date(mondayStr + 'T00:00:00')
+  const sunday = new Date(monday)
+  sunday.setDate(sunday.getDate() + 6)
+  const fmt = (d: Date) => d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
+  return `${fmt(monday)} – ${fmt(sunday)}`
+}
+
+// ── Zaman Helpers ──
+export function timeAgo(dateStr: string): string {
+  const now = new Date()
+  const date = new Date(dateStr)
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000)
+  if (diff < 60) return 'az önce'
+  if (diff < 3600) return `${Math.floor(diff / 60)} dk önce`
+  if (diff < 86400) return `${Math.floor(diff / 3600)} saat önce`
+  if (diff < 604800) return `${Math.floor(diff / 86400)} gün önce`
+  return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
+}
+
+// ── Bildirim Helpers ──
+const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
+  lesson_reminder: 'Ders Hatırlatma',
+  nutrition_reminder: 'Beslenme Hatırlatma',
+  weekly_report: 'Haftalık Rapor',
+  badge: 'Rozet',
+  manual: 'Manuel',
+  calendar_update: 'Takvim Güncelleme',
+  calendar_cancel: 'Takvim İptal',
+  package_warning: 'Paket Uyarısı',
+  motivation: 'Motivasyon',
+  habit_reminder: 'Alışkanlık',
+  streak_warning: 'Seri Uyarısı',
+  inactive_warning: 'İnaktif Uyarısı',
+  daily_summary: 'Günlük Özet',
+}
+
+export function getNotificationTypeLabel(type: string): string {
+  return NOTIFICATION_TYPE_LABELS[type] || type
+}
+
 // ── Token Helpers ──
 export function generateInviteToken(): string {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'

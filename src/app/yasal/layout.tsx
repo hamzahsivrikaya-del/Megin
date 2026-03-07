@@ -39,7 +39,7 @@ export default function YasalLayout({ children }: { children: React.ReactNode })
             ))}
           </div>
           <p className="text-center text-[10px] text-[#D6D3D1]">
-            © 2026 Hamza Sivrikaya. Tüm hakları saklıdır.
+            © 2026 Megin. Tüm hakları saklıdır.
           </p>
         </div>
       </footer>

@@ -1,18 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  )
+}
+
+function LoginContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get('error') === 'auth') {
+      setError('Google ile giriş başarısız oldu. Lütfen tekrar deneyin.')
+    }
+  }, [searchParams])
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,7 +46,7 @@ export default function LoginPage() {
       return
     }
 
-    // Rol bazlı yönlendirme: trainer → /dashboard, client → /app
+    // Rol bazlı yönlendirme
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       const { data: trainer } = await supabase
@@ -42,14 +57,24 @@ export default function LoginPage() {
 
       if (trainer) {
         router.push(trainer.onboarding_completed ? '/dashboard' : '/onboarding')
-      } else if (user.user_metadata?.role === 'trainer') {
-        // Trainer kaydı henüz yok (onboarding tamamlanmamış)
-        router.push('/onboarding')
-      } else {
-        router.push('/app')
+        return
       }
+
+      const { data: client } = await supabase
+        .from('clients')
+        .select('id, onboarding_completed')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (client) {
+        router.push(client.onboarding_completed ? '/app' : '/app/onboarding')
+        return
+      }
+
+      // Ne trainer ne client — onboarding'e yönlendir
+      router.push('/onboarding')
     } else {
-      router.push('/dashboard')
+      router.push('/login')
     }
     router.refresh()
   }

@@ -39,14 +39,14 @@ Dev server'da landing page'e git, sol üstte logo olmadığını doğrula.
 **Files:**
 - Modify: `src/components/shared/Navbar.tsx`
 
-**Mevcut durum:** Sol üstte kırmızı "HS" kutusu + "hamzasivrikaya.com" text var. Kaba görünüyor.
+**Mevcut durum:** Sol üstte kırmızı "HS" kutusu + "megin.ai" text var. Kaba görünüyor.
 
 **Hedef tasarım:** Minimal, şık bir ana sayfa dönüş butonu. Küçük bir home ikonu veya stilize "H" logosu ile soft hover efekti.
 
 **Step 1: Navbar sol tarafını yeniden tasarla**
 
 frontend-design skill kullanarak:
-- "HS" box + "hamzasivrikaya.com" yerine daha minimal ve şık bir tasarım
+- "HS" box + "megin.ai" yerine daha minimal ve şık bir tasarım
 - Küçük boyutlu, zarif hover efekti olan bir home ikonu
 - Mobilde de iyi görünmeli
 
