@@ -26,6 +26,24 @@ export interface Trainer {
   created_at: string
 }
 
+// ── Eski uyumluluk (admin paneli hâlâ User kullanıyor) ──
+export interface User {
+  id: string
+  user_id?: string
+  full_name: string
+  email: string
+  phone: string | null
+  gender: Gender | null
+  avatar_url: string | null
+  parent_id: string | null
+  nutrition_note: string | null
+  is_active: boolean
+  role?: string
+  start_date?: string
+  onboarding_completed?: boolean
+  created_at: string
+}
+
 // ── Client (Danışan) ──
 export interface Client {
   id: string
@@ -134,6 +152,7 @@ export interface Workout {
   trainer_id: string
   type: WorkoutType
   client_id: string | null
+  user_id?: string | null
   week_start: string
   day_index: number
   title: string
@@ -155,6 +174,13 @@ export interface ClientMeal {
   name: string
   order_num: number
   created_at: string
+}
+
+export interface MemberMeal {
+  id: string
+  user_id: string
+  name: string
+  order_num: number
 }
 
 export interface MealLog {
@@ -206,6 +232,9 @@ export type NotificationType =
   | 'streak_at_risk'
   | 'streak_celebration'
   | 'program_assigned'
+  | 'admin_low_lessons'
+  | 'admin_measurement'
+  | 'admin_nutrition_summary'
 
 export interface TrainerNotificationPreferences {
   id: string

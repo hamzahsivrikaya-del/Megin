@@ -12,7 +12,7 @@
 
 Megin, personal trainer'ların danışan takibi, ödeme kontrolü, antrenman programlama, beslenme takibi ve danışan bağlılığı araçlarını tek çatı altında sunan bir SaaS platformu.
 
-**Temel ilke:** Mevcut hamza-web-site sıfırdan referans alınarak yazılacak. Ayrı repo, ayrı DB, ayrı Supabase instance. hamzasivrikaya.com çalışmaya devam eder, Hamza ileride Megin'e ilk kullanıcı olarak geçer.
+**Temel ilke:** Mevcut hamza-web-site sıfırdan referans alınarak yazılacak. Ayrı repo, ayrı DB, ayrı Supabase instance. megin.ai çalışmaya devam eder, Hamza ileride Megin'e ilk kullanıcı olarak geçer.
 
 ---
 

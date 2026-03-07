@@ -353,28 +353,12 @@ export async function GET(
             display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
             paddingTop: '30px',
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <span style={{
-                fontFamily: '"Teko"', fontSize: '40px', fontWeight: 700,
-                color: '#C89B3C', letterSpacing: '5px', textTransform: 'uppercase',
-                display: 'flex',
-              }}>
-                @hamzasivrikayaa
-              </span>
-              <span style={{
-                fontFamily: '"Space Mono"', fontSize: '22px',
-                color: 'rgba(242,232,213,0.25)', letterSpacing: '4px',
-                textTransform: 'uppercase', display: 'flex',
-              }}>
-                {`Ki\u015Fisel Antren\u00F6r \u2014 Antalya`}
-              </span>
-            </div>
             <span style={{
-              fontFamily: '"Space Mono"', fontSize: '26px',
-              color: 'rgba(242,232,213,0.3)', letterSpacing: '2px',
+              fontFamily: '"Teko"', fontSize: '40px', fontWeight: 700,
+              color: '#C89B3C', letterSpacing: '5px', textTransform: 'uppercase',
               display: 'flex',
             }}>
-              hamzasivrikaya.com
+              megin.ai
             </span>
           </div>
         </div>

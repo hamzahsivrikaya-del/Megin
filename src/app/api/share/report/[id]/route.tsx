@@ -300,7 +300,7 @@ export async function GET(
           backgroundColor: '#1A1A1A', padding: '0 60px',
         }}>
           <div style={{ display: 'flex', fontFamily: '"Oswald"', fontSize: '56px', color: '#DC2626', letterSpacing: '2px' }}>
-            @hamzasivrikayaa
+            megin.ai
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
             <div style={{ display: 'flex', fontSize: '24px', fontWeight: 700, color: '#555', letterSpacing: '2px', textTransform: 'uppercase' }}>

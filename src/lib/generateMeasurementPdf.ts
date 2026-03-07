@@ -134,7 +134,7 @@ export async function generateMeasurementPdf(member: User, measurements: Measure
   doc.setTextColor(...LGRAY)
   doc.text(`E-posta: ${member.email}`, margin + 6, y + 15)
   if (member.phone) doc.text(`Tel: ${member.phone}`, margin + 90, y + 15)
-  doc.text(`Üyelik: ${fmtLong(member.start_date)}`, W - margin - 6, y + 15, { align: 'right' })
+  doc.text(`Üyelik: ${fmtLong(member.start_date || member.created_at)}`, W - margin - 6, y + 15, { align: 'right' })
 
   y += 32
 
@@ -320,7 +320,7 @@ export async function generateMeasurementPdf(member: User, measurements: Measure
     doc.setFont('NotoSans', 'normal')
     doc.setFontSize(7)
     doc.setTextColor(...GRAY)
-    doc.text('hamzasivrikaya.com  ·  0545 681 4776  ·  @hamzasivrikayaa', margin, pageH - 4.5)
+    doc.text('megin.ai', margin, pageH - 4.5)
     doc.text(`${i} / ${pageCount}`, W - margin, pageH - 4.5, { align: 'right' })
   }
 

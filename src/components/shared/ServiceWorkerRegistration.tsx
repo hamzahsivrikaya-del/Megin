@@ -23,7 +23,7 @@ async function saveSubscription(subscription: PushSubscription) {
   })
 }
 
-async function subscribeToPush(registration: ServiceWorkerRegistration) {
+export async function subscribeToPush(registration: ServiceWorkerRegistration) {
   const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   if (!vapidPublicKey) return
 

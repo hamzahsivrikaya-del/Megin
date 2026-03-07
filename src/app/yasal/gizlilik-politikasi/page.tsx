@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Gizlilik ve Kişisel Verilerin Korunması Politikası | Hamza Sivrikaya',
+  title: 'Gizlilik ve Kişisel Verilerin Korunması Politikası | Megin',
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -34,10 +34,8 @@ export default function GizlilikPolitikasi() {
       <Section title="1. Veri Sorumlusu">
         <p>6698 Sayılı Kişisel Verilerin Korunması Kanunu (&quot;KVKK&quot;) uyarınca veri sorumlusu:</p>
         <InfoCard label="İletişim Bilgileri">
-          <p><span className="font-medium text-[#1A1A1A]">Ünvan:</span> Hamza Hakkı Sivrikaya (Şahıs Şirketi)</p>
-          <p><span className="font-medium text-[#1A1A1A]">Adres:</span> Antalya, Türkiye</p>
-          <p><span className="font-medium text-[#1A1A1A]">E-posta:</span> hamzahsivrikaya@gmail.com</p>
-          <p><span className="font-medium text-[#1A1A1A]">Telefon:</span> +90 545 681 47 76</p>
+          <p><span className="font-medium text-[#1A1A1A]">Ünvan:</span> Megin</p>
+          <p><span className="font-medium text-[#1A1A1A]">Web:</span> www.megin.ai</p>
         </InfoCard>
       </Section>
 
@@ -99,7 +97,7 @@ export default function GizlilikPolitikasi() {
           <li>Otomatik sistemler aracılığıyla aleyhinize oluşan kararlara itiraz etme</li>
           <li>Hukuka aykırı işleme nedeniyle zararın giderilmesini talep etme</li>
         </ul>
-        <p className="mt-3">Haklarınızı kullanmak için hamzahsivrikaya@gmail.com adresine kimliğinizi doğrulayan bilgilerle yazılı başvuruda bulunabilirsiniz. Başvurunuz 30 gün içinde yanıtlanır.</p>
+        <p className="mt-3">Haklarınızı kullanmak için info@megin.ai adresine kimliğinizi doğrulayan bilgilerle yazılı başvuruda bulunabilirsiniz. Başvurunuz 30 gün içinde yanıtlanır.</p>
       </Section>
 
       <Section title="8. Çerez Politikası">
@@ -124,9 +122,7 @@ export default function GizlilikPolitikasi() {
 
       <Section title="11. İletişim">
         <InfoCard label="Bize Ulaşın">
-          <p><span className="font-medium text-[#1A1A1A]">E-posta:</span> hamzahsivrikaya@gmail.com</p>
-          <p><span className="font-medium text-[#1A1A1A]">Telefon:</span> +90 545 681 47 76</p>
-          <p><span className="font-medium text-[#1A1A1A]">Web:</span> www.hamzasivrikaya.com</p>
+          <p><span className="font-medium text-[#1A1A1A]">Web:</span> www.megin.ai</p>
         </InfoCard>
       </Section>
     </div>

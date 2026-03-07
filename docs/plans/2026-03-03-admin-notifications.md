@@ -46,7 +46,7 @@ SELECT cron.schedule(
   '0 7 * * *',
   $$
   SELECT net.http_get(
-    url := 'https://hamzasivrikaya.com/api/cron/admin-nutrition-summary',
+    url := 'https://megin.ai/api/cron/admin-nutrition-summary',
     headers := jsonb_build_object(
       'Authorization', 'Bearer nY51nHFHOzt+hLx0zdqAXxltyHH3rWHrTefX0sdkJfs='
     )
@@ -59,7 +59,7 @@ SELECT cron.schedule(
   '0 10 * * *',
   $$
   SELECT net.http_get(
-    url := 'https://hamzasivrikaya.com/api/cron/admin-nutrition-summary',
+    url := 'https://megin.ai/api/cron/admin-nutrition-summary',
     headers := jsonb_build_object(
       'Authorization', 'Bearer nY51nHFHOzt+hLx0zdqAXxltyHH3rWHrTefX0sdkJfs='
     )
@@ -72,7 +72,7 @@ SELECT cron.schedule(
   '0 13 * * *',
   $$
   SELECT net.http_get(
-    url := 'https://hamzasivrikaya.com/api/cron/admin-nutrition-summary',
+    url := 'https://megin.ai/api/cron/admin-nutrition-summary',
     headers := jsonb_build_object(
       'Authorization', 'Bearer nY51nHFHOzt+hLx0zdqAXxltyHH3rWHrTefX0sdkJfs='
     )
@@ -85,7 +85,7 @@ SELECT cron.schedule(
   '0 16 * * *',
   $$
   SELECT net.http_get(
-    url := 'https://hamzasivrikaya.com/api/cron/admin-nutrition-summary',
+    url := 'https://megin.ai/api/cron/admin-nutrition-summary',
     headers := jsonb_build_object(
       'Authorization', 'Bearer nY51nHFHOzt+hLx0zdqAXxltyHH3rWHrTefX0sdkJfs='
     )
@@ -612,7 +612,7 @@ npx vercel --prod
 
 1. Beslenme cron'u test et:
 ```bash
-curl -s "https://hamzasivrikaya.com/api/cron/admin-nutrition-summary" \
+curl -s "https://megin.ai/api/cron/admin-nutrition-summary" \
   -H "Authorization: Bearer nY51nHFHOzt+hLx0zdqAXxltyHH3rWHrTefX0sdkJfs="
 ```
 

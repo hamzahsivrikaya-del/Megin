@@ -3,7 +3,7 @@ import LandingNavbar from '@/components/shared/LandingNavbar'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Fitness Hesaplayıcıları | Hamza Sivrikaya',
+  title: 'Fitness Hesaplayıcıları | Megin',
   description: 'Kalori, 1RM, BMI, su ihtiyacı, ideal kilo ve deri kaliper hesaplayıcıları. Ücretsiz fitness araçları.',
 }
 

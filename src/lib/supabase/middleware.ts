@@ -37,6 +37,7 @@ export async function updateSession(request: NextRequest) {
     '/forgot-password',
     '/reset-password',
     '/auth/callback',
+    '/onboarding',
   ]
 
   const marketingPrefixes = [
@@ -53,11 +54,17 @@ export async function updateSession(request: NextRequest) {
     '/yasal',
   ]
 
+  // Korumalı tek-segmentli path'ler — username regex'ten hariç tutulmalı
+  const reservedPaths = ['/dashboard', '/app', '/settings', '/admin']
+  const isReservedPath = reservedPaths.some((p) =>
+    request.nextUrl.pathname === p || request.nextUrl.pathname.startsWith(p + '/')
+  )
+
   const isPublicPath =
     publicPaths.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith('/api/') ||
     marketingPrefixes.some((p) => request.nextUrl.pathname.startsWith(p)) ||
-    request.nextUrl.pathname.match(/^\/[a-z0-9_-]+$/) !== null || // /<username> public profil
+    (!isReservedPath && request.nextUrl.pathname.match(/^\/[a-z0-9_-]+$/) !== null) || // /<username> public profil
     request.nextUrl.pathname.match(/^\/[a-z0-9_-]+\/davet\/[a-z0-9]+$/) !== null // /<handle>/davet/<token>
 
   if (!user && !isPublicPath) {

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Kullanım Koşulları | Hamza Sivrikaya',
+  title: 'Kullanım Koşulları | Megin',
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -23,7 +23,7 @@ export default function KullanimKosullari() {
       </div>
 
       <Section title="1. Kabul">
-        <p>www.hamzasivrikaya.com web sitesini ziyaret ederek veya hizmet satın alarak aşağıdaki kullanım koşullarını kabul etmiş sayılırsınız. Koşulları kabul etmiyorsanız siteyi kullanmayınız.</p>
+        <p>www.megin.ai web sitesini ziyaret ederek veya hizmet satın alarak aşağıdaki kullanım koşullarını kabul etmiş sayılırsınız. Koşulları kabul etmiyorsanız siteyi kullanmayınız.</p>
       </Section>
 
       <Section title="2. Sunulan Hizmetler">
@@ -53,7 +53,7 @@ export default function KullanimKosullari() {
       </Section>
 
       <Section title="5. Fikri Mülkiyet">
-        <p>Web sitesindeki tüm içerikler (metin, görsel, logo, video, antrenman programları, blog yazıları) Hamza Hakkı Sivrikaya&apos;ya aittir ve telif hakkı kapsamında korunmaktadır.</p>
+        <p>Web sitesindeki tüm içerikler (metin, görsel, logo, video, antrenman programları, blog yazıları) Megin&apos;e aittir ve telif hakkı kapsamında korunmaktadır.</p>
         <p>İzin alınmadan kopyalanamaz, dağıtılamaz, ticari amaçla kullanılamaz.</p>
         <p>Müşterilere teslim edilen antrenman programları yalnızca kişisel kullanım içindir; üçüncü kişilerle paylaşılamaz.</p>
       </Section>
@@ -78,9 +78,7 @@ export default function KullanimKosullari() {
 
       <Section title="10. İletişim">
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 space-y-1">
-          <p><span className="font-medium text-[#1A1A1A]">E-posta:</span> hamzahsivrikaya@gmail.com</p>
-          <p><span className="font-medium text-[#1A1A1A]">Telefon:</span> +90 545 681 47 76</p>
-          <p><span className="font-medium text-[#1A1A1A]">Web:</span> www.hamzasivrikaya.com</p>
+          <p><span className="font-medium text-[#1A1A1A]">Web:</span> www.megin.ai</p>
         </div>
       </Section>
     </div>
