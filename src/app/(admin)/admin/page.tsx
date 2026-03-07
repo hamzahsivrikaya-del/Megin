@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import Card, { CardHeader, CardTitle } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
+import Button from '@/components/ui/Button'
 import Link from 'next/link'
 import { toDateStr } from '@/lib/utils'
 import NutritionCard from './NutritionCard'
@@ -53,27 +54,36 @@ export default async function AdminDashboard() {
     <div className="space-y-6 panel-section-enter">
       <h1 className="text-2xl heading-gradient">Anasayfa</h1>
 
-      {/* İstatistik Çipleri — kompakt tek satır */}
-      <div className="flex items-center justify-center gap-3 flex-wrap">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 panel-stat text-sm font-medium text-text-primary">
-          <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          {activeMembers || 0} Üye
-        </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 panel-stat text-sm font-medium text-text-primary">
-          <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-          {weeklyLessons?.length || 0} Haftalık
-        </span>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 panel-stat text-sm font-medium text-text-primary">
-          <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-          {todayLessons?.length || 0} Bugün
-        </span>
+      {/* İstatistik Kartları */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card className="text-center !p-4">
+          <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-primary/10 to-orange-500/10 flex items-center justify-center">
+            <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          </div>
+          <span className="text-2xl font-bold text-text-primary">{activeMembers || 0}</span>
+          <span className="block text-xs text-text-secondary mt-0.5">Danışan</span>
+        </Card>
+        <Card className="text-center !p-4">
+          <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-primary/10 to-orange-500/10 flex items-center justify-center">
+            <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+          </div>
+          <span className="text-2xl font-bold text-text-primary">{weeklyLessons?.length || 0}</span>
+          <span className="block text-xs text-text-secondary mt-0.5">Haftalık Ders</span>
+        </Card>
+        <Card className="text-center !p-4">
+          <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-primary/10 to-orange-500/10 flex items-center justify-center">
+            <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          </div>
+          <span className="text-2xl font-bold text-text-primary">{todayLessons?.length || 0}</span>
+          <span className="block text-xs text-text-secondary mt-0.5">Bugün</span>
+        </Card>
       </div>
 
-      {/* Hızlı Aksiyonlar — hemen render */}
+      {/* Hızlı Aksiyonlar */}
       <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2 sm:gap-3">
         <Link
           href="/admin/takvim"
-          className="inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-3 sm:py-2.5 bg-primary text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-primary-hover active:bg-primary-hover transition-colors"
+          className="cta-gradient inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-5 py-3 sm:py-2.5 text-xs sm:text-sm"
         >
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -82,7 +92,7 @@ export default async function AdminDashboard() {
         </Link>
         <Link
           href="/admin/lessons/new"
-          className="inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-3 sm:py-2.5 bg-surface border border-border text-text-primary rounded-lg text-xs sm:text-sm font-medium hover:bg-surface-hover active:bg-surface-hover transition-colors"
+          className="cta-ghost inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-5 py-3 sm:py-2.5 text-xs sm:text-sm !border-border"
         >
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -91,12 +101,21 @@ export default async function AdminDashboard() {
         </Link>
         <Link
           href="/admin/members?action=new"
-          className="inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-3 sm:py-2.5 bg-surface border border-border text-text-primary rounded-lg text-xs sm:text-sm font-medium hover:bg-surface-hover active:bg-surface-hover transition-colors"
+          className="cta-ghost inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-5 py-3 sm:py-2.5 text-xs sm:text-sm !border-border"
         >
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
           </svg>
           <span>Yeni Üye</span>
+        </Link>
+        <Link
+          href="/admin/measurements/new"
+          className="cta-ghost inline-flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-5 py-3 sm:py-2.5 text-xs sm:text-sm !border-border"
+        >
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span>Ölçüm Gir</span>
         </Link>
       </div>
 
@@ -104,11 +123,11 @@ export default async function AdminDashboard() {
       <MemberSearch />
 
       {/* Bugünün Ders Programı */}
-      <Card className="border-primary/30">
+      <Card className="">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Bugünün Programı</CardTitle>
-            <Link href="/admin/takvim" className="text-xs text-primary font-medium hover:underline">
+            <Link href="/admin/takvim" className="text-xs font-semibold text-primary hover:text-primary-dark transition-colors">
               Takvime git →
             </Link>
           </div>
@@ -243,7 +262,7 @@ async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, u
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card className="border-primary/30">
+      <Card className="">
         <CardHeader>
           <CardTitle>Paket Uyarıları</CardTitle>
         </CardHeader>
@@ -271,7 +290,7 @@ async function DeferredAlerts({ todayLessons }: { todayLessons: Record<string, u
         )}
       </Card>
 
-      <Card className="border-primary/30">
+      <Card className="">
         <CardHeader>
           <CardTitle>Bugün Gelen Üyeler</CardTitle>
         </CardHeader>
