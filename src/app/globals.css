@@ -791,47 +791,72 @@ input:-webkit-autofill {
   color: #FFFFFF;
 }
 
-.mkt-heading-xl {
-  font-family: var(--font-oswald), var(--font-display), Impact, sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  line-height: 0.95;
-}
+/* ── Unified Heading System ── */
 
-.mkt-heading-lg {
+.heading-display,
+.mkt-heading-lg,
+.panel-heading {
   font-family: var(--font-oswald), var(--font-display), Impact, sans-serif;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1.05;
+  color: var(--color-text-primary);
 }
 
+.heading-display-xl,
+.mkt-heading-xl {
+  font-family: var(--font-oswald), var(--font-display), Impact, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+}
+
+.heading-gradient,
+.panel-heading-gradient {
+  font-family: var(--font-oswald), var(--font-display), Impact, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+  background: var(--gradient-warm);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Unified CTA/Button System ── */
+
+.cta-primary,
 .mkt-cta-primary {
-  @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider uppercase transition-all;
+  @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider transition-all;
   background: #FF2D2D;
   color: #FFFFFF;
   border-radius: 12px;
 }
+.cta-primary:hover,
 .mkt-cta-primary:hover {
   background: #E01F1F;
   transform: translateY(-1px);
   box-shadow: 0 8px 24px -4px rgba(255, 45, 45, 0.3);
 }
+.cta-primary:active,
 .mkt-cta-primary:active {
   transform: scale(0.97);
 }
 
+.cta-ghost,
 .mkt-cta-ghost {
-  @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider uppercase transition-all;
+  @apply inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold tracking-wider transition-all;
   background: transparent;
   border: 2px solid #E5E7EB;
   color: #0A0A0A;
   border-radius: 12px;
 }
+.cta-ghost:hover,
 .mkt-cta-ghost:hover {
   border-color: #FF2D2D;
   color: #FF2D2D;
 }
+.cta-ghost:active,
 .mkt-cta-ghost:active {
   transform: scale(0.97);
 }
@@ -894,27 +919,32 @@ input:-webkit-autofill {
   background-clip: text;
 }
 
-/* Premium CTA button with warm gradient */
-.mkt-cta-gradient {
+.cta-gradient,
+.mkt-cta-gradient,
+.btn-warm-gradient {
   background: var(--gradient-warm);
   color: #FFFFFF;
   border-radius: 12px;
   font-weight: 700;
   font-size: 0.875rem;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
   transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 2rem;
+  border: none;
 }
-.mkt-cta-gradient:hover {
+.cta-gradient:hover,
+.mkt-cta-gradient:hover,
+.btn-warm-gradient:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 32px -4px rgba(220, 38, 38, 0.3), 0 4px 12px -2px rgba(249, 115, 22, 0.2);
 }
-.mkt-cta-gradient:active {
+.cta-gradient:active,
+.mkt-cta-gradient:active,
+.btn-warm-gradient:active {
   transform: scale(0.97);
 }
 
@@ -1128,6 +1158,7 @@ input:-webkit-autofill {
   0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
   50% { box-shadow: 0 0 40px 8px rgba(220, 38, 38, 0.15); }
 }
+.cta-glow,
 .mkt-cta-glow {
   animation: cta-glow 3s ease-in-out infinite;
 }
@@ -1161,10 +1192,12 @@ input:-webkit-autofill {
 }
 
 /* Emphasized heading line — red underline accent */
+.heading-accent,
 .mkt-heading-accent {
   position: relative;
   display: inline-block;
 }
+.heading-accent::after,
 .mkt-heading-accent::after {
   content: '';
   position: absolute;
@@ -1280,4 +1313,87 @@ input:-webkit-autofill {
 /* Tap highlight (mobile) */
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Panel Design System (LP ile birebir uyumlu) ── */
+/* panel-heading, panel-heading-gradient → Unified Heading System'e taşındı */
+
+/* LP ile aynı Card stili — 12px radius, warm hover */
+.panel-card {
+  background: var(--color-surface);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  padding: 1rem;
+  transition: all 0.25s ease;
+}
+
+@media (min-width: 640px) {
+  .panel-card { padding: 1.5rem; }
+}
+
+.panel-card:hover {
+  border-color: rgba(255, 45, 45, 0.2);
+  box-shadow: 0 8px 24px -4px rgba(255, 45, 45, 0.08), 0 4px 12px -2px rgba(249, 115, 22, 0.06);
+}
+
+.panel-card-interactive { cursor: pointer; }
+.panel-card-interactive:hover { transform: translateY(-2px); }
+
+/* LP ile aynı renk tonu — #FF2D2D + #F97316 warm */
+.panel-stat {
+  background: linear-gradient(135deg, rgba(255, 45, 45, 0.06), rgba(249, 115, 22, 0.06));
+  border: 1px solid rgba(255, 45, 45, 0.15);
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+.panel-stat:hover {
+  border-color: rgba(255, 45, 45, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 45, 45, 0.1), 0 2px 6px rgba(249, 115, 22, 0.08);
+}
+
+.panel-section-enter { animation: fade-up 0.5s ease-out both; }
+.panel-section-enter:nth-child(2) { animation-delay: 0.1s; }
+.panel-section-enter:nth-child(3) { animation-delay: 0.2s; }
+.panel-section-enter:nth-child(4) { animation-delay: 0.3s; }
+.panel-section-enter:nth-child(5) { animation-delay: 0.4s; }
+
+/* LP gradient ile birebir aynı */
+.sidebar-logo-gradient {
+  background: var(--gradient-warm);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-item-active {
+  background: linear-gradient(135deg, rgba(255, 45, 45, 0.08), rgba(249, 115, 22, 0.06));
+  border-left: 3px solid #FF2D2D;
+  color: #FF2D2D;
+  font-weight: 600;
+}
+
+.navbar-brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gradient-warm);
+  box-shadow: 0 0 8px rgba(255, 45, 45, 0.4);
+}
+
+/* btn-warm-gradient → Unified CTA/Button System'e taşındı */
+
+/* PWA safe area */
+.pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+.pt-safe { padding-top: max(1rem, env(safe-area-inset-top)); }
+
+@media (max-width: 640px) {
+  .panel-card { border-radius: 0.75rem; }
+  .panel-mobile-full {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
 }
