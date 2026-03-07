@@ -1,11 +1,16 @@
-interface CardProps {
+export interface CardProps {
   children: React.ReactNode
   className?: string
+  onClick?: () => void
 }
 
-export default function Card({ children, className = '' }: CardProps) {
+export default function Card({ children, className = '', onClick }: CardProps) {
   return (
-    <div className={`bg-surface rounded-xl border border-border p-4 sm:p-6 ${className}`}>
+    <div
+      className={`bg-surface rounded-xl border border-border p-4 sm:p-6 ${className}`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+    >
       {children}
     </div>
   )

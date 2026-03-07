@@ -52,10 +52,7 @@ export default function BadgeStrip() {
     .slice(0, MAX_BADGES)
 
   return (
-    <div
-      className="bg-surface rounded-2xl border border-border p-4 animate-fade-up delay-75"
-      style={{ fontFamily: 'var(--font-nunito), sans-serif' }}
-    >
+    <div className="bg-surface rounded-2xl border border-border p-4 animate-fade-up delay-75">
       {/* Baslik satiri */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -67,7 +64,7 @@ export default function BadgeStrip() {
           )}
         </div>
         <Link
-          href="/dashboard/rozetler"
+          href="/app/rozetler"
           className="text-sm text-primary hover:underline"
         >
           Tüm rozetleri gör &rarr;
@@ -96,7 +93,7 @@ export default function BadgeStrip() {
             return (
               <Link
                 key={badge.id}
-                href="/dashboard/rozetler"
+                href="/app/rozetler"
                 className="shrink-0 flex flex-col items-center justify-center text-center no-underline"
                 style={{
                   width: 104,

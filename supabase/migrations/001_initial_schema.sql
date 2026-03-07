@@ -1,280 +1,326 @@
--- Users tablosu (Supabase Auth ile bağlantılı)
-CREATE TABLE public.users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT UNIQUE NOT NULL,
+-- ══════════════════════════════════════════════════════════════
+-- MEGIN — Multi-tenant Personal Trainer SaaS
+-- Initial Schema — 001
+-- ══════════════════════════════════════════════════════════════
+
+-- ── Enums ──
+CREATE TYPE user_role AS ENUM ('trainer', 'client');
+CREATE TYPE expertise_area AS ENUM ('pt', 'pilates', 'yoga', 'dietitian', 'other');
+CREATE TYPE referral_source AS ENUM ('instagram', 'friend', 'google', 'other');
+CREATE TYPE package_status AS ENUM ('active', 'completed', 'expired');
+CREATE TYPE payment_status AS ENUM ('paid', 'unpaid');
+CREATE TYPE workout_type AS ENUM ('template', 'client');
+CREATE TYPE workout_section AS ENUM ('warmup', 'strength', 'accessory', 'cardio');
+CREATE TYPE meal_status AS ENUM ('compliant', 'non_compliant');
+CREATE TYPE blog_post_status AS ENUM ('draft', 'published');
+CREATE TYPE notification_type AS ENUM (
+  'low_lessons', 'weekly_report', 'inactive', 'manual',
+  'nutrition_reminder', 'badge_earned', 'client_action'
+);
+CREATE TYPE photo_angle AS ENUM ('front', 'side', 'back');
+CREATE TYPE subscription_plan AS ENUM ('free', 'pro', 'studio');
+CREATE TYPE subscription_status AS ENUM ('active', 'cancelled', 'past_due');
+CREATE TYPE goal_metric_type AS ENUM ('weight', 'body_fat_pct', 'chest', 'waist', 'arm', 'leg');
+CREATE TYPE gender_type AS ENUM ('male', 'female');
+
+-- ── Trainers (PT Profilleri) ──
+CREATE TABLE trainers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT NOT NULL,
+  username TEXT NOT NULL UNIQUE,
+  avatar_url TEXT,
   phone TEXT,
-  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
-  start_date DATE DEFAULT CURRENT_DATE,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  expertise expertise_area NOT NULL DEFAULT 'pt',
+  experience_years INTEGER,
+  client_count_range TEXT,
+  referral_source referral_source,
+  bio TEXT,
+  onboarding_completed BOOLEAN NOT NULL DEFAULT false,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT username_format CHECK (username ~ '^[a-z0-9_-]{3,30}$')
 );
 
--- Paketler
-CREATE TABLE public.packages (
+CREATE UNIQUE INDEX idx_trainers_user_id ON trainers(user_id);
+CREATE UNIQUE INDEX idx_trainers_username ON trainers(username);
+
+-- ── Clients (Danışanlar) ──
+CREATE TABLE clients (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  total_lessons INTEGER NOT NULL CHECK (total_lessons IN (10, 20, 30)),
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  full_name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  gender gender_type,
+  avatar_url TEXT,
+  parent_id UUID REFERENCES clients(id) ON DELETE SET NULL,
+  nutrition_note TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  start_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  invite_token TEXT UNIQUE,
+  invite_accepted BOOLEAN NOT NULL DEFAULT false,
+  onboarding_completed BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_clients_trainer_id ON clients(trainer_id);
+CREATE INDEX idx_clients_user_id ON clients(user_id);
+CREATE INDEX idx_clients_invite_token ON clients(invite_token);
+
+-- ── Packages (Ders Paketleri) ──
+CREATE TABLE packages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  total_lessons INTEGER NOT NULL,
   used_lessons INTEGER NOT NULL DEFAULT 0,
-  start_date DATE NOT NULL,
+  start_date DATE NOT NULL DEFAULT CURRENT_DATE,
   expire_date DATE NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed', 'expired')),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  status package_status NOT NULL DEFAULT 'active',
+  price NUMERIC,
+  payment_status payment_status NOT NULL DEFAULT 'unpaid',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Dersler
-CREATE TABLE public.lessons (
+CREATE INDEX idx_packages_trainer_id ON packages(trainer_id);
+CREATE INDEX idx_packages_client_id ON packages(client_id);
+CREATE INDEX idx_packages_status ON packages(status);
+
+-- ── Lessons (Dersler) ──
+CREATE TABLE lessons (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  package_id UUID NOT NULL REFERENCES public.packages(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  package_id UUID NOT NULL REFERENCES packages(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
   date DATE NOT NULL DEFAULT CURRENT_DATE,
   notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Ölçümler
-CREATE TABLE public.measurements (
+CREATE INDEX idx_lessons_trainer_id ON lessons(trainer_id);
+CREATE INDEX idx_lessons_client_id ON lessons(client_id);
+CREATE INDEX idx_lessons_date ON lessons(date);
+
+-- ── Measurements (Vücut Ölçümleri) ──
+CREATE TABLE measurements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
   date DATE NOT NULL DEFAULT CURRENT_DATE,
-  weight DECIMAL(5,2),
-  height DECIMAL(5,2),
-  chest DECIMAL(5,2),
-  waist DECIMAL(5,2),
-  arm DECIMAL(5,2),
-  leg DECIMAL(5,2),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  weight NUMERIC,
+  height NUMERIC,
+  chest NUMERIC,
+  waist NUMERIC,
+  arm NUMERIC,
+  leg NUMERIC,
+  sf_chest NUMERIC,
+  sf_abdomen NUMERIC,
+  sf_thigh NUMERIC,
+  body_fat_pct NUMERIC,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Blog yazıları
-CREATE TABLE public.blog_posts (
+CREATE INDEX idx_measurements_trainer_id ON measurements(trainer_id);
+CREATE INDEX idx_measurements_client_id ON measurements(client_id);
+
+-- ── Workouts (Antrenman Programları) ──
+CREATE TABLE workouts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  type workout_type NOT NULL DEFAULT 'client',
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  week_start DATE NOT NULL,
+  day_index INTEGER NOT NULL CHECK (day_index BETWEEN 0 AND 6),
   title TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
+  content TEXT,
+  warmup_text TEXT,
+  cardio_text TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_workouts_trainer_id ON workouts(trainer_id);
+CREATE INDEX idx_workouts_client_id ON workouts(client_id);
+
+-- ── Workout Exercises ──
+CREATE TABLE workout_exercises (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workout_id UUID NOT NULL REFERENCES workouts(id) ON DELETE CASCADE,
+  order_num INTEGER NOT NULL DEFAULT 0,
+  name TEXT NOT NULL,
+  sets INTEGER,
+  reps TEXT,
+  weight TEXT,
+  rest TEXT,
+  notes TEXT,
+  superset_group INTEGER,
+  section workout_section NOT NULL DEFAULT 'strength'
+);
+
+CREATE INDEX idx_workout_exercises_workout_id ON workout_exercises(workout_id);
+
+-- ── Client Meals (Öğün Şablonları) ──
+CREATE TABLE client_meals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  order_num INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_client_meals_client_id ON client_meals(client_id);
+
+-- ── Meal Logs (Beslenme Kayıtları) ──
+CREATE TABLE meal_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  date DATE NOT NULL DEFAULT CURRENT_DATE,
+  meal_id UUID REFERENCES client_meals(id) ON DELETE SET NULL,
+  status meal_status NOT NULL DEFAULT 'compliant',
+  photo_url TEXT,
+  note TEXT,
+  is_extra BOOLEAN NOT NULL DEFAULT false,
+  extra_name TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT unique_meal_log UNIQUE (client_id, date, meal_id)
+);
+
+CREATE INDEX idx_meal_logs_client_id ON meal_logs(client_id);
+CREATE INDEX idx_meal_logs_date ON meal_logs(date);
+
+-- ── Blog Posts ──
+CREATE TABLE blog_posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
   content TEXT NOT NULL DEFAULT '',
   cover_image TEXT,
-  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+  status blog_post_status NOT NULL DEFAULT 'draft',
   published_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT unique_blog_slug UNIQUE (trainer_id, slug)
 );
 
--- Bildirimler
-CREATE TABLE public.notifications (
+CREATE INDEX idx_blog_posts_trainer_id ON blog_posts(trainer_id);
+
+-- ── Notifications ──
+CREATE TABLE notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  type TEXT NOT NULL CHECK (type IN ('low_lessons', 'weekly_report', 'inactive', 'manual')),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  type notification_type NOT NULL,
   title TEXT NOT NULL,
   message TEXT NOT NULL,
-  is_read BOOLEAN DEFAULT false,
-  sent_at TIMESTAMPTZ DEFAULT NOW()
+  is_read BOOLEAN NOT NULL DEFAULT false,
+  data JSONB,
+  sent_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Push subscriptions
-CREATE TABLE public.push_subscriptions (
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_notifications_trainer_id ON notifications(trainer_id);
+CREATE INDEX idx_notifications_is_read ON notifications(is_read) WHERE NOT is_read;
+
+-- ── Push Subscriptions ──
+CREATE TABLE push_subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  endpoint TEXT NOT NULL,
-  keys JSONB NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL UNIQUE,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- İndeksler
-CREATE INDEX idx_packages_user_id ON public.packages(user_id);
-CREATE INDEX idx_packages_status ON public.packages(status);
-CREATE INDEX idx_lessons_user_id ON public.lessons(user_id);
-CREATE INDEX idx_lessons_package_id ON public.lessons(package_id);
-CREATE INDEX idx_lessons_date ON public.lessons(date);
-CREATE INDEX idx_measurements_user_id ON public.measurements(user_id);
-CREATE INDEX idx_measurements_date ON public.measurements(date);
-CREATE INDEX idx_blog_posts_status ON public.blog_posts(status);
-CREATE INDEX idx_blog_posts_slug ON public.blog_posts(slug);
-CREATE INDEX idx_notifications_user_id ON public.notifications(user_id);
-CREATE INDEX idx_notifications_is_read ON public.notifications(is_read);
+CREATE INDEX idx_push_subs_user_id ON push_subscriptions(user_id);
 
--- RLS (Row Level Security) aktifleştir
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.packages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.lessons ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.measurements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.blog_posts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
+-- ── Weekly Reports ──
+CREATE TABLE weekly_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  week_start DATE NOT NULL,
+  lessons_count INTEGER NOT NULL DEFAULT 0,
+  nutrition_compliance NUMERIC,
+  consecutive_weeks INTEGER NOT NULL DEFAULT 0,
+  summary TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
 
--- RLS Politikaları
+  CONSTRAINT unique_weekly_report UNIQUE (client_id, week_start)
+);
 
--- Users: Herkes kendi profilini görebilir, admin herkesi görebilir
-CREATE POLICY "users_select_own" ON public.users
-  FOR SELECT USING (
-    auth.uid() = id OR
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+CREATE INDEX idx_weekly_reports_client_id ON weekly_reports(client_id);
 
-CREATE POLICY "users_insert_admin" ON public.users
-  FOR INSERT WITH CHECK (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-    OR auth.uid() = id  -- İlk kayıt için
-  );
+-- ── Client Goals ──
+CREATE TABLE client_goals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  metric_type goal_metric_type NOT NULL,
+  target_value NUMERIC NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  achieved_at TIMESTAMPTZ,
 
-CREATE POLICY "users_update_admin" ON public.users
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+  CONSTRAINT unique_client_goal UNIQUE (client_id, metric_type)
+);
 
--- Packages: Üye kendi paketlerini görür, admin tümünü yönetir
-CREATE POLICY "packages_select" ON public.packages
-  FOR SELECT USING (
-    user_id = auth.uid() OR
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+-- ── Client Badges ──
+CREATE TABLE client_badges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  badge_id TEXT NOT NULL,
+  earned_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  notified BOOLEAN NOT NULL DEFAULT false,
 
-CREATE POLICY "packages_insert_admin" ON public.packages
-  FOR INSERT WITH CHECK (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+  CONSTRAINT unique_client_badge UNIQUE (client_id, badge_id)
+);
 
-CREATE POLICY "packages_update_admin" ON public.packages
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+CREATE INDEX idx_client_badges_client_id ON client_badges(client_id);
 
-CREATE POLICY "packages_delete_admin" ON public.packages
-  FOR DELETE USING (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+-- ── Progress Photos ──
+CREATE TABLE progress_photos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  photo_url TEXT NOT NULL,
+  angle photo_angle NOT NULL,
+  taken_at DATE NOT NULL DEFAULT CURRENT_DATE,
+  comment TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
--- Lessons: Üye kendi derslerini görür, admin tümünü yönetir
-CREATE POLICY "lessons_select" ON public.lessons
-  FOR SELECT USING (
-    user_id = auth.uid() OR
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+CREATE INDEX idx_progress_photos_client_id ON progress_photos(client_id);
 
-CREATE POLICY "lessons_insert_admin" ON public.lessons
-  FOR INSERT WITH CHECK (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+-- ── Subscriptions (SaaS Abonelik) ──
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID NOT NULL REFERENCES trainers(id) ON DELETE CASCADE,
+  plan subscription_plan NOT NULL DEFAULT 'free',
+  status subscription_status NOT NULL DEFAULT 'active',
+  current_period_start TIMESTAMPTZ NOT NULL DEFAULT now(),
+  current_period_end TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '100 years'),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
-CREATE POLICY "lessons_delete_admin" ON public.lessons
-  FOR DELETE USING (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+CREATE UNIQUE INDEX idx_subscriptions_trainer_id ON subscriptions(trainer_id);
 
--- Measurements: Üye kendi ölçümlerini görür, admin tümünü yönetir
-CREATE POLICY "measurements_select" ON public.measurements
-  FOR SELECT USING (
-    user_id = auth.uid() OR
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
+-- ── Audit Log ──
+CREATE TABLE audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id UUID REFERENCES trainers(id) ON DELETE SET NULL,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  action TEXT NOT NULL,
+  entity_type TEXT NOT NULL,
+  entity_id UUID,
+  metadata JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
-CREATE POLICY "measurements_insert_admin" ON public.measurements
-  FOR INSERT WITH CHECK (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "measurements_update_admin" ON public.measurements
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
--- Blog posts: Yayında olanları herkes okuyabilir, admin tümünü yönetir
-CREATE POLICY "blog_posts_select_published" ON public.blog_posts
-  FOR SELECT USING (
-    status = 'published' OR
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "blog_posts_insert_admin" ON public.blog_posts
-  FOR INSERT WITH CHECK (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "blog_posts_update_admin" ON public.blog_posts
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "blog_posts_delete_admin" ON public.blog_posts
-  FOR DELETE USING (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
--- Notifications: Üye kendi bildirimlerini görür/günceller, admin tümünü yönetir
-CREATE POLICY "notifications_select" ON public.notifications
-  FOR SELECT USING (
-    user_id = auth.uid() OR
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "notifications_insert_admin" ON public.notifications
-  FOR INSERT WITH CHECK (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "notifications_update" ON public.notifications
-  FOR UPDATE USING (
-    user_id = auth.uid() OR
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
-CREATE POLICY "notifications_delete_admin" ON public.notifications
-  FOR DELETE USING (
-    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
-  );
-
--- Push subscriptions: Kullanıcı kendi subscription'ını yönetir
-CREATE POLICY "push_subscriptions_select" ON public.push_subscriptions
-  FOR SELECT USING (user_id = auth.uid());
-
-CREATE POLICY "push_subscriptions_insert" ON public.push_subscriptions
-  FOR INSERT WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "push_subscriptions_delete" ON public.push_subscriptions
-  FOR DELETE USING (user_id = auth.uid());
-
--- Trigger: Ders eklendiğinde paket used_lessons güncelle
-CREATE OR REPLACE FUNCTION update_package_used_lessons()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF TG_OP = 'INSERT' THEN
-    UPDATE public.packages
-    SET used_lessons = used_lessons + 1,
-        status = CASE
-          WHEN used_lessons + 1 >= total_lessons THEN 'completed'
-          ELSE status
-        END
-    WHERE id = NEW.package_id;
-  ELSIF TG_OP = 'DELETE' THEN
-    UPDATE public.packages
-    SET used_lessons = used_lessons - 1,
-        status = CASE
-          WHEN status = 'completed' AND used_lessons - 1 < total_lessons THEN 'active'
-          ELSE status
-        END
-    WHERE id = OLD.package_id;
-  END IF;
-  RETURN COALESCE(NEW, OLD);
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER trigger_update_used_lessons
-  AFTER INSERT OR DELETE ON public.lessons
-  FOR EACH ROW EXECUTE FUNCTION update_package_used_lessons();
-
--- Trigger: Yeni auth kullanıcı oluşturulduğunda users tablosuna ekle
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.users (id, email, full_name, role)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'member')
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+CREATE INDEX idx_audit_logs_trainer_id ON audit_logs(trainer_id);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);

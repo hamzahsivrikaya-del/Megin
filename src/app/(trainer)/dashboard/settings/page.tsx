@@ -1,0 +1,591 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { updateTrainerProfile } from './actions'
+import Card, { CardHeader, CardTitle } from '@/components/ui/Card'
+import Input from '@/components/ui/Input'
+import Textarea from '@/components/ui/Textarea'
+import Select from '@/components/ui/Select'
+import Button from '@/components/ui/Button'
+import { Subscription, PaymentOrder, TourProgress, SubscriptionPlan } from '@/lib/types'
+import { PLAN_CONFIGS } from '@/lib/plans'
+import { TRAINER_TOUR_STEPS, isTourStepLocked } from '@/lib/tour'
+import { formatPrice } from '@/lib/utils'
+
+const EXPERTISE_OPTIONS = [
+  { value: 'pt', label: 'Personal Training' },
+  { value: 'pilates', label: 'Pilates' },
+  { value: 'yoga', label: 'Yoga' },
+  { value: 'dietitian', label: 'Diyetisyen' },
+  { value: 'other', label: 'Diğer' },
+]
+
+export default function TrainerProfilePage() {
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  // Profil state
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [bio, setBio] = useState('')
+  const [expertise, setExpertise] = useState('pt')
+  const [experienceYears, setExperienceYears] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [memberSince, setMemberSince] = useState('')
+
+  // UI state
+  const [loading, setLoading] = useState(true)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarError, setAvatarError] = useState('')
+  const [profilLoading, setProfilLoading] = useState(false)
+  const [profilMessage, setProfilMessage] = useState('')
+  const [profilError, setProfilError] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [sifreLoading, setSifreLoading] = useState(false)
+  const [sifreMessage, setSifreMessage] = useState('')
+  const [sifreError, setSifreError] = useState('')
+
+  // Abonelik state
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [paymentOrders, setPaymentOrders] = useState<PaymentOrder[]>([])
+
+  // Tour state
+  const [tourProgress, setTourProgress] = useState<TourProgress | null>(null)
+  const [tourStepStatus, setTourStepStatus] = useState<Record<string, boolean>>({})
+  const [trainerPlan, setTrainerPlan] = useState<SubscriptionPlan>('free')
+
+  // Bildirim tercihleri
+  const [notifPrefs, setNotifPrefs] = useState({
+    client_habits_completed: true,
+    client_streak_milestone: true,
+    client_inactive: true,
+    daily_summary: true,
+    trainer_nutrition_summary: true,
+    low_lessons: true,
+  })
+
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: trainer } = await supabase
+        .from('trainers')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (trainer) {
+        setFullName(trainer.full_name || '')
+        setPhone(trainer.phone || '')
+        setBio(trainer.bio || '')
+        setExpertise(trainer.expertise || 'pt')
+        setExperienceYears(trainer.experience_years?.toString() || '')
+        setAvatarUrl(trainer.avatar_url)
+        setMemberSince(trainer.created_at)
+
+        // Abonelik bilgisi
+        const { data: sub } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('trainer_id', trainer.id)
+          .single()
+        if (sub) setSubscription(sub)
+
+        // Ödeme geçmişi
+        const { data: orders } = await supabase
+          .from('payment_orders')
+          .select('*')
+          .eq('trainer_id', trainer.id)
+          .eq('status', 'success')
+          .order('created_at', { ascending: false })
+          .limit(10)
+        if (orders) setPaymentOrders(orders)
+
+        // Tour progress
+        setTourProgress(trainer.tour_progress as TourProgress | null)
+        const plan = (sub?.plan || 'free') as SubscriptionPlan
+        setTrainerPlan(plan)
+
+        // Gerçek aksiyonları kontrol et
+        const [clients, workouts, measurements] = await Promise.all([
+          supabase.from('clients').select('id').eq('trainer_id', trainer.id).limit(1),
+          supabase.from('workouts').select('id').eq('trainer_id', trainer.id).limit(1),
+          supabase.from('measurements').select('id').eq('trainer_id', trainer.id).limit(1),
+        ])
+
+        setTourStepStatus({
+          invite_client: (clients.data?.length ?? 0) > 0,
+          create_workout: (workouts.data?.length ?? 0) > 0,
+          record_measurement: (measurements.data?.length ?? 0) > 0,
+          send_notification: false,
+          complete_profile: !!(trainer.bio || trainer.phone),
+        })
+      }
+      // Bildirim tercihleri
+      const prefsRes = await fetch('/api/notification-preferences')
+      if (prefsRes.ok) {
+        const prefsData = await prefsRes.json()
+        if (prefsData.preferences) setNotifPrefs(prefsData.preferences)
+      }
+
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 15 * 1024 * 1024) {
+      setAvatarError('Dosya boyutu en fazla 15MB olmalıdır')
+      return
+    }
+
+    setAvatarUploading(true)
+    setAvatarError('')
+
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const ext = file.name.split('.').pop()
+      const path = `trainers/${user.id}/avatar.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true })
+
+      if (uploadError) {
+        setAvatarError('Yükleme başarısız')
+        setAvatarUploading(false)
+        return
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(path)
+
+      const publicUrl = urlData.publicUrl + '?t=' + Date.now()
+
+      await supabase
+        .from('trainers')
+        .update({ avatar_url: publicUrl })
+        .eq('user_id', user.id)
+
+      setAvatarUrl(publicUrl)
+      window.dispatchEvent(new Event('profile-updated'))
+    } catch {
+      setAvatarError('Bir hata oluştu')
+    }
+    setAvatarUploading(false)
+  }
+
+  async function handleProfilSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setProfilError('')
+    setProfilMessage('')
+
+    if (fullName.trim().length < 2) {
+      setProfilError('Ad soyad en az 2 karakter olmalıdır')
+      return
+    }
+
+    setProfilLoading(true)
+    try {
+      await updateTrainerProfile({
+        full_name: fullName,
+        phone,
+        bio,
+        expertise,
+        experience_years: experienceYears ? Number(experienceYears) : null,
+      })
+      setProfilMessage('Profil güncellendi')
+      window.dispatchEvent(new Event('profile-updated'))
+    } catch {
+      setProfilError('Güncellenirken bir hata oluştu')
+    }
+    setProfilLoading(false)
+  }
+
+  async function handleSifreSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setSifreError('')
+    setSifreMessage('')
+
+    if (newPassword.length < 6) {
+      setSifreError('Şifre en az 6 karakter olmalıdır')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setSifreError('Şifreler eşleşmiyor')
+      return
+    }
+
+    setSifreLoading(true)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) throw error
+      setSifreMessage('Şifre güncellendi')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch {
+      setSifreError('Şifre güncellenirken bir hata oluştu')
+    }
+    setSifreLoading(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6 max-w-lg mx-auto animate-pulse">
+        <div className="h-8 bg-border rounded w-40" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-24 h-24 rounded-full bg-border" />
+          <div className="h-5 bg-border rounded w-48" />
+        </div>
+        <div className="bg-surface rounded-xl border border-border p-6 space-y-4">
+          <div className="h-5 bg-border rounded w-32" />
+          <div className="h-10 bg-border rounded" />
+          <div className="h-10 bg-border rounded" />
+        </div>
+      </div>
+    )
+  }
+
+  const initials = fullName
+    .split(' ')
+    .map((n) => n.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+
+  return (
+    <div className="space-y-6 max-w-lg mx-auto">
+      <h1 className="text-2xl font-bold">Profilim</h1>
+
+      {/* Avatar */}
+      <div className="flex flex-col items-center gap-3">
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          className="relative group cursor-pointer"
+          disabled={avatarUploading}
+        >
+          <div className="w-24 h-24 rounded-full border-3 border-border overflow-hidden bg-surface-hover">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={fullName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-2xl font-bold text-text-secondary">{initials || '?'}</span>
+              </div>
+            )}
+          </div>
+          <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            {avatarUploading ? (
+              <svg className="w-6 h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            )}
+          </div>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            className="hidden"
+          />
+        </button>
+        <div className="text-center">
+          <p className="font-semibold text-text-primary">{fullName}</p>
+          {memberSince && (
+            <p className="text-xs text-text-secondary mt-0.5">
+              Üyelik: {new Date(memberSince).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}
+            </p>
+          )}
+        </div>
+        {avatarError && (
+          <p className="text-xs text-danger">{avatarError}</p>
+        )}
+      </div>
+
+      {/* Profil Bilgileri */}
+      <Card>
+        <CardHeader><CardTitle>Profil Bilgileri</CardTitle></CardHeader>
+        <form onSubmit={handleProfilSubmit} className="space-y-4">
+          <Input
+            label="Ad Soyad"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Adınız Soyadınız"
+          />
+          <Input
+            label="Telefon"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="05XX XXX XX XX"
+          />
+          <Textarea
+            label="Hakkımda"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            placeholder="Kendinizi kısaca tanıtın..."
+            rows={3}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <Select
+              label="Uzmanlık"
+              value={expertise}
+              onChange={(e) => setExpertise(e.target.value)}
+              options={EXPERTISE_OPTIONS}
+            />
+            <Input
+              label="Deneyim (Yıl)"
+              type="number"
+              value={experienceYears}
+              onChange={(e) => setExperienceYears(e.target.value)}
+              placeholder="5"
+              min={0}
+              max={50}
+            />
+          </div>
+
+          {profilMessage && (
+            <div className="rounded-lg bg-success/10 px-4 py-3 text-sm text-success">
+              {profilMessage}
+            </div>
+          )}
+          {profilError && (
+            <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
+              {profilError}
+            </div>
+          )}
+
+          <Button type="submit" fullWidth loading={profilLoading}>
+            Profili Güncelle
+          </Button>
+        </form>
+      </Card>
+
+      {/* Abonelik */}
+      <Card>
+        <CardHeader><CardTitle>Abonelik</CardTitle></CardHeader>
+        <div className="space-y-4">
+          {subscription ? (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-text-secondary">Mevcut Plan</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="font-bold text-lg">{PLAN_CONFIGS[subscription.plan]?.name || subscription.plan}</span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      subscription.status === 'active'
+                        ? 'bg-success/10 text-success'
+                        : subscription.status === 'past_due'
+                          ? 'bg-warning/10 text-warning'
+                          : 'bg-border text-text-secondary'
+                    }`}>
+                      {subscription.status === 'active' ? 'Aktif' : subscription.status === 'past_due' ? 'Ödeme Bekliyor' : 'İptal'}
+                    </span>
+                  </div>
+                </div>
+                {subscription.plan !== 'elite' && (
+                  <Link
+                    href="/dashboard/upgrade"
+                    className="text-sm font-semibold text-primary hover:underline"
+                  >
+                    Planı Yükselt
+                  </Link>
+                )}
+              </div>
+
+              {subscription.plan !== 'free' && subscription.current_period_end && (
+                <div className="text-sm text-text-secondary">
+                  Dönem bitişi: {new Date(subscription.current_period_end).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-text-secondary">Abonelik bilgisi yüklenemedi.</p>
+          )}
+
+          {/* Ödeme Geçmişi */}
+          {paymentOrders.length > 0 && (
+            <div className="pt-3 border-t border-border">
+              <p className="text-sm font-medium text-text-primary mb-2">Ödeme Geçmişi</p>
+              <div className="space-y-2">
+                {paymentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-text-secondary">
+                        {new Date(order.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                      <span className="text-text-primary font-medium">
+                        {PLAN_CONFIGS[order.plan]?.name || order.plan}
+                      </span>
+                    </div>
+                    <span className="font-medium">{formatPrice(order.amount / 100)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Şifre Değiştir */}
+      <Card>
+        <CardHeader><CardTitle>Şifre Değiştir</CardTitle></CardHeader>
+        <form onSubmit={handleSifreSubmit} className="space-y-4">
+          <Input
+            label="Yeni Şifre"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="En az 6 karakter"
+          />
+          <Input
+            label="Şifre Tekrar"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Şifreni tekrar gir"
+          />
+
+          {sifreMessage && (
+            <div className="rounded-lg bg-success/10 px-4 py-3 text-sm text-success">
+              {sifreMessage}
+            </div>
+          )}
+          {sifreError && (
+            <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
+              {sifreError}
+            </div>
+          )}
+
+          <Button type="submit" fullWidth loading={sifreLoading} variant="secondary">
+            Şifreyi Güncelle
+          </Button>
+        </form>
+      </Card>
+
+      {/* Platform Rehberi */}
+      {tourProgress && !tourProgress.dismissed && (
+        <Card>
+          <CardHeader><CardTitle>Platform Rehberi</CardTitle></CardHeader>
+          <div className="space-y-1">
+            {(() => {
+              const completedCount = TRAINER_TOUR_STEPS.filter(s =>
+                tourStepStatus[s.key] || isTourStepLocked(s, trainerPlan)
+              ).length
+              const allDone = completedCount === TRAINER_TOUR_STEPS.length
+              return (
+                <>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm text-text-secondary mb-2">
+                      <span>İlerleme</span>
+                      <span>{completedCount}/{TRAINER_TOUR_STEPS.length} tamamlandı</span>
+                    </div>
+                    <div className="h-2 bg-border rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all duration-500"
+                        style={{ width: `${(completedCount / TRAINER_TOUR_STEPS.length) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  {allDone ? (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-success font-medium">Tebrikler! Platformu keşfettin.</p>
+                    </div>
+                  ) : (
+                    TRAINER_TOUR_STEPS.map(s => {
+                      const locked = isTourStepLocked(s, trainerPlan)
+                      const completed = tourStepStatus[s.key]
+                      return (
+                        <div key={s.key} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
+                          <div className="flex items-center gap-3">
+                            <span className="text-base">{locked ? '🔒' : completed ? '✅' : '◻️'}</span>
+                            <span className={`text-sm ${completed ? 'text-text-tertiary line-through' : 'text-text-primary'}`}>
+                              {s.title}
+                            </span>
+                          </div>
+                          {!completed && (
+                            <Link
+                              href={locked ? '/dashboard/upgrade' : s.ctaPath}
+                              className="text-xs text-primary hover:text-primary/80 font-medium"
+                            >
+                              {locked ? 'Pro ile Aç' : '→ Git'}
+                            </Link>
+                          )}
+                        </div>
+                      )
+                    })
+                  )}
+                </>
+              )
+            })()}
+          </div>
+        </Card>
+      )}
+      {/* Bildirim Tercihleri */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Bildirim Tercihleri</CardTitle>
+        </CardHeader>
+        <div className="space-y-3">
+          {([
+            { key: 'client_habits_completed', label: 'Alışkanlık Tamamlama', desc: 'Danışan tüm alışkanlıklarını tamamladığında' },
+            { key: 'client_streak_milestone', label: 'Streak Milestone', desc: 'Danışan 7, 14, 30 günlük seriye ulaştığında' },
+            { key: 'client_inactive', label: 'İnaktif Danışan', desc: '3+ gündür giriş yapmayan danışan uyarısı' },
+            { key: 'daily_summary', label: 'Günlük Özet', desc: 'Her akşam günün aktivite özeti' },
+            { key: 'trainer_nutrition_summary', label: 'Beslenme Özeti', desc: 'Günlük beslenme giriş durumu' },
+            { key: 'low_lessons', label: 'Ders Paketi Uyarısı', desc: 'Danışanın ders paketi azaldığında' },
+          ] as const).map(item => (
+            <div key={item.key} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+              <div>
+                <p className="text-sm font-medium text-text-primary">{item.label}</p>
+                <p className="text-xs text-text-secondary">{item.desc}</p>
+              </div>
+              <button
+                onClick={async () => {
+                  const newVal = !notifPrefs[item.key]
+                  setNotifPrefs(prev => ({ ...prev, [item.key]: newVal }))
+                  await fetch('/api/notification-preferences', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [item.key]: newVal }),
+                  })
+                }}
+                className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${
+                  notifPrefs[item.key] ? 'bg-primary' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                    notifPrefs[item.key] ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  )
+}

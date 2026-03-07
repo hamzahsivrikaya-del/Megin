@@ -1,11 +1,11 @@
 {
-  "name": "Hamza Sivrikaya - Kişisel Antrenör",
-  "short_name": "Hamza Sivrikaya",
-  "description": "Hamza Sivrikaya - Kişisel Antrenör | Üye takip sistemi",
+  "name": "Megin — Personal Trainer Platformu",
+  "short_name": "Megin",
+  "description": "Kişisel antrenör platformu",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#FAFAFA",
-  "theme_color": "#FAFAFA",
+  "theme_color": "#DC2626",
   "orientation": "portrait-primary",
   "icons": [
     {

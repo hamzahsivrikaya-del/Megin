@@ -1,76 +1,59 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Teko, Oswald, Lora, Space_Mono, Nunito } from 'next/font/google'
 import ServiceWorkerRegistration from '@/components/shared/ServiceWorkerRegistration'
+import SilentErrorTracker from '@/components/shared/SilentErrorTracker'
 import './globals.css'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
-
-const teko = Teko({
-  variable: '--font-display',
-  subsets: ['latin', 'latin-ext'],
-  weight: ['400', '700'],
-})
-
-const oswald = Oswald({
-  variable: '--font-oswald',
-  subsets: ['latin'],
-})
-
-const lora = Lora({
-  variable: '--font-lora',
-  subsets: ['latin'],
-})
-
-const spaceMono = Space_Mono({
-  variable: '--font-space-mono',
-  subsets: ['latin', 'latin-ext'],
-  weight: ['400', '700'],
-})
-
-const nunito = Nunito({
-  variable: '--font-nunito',
-  subsets: ['latin', 'latin-ext'],
-  weight: ['600', '700', '800', '900'],
-})
-
 export const metadata: Metadata = {
-  title: 'Megin — The Platform for Personal Trainers',
-  description: 'Client tracking, workout programming, nutrition management — all in one platform.',
-  manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Megin',
+  title: {
+    default: 'Megin — Personal Trainer Platformu',
+    template: '%s | Megin',
   },
+  description:
+    'Danışanlarını takip et, ödemelerini kontrol et, antrenman programla. Tek platform, sınırsız danışan.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#0A0A0A',
+  maximumScale: 1,
+  themeColor: '#DC2626',
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="tr">
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Geist:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${teko.variable} ${oswald.variable} ${lora.variable} ${spaceMono.variable} ${nunito.variable} antialiased`}>
+      <body className="min-h-screen bg-background text-text-primary antialiased">
         {children}
+        <SilentErrorTracker />
         <ServiceWorkerRegistration />
+        {/* Microsoft Clarity */}
+        {process.env.NEXT_PUBLIC_CLARITY_ID && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(c,l,a,r,i,t,y){
+                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_ID}");
+              `,
+            }}
+          />
+        )}
       </body>
     </html>
   )

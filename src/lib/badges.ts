@@ -72,7 +72,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   },
   {
     id: 'three_in_a_row',
-    name: "Üçlü",
+    name: 'Üçlü',
     description: 'Bir haftada 3 ders gel',
     category: 'lesson',
     phase: 'A',
@@ -241,7 +241,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   {
     id: 'athlete_of_month',
     name: 'Ayın Sporcusu',
-    description: "Hamza'nın seçimi",
+    description: 'Antrenörünün seçimi',
     category: 'special',
     phase: 'C',
     trigger: 'admin',
