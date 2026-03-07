@@ -130,7 +130,8 @@ export default function PricingCards({ t }: PricingCardsProps) {
           const monthlyPrice = tier.monthlyPrice
           const annualPerMonth = tier.annualPrice === 0 ? 0 : Math.round(tier.annualPrice / 12)
           const displayPrice = isAnnual ? annualPerMonth : monthlyPrice
-          const priceLabel = displayPrice === 0 ? '$0' : `$${displayPrice}`
+          const cs = pricing.currencySymbol
+          const priceLabel = displayPrice === 0 ? `${cs}0` : `${cs}${displayPrice}`
 
           const ctaLabel = ctaLabels[index]
           const ctaHref = ctaHrefs[index]
@@ -190,7 +191,7 @@ export default function PricingCards({ t }: PricingCardsProps) {
                   {isAnnual && monthlyPrice > 0 && (
                     <div className="mb-1">
                       <span className={`text-lg line-through ${isDark ? 'text-white/30' : 'text-[#D1D5DB]'}`}>
-                        ${monthlyPrice}
+                        {cs}{monthlyPrice}
                       </span>
                     </div>
                   )}
@@ -210,7 +211,7 @@ export default function PricingCards({ t }: PricingCardsProps) {
                 {/* Annual total */}
                 {isAnnual && tier.annualPrice > 0 && (
                   <p className={`text-xs mt-1 ${isDark ? 'text-white/40' : 'text-[#9CA3AF]'}`}>
-                    ${tier.annualPrice}{pricing.perYear}
+                    {cs}{tier.annualPrice}{pricing.perYear}
                   </p>
                 )}
 

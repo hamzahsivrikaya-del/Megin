@@ -234,6 +234,7 @@ export const en: MarketingTranslations = {
     ],
   },
   pricing: {
+    currencySymbol: '$',
     title: 'More Features Than Any Competitor. Fraction of the Price.',
     subtitle: 'Client tracking, workout programming, nutrition, badges, reports — all included. Start free, upgrade when you grow.',
     monthly: 'Monthly',

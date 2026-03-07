@@ -99,6 +99,7 @@ export interface MarketingTranslations {
     }>
   }
   pricing: {
+    currencySymbol: string
     title: string
     subtitle: string
     monthly: string

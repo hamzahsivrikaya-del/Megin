@@ -234,6 +234,7 @@ export const tr: MarketingTranslations = {
     ],
   },
   pricing: {
+    currencySymbol: '₺',
     title: 'Rakiplerden Fazla Özellik. Fiyatın Onda Biri.',
     subtitle: 'Üye takibi, antrenman programlama, beslenme, rozetler, raporlar — hepsi dahil. Ücretsiz başla, büyüdükçe yükselt.',
     monthly: 'Aylık',

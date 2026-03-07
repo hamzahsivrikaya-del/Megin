@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   UserCheck,
@@ -19,6 +19,7 @@ const BUSINESS_ICONS = [UserCheck, Building2, Laptop]
 
 export default function MarketingNavbar({ locale = 'tr' }: MarketingNavbarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [darkHero, setDarkHero] = useState(false)
@@ -72,6 +73,15 @@ export default function MarketingNavbar({ locale = 'tr' }: MarketingNavbarProps)
 
   function scheduleMegaClose() {
     closeTimer.current = setTimeout(() => setUseCasesOpen(false), 120)
+  }
+
+  function switchLocale(target: Locale) {
+    if (target === locale) return
+    document.cookie = `megin-locale=${target}; path=/; max-age=${60 * 60 * 24 * 365}`
+    // Convert current path to target locale
+    const stripped = pathname.replace(/^\/tr\/?/, '/') || '/'
+    const newPath = target === 'tr' ? (stripped === '/' ? '/tr' : `/tr${stripped}`) : stripped
+    router.push(newPath)
   }
 
   const navLinks = [
@@ -194,21 +204,21 @@ export default function MarketingNavbar({ locale = 'tr' }: MarketingNavbarProps)
 
           {/* Language switcher */}
           <div className="hidden md:flex items-center gap-1 text-xs font-semibold">
-            <Link
-              href="/"
-              className={locale === 'en' ? 'text-[#DC2626]' : `${lightNav ? 'text-white/70' : 'text-[#0A0A0A]'} hover:text-[#DC2626] transition-colors`}
+            <button
+              onClick={() => switchLocale('en')}
+              className={`cursor-pointer ${locale === 'en' ? 'text-[#DC2626]' : `${lightNav ? 'text-white/70' : 'text-[#0A0A0A]'} hover:text-[#DC2626] transition-colors`}`}
               aria-label="Switch to English"
             >
               EN
-            </Link>
+            </button>
             <span className={lightNav ? 'text-white/30' : 'text-gray-300'}>|</span>
-            <Link
-              href="/tr"
-              className={locale === 'tr' ? 'text-[#DC2626]' : `${lightNav ? 'text-white/70' : 'text-[#0A0A0A]'} hover:text-[#DC2626] transition-colors`}
+            <button
+              onClick={() => switchLocale('tr')}
+              className={`cursor-pointer ${locale === 'tr' ? 'text-[#DC2626]' : `${lightNav ? 'text-white/70' : 'text-[#0A0A0A]'} hover:text-[#DC2626] transition-colors`}`}
               aria-label="Turkce'ye gec"
             >
               TR
-            </Link>
+            </button>
           </div>
 
           {/* Login link */}
@@ -308,21 +318,19 @@ export default function MarketingNavbar({ locale = 'tr' }: MarketingNavbarProps)
             </Link>
             {/* Mobile language switcher */}
             <div className="px-4 py-3 flex items-center gap-2 text-xs font-semibold border-t border-gray-100 mt-1">
-              <Link
-                href="/"
-                onClick={() => setOpen(false)}
-                className={locale === 'en' ? 'text-[#DC2626]' : 'text-[#57534E] hover:text-[#0A0A0A] transition-colors'}
+              <button
+                onClick={() => { setOpen(false); switchLocale('en') }}
+                className={`cursor-pointer ${locale === 'en' ? 'text-[#DC2626]' : 'text-[#57534E] hover:text-[#0A0A0A] transition-colors'}`}
               >
                 EN
-              </Link>
+              </button>
               <span className="text-gray-300">|</span>
-              <Link
-                href="/tr"
-                onClick={() => setOpen(false)}
-                className={locale === 'tr' ? 'text-[#DC2626]' : 'text-[#57534E] hover:text-[#0A0A0A] transition-colors'}
+              <button
+                onClick={() => { setOpen(false); switchLocale('tr') }}
+                className={`cursor-pointer ${locale === 'tr' ? 'text-[#DC2626]' : 'text-[#57534E] hover:text-[#0A0A0A] transition-colors'}`}
               >
                 TR
-              </Link>
+              </button>
             </div>
           </div>
         </div>
