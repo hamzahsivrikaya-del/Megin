@@ -110,12 +110,12 @@ export default function BlogClient({ posts: initialPosts, trainerId }: BlogClien
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Blog Yazilari</h1>
+        <h1 className="text-2xl heading-gradient">Blog Yazilari</h1>
         <Button onClick={openNew} size="sm">Yeni Yazi</Button>
       </div>
 
       {posts.length === 0 ? (
-        <Card className="text-center py-12">
+        <Card glow className="text-center py-12">
           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
               <path d="M12 20h9" />
@@ -128,7 +128,7 @@ export default function BlogClient({ posts: initialPosts, trainerId }: BlogClien
       ) : (
         <div className="space-y-3">
           {posts.map(post => (
-            <Card key={post.id}>
+            <Card glow key={post.id}>
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">

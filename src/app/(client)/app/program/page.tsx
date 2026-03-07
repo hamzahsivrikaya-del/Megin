@@ -54,19 +54,19 @@ export default async function ProgramPage() {
   const weekRange = `${format(monday)} - ${format(weekEnd)} ${weekEnd.getFullYear()}`
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 panel-section-enter">
       <div className="flex items-center justify-between">
         <div>
           <Link href="/app" className="text-sm text-text-secondary hover:text-primary transition-colors">
             ← Geri
           </Link>
-          <h1 className="text-2xl font-bold mt-1">Programım</h1>
+          <h1 className="text-2xl heading-gradient mt-1">Programım</h1>
         </div>
         <span className="text-sm text-text-secondary">{weekRange}</span>
       </div>
 
       {!workouts || workouts.length === 0 ? (
-        <Card className="text-center py-8">
+        <Card glow className="text-center py-8">
           <p className="text-text-secondary">Henüz program atanmadı.</p>
           <p className="text-sm text-text-tertiary mt-1">Antrenörün programını oluşturduğunda burada görünecek.</p>
         </Card>
@@ -82,6 +82,7 @@ export default async function ProgramPage() {
 
             return (
               <Card
+                glow
                 key={index}
                 className={isToday ? 'border-primary/30 bg-primary/5' : ''}
               >

@@ -330,9 +330,9 @@ export default function BeslenmeClient({ clientId, trainerId, userId, memberMeal
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <h1 className="text-2xl font-bold">Beslenme Takibi</h1>
+          <h1 className="text-2xl heading-gradient">Beslenme Takibi</h1>
         </div>
-        <Card className="animate-fade-up delay-100">
+        <Card glow className="animate-fade-up delay-100">
           <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
             <div className="w-14 h-14 rounded-full bg-surface-hover flex items-center justify-center">
               <svg className="w-7 h-7 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -350,7 +350,7 @@ export default function BeslenmeClient({ clientId, trainerId, userId, memberMeal
   }
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 panel-section-enter">
       {/* Toast */}
       {successMsg && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-fade-up">
@@ -579,7 +579,7 @@ export default function BeslenmeClient({ clientId, trainerId, userId, memberMeal
                       <button
                         onClick={() => handleNoteSave(log.id, meal.id)}
                         disabled={saving !== null}
-                        className="w-full py-2 bg-primary text-white text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50"
+                        className="w-full py-2 bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white text-xs font-semibold rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-50"
                       >
                         Notu Kaydet
                       </button>
@@ -648,7 +648,7 @@ export default function BeslenmeClient({ clientId, trainerId, userId, memberMeal
               <button
                 onClick={handleExtraSave}
                 disabled={!extraForm.name.trim() || saving === 'extra'}
-                className="flex-1 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50"
+                className="flex-1 py-2.5 bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-50"
               >
                 {saving === 'extra' ? <Spinner /> : 'Kaydet'}
               </button>
@@ -674,7 +674,7 @@ export default function BeslenmeClient({ clientId, trainerId, userId, memberMeal
       </div>
 
       {/* Son 14 gün grid */}
-      <Card className="animate-fade-up">
+      <Card glow className="animate-fade-up">
         <h3 className="font-semibold text-sm text-text-primary mb-3">Son 14 Gün</h3>
         <div className="grid grid-cols-7 gap-1.5">
           {past14Days.map(({ date, compliant: comp, total: tot, hasExtra }) => {

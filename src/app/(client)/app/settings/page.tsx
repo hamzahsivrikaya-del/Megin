@@ -377,7 +377,7 @@ export default function ClientSettingsPage() {
   }
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 panel-section-enter">
       {/* Baslik */}
       <div className="flex items-center gap-3">
         <Link
@@ -388,7 +388,7 @@ export default function ClientSettingsPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h1 className="text-2xl font-bold text-text-primary">Profilim</h1>
+        <h1 className="text-2xl heading-gradient">Profilim</h1>
       </div>
 
       {/* Section 1: Profile Header */}
@@ -475,7 +475,7 @@ export default function ClientSettingsPage() {
       </div>
 
       {/* Section 2: Profil Bilgileri */}
-      <Card className="rounded-2xl p-5">
+      <Card glow className="rounded-2xl p-5">
         <CardHeader className="mb-0">
           <CardTitle>Profil Bilgileri</CardTitle>
         </CardHeader>
@@ -501,7 +501,7 @@ export default function ClientSettingsPage() {
       </Card>
 
       {/* Section 3: Sifre Degistir */}
-      <Card className="rounded-2xl p-5">
+      <Card glow className="rounded-2xl p-5">
         <CardHeader className="mb-0">
           <CardTitle>Şifre Değiştir</CardTitle>
         </CardHeader>
@@ -528,7 +528,7 @@ export default function ClientSettingsPage() {
 
       {/* Platform Rehberi */}
       {tourProgress && !tourProgress.dismissed && (
-        <Card className="rounded-2xl p-5">
+        <Card glow className="rounded-2xl p-5">
           <CardHeader className="mb-0">
             <CardTitle>Platform Rehberi</CardTitle>
           </CardHeader>
@@ -601,7 +601,7 @@ export default function ClientSettingsPage() {
       )}
 
       {/* Section 4: Rozetlerim */}
-      <Card className="rounded-2xl p-5">
+      <Card glow className="rounded-2xl p-5">
         <CardHeader className="mb-0">
           <div className="flex items-center justify-between">
             <CardTitle>Rozetlerim</CardTitle>

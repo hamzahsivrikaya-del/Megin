@@ -28,17 +28,17 @@ export default async function PackagesPage() {
   const pastPackages = packages?.filter((p) => p.status !== 'active') || []
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 panel-section-enter">
       <div>
         <Link href="/app" className="text-sm text-text-secondary hover:text-primary transition-colors">
           ← Geri
         </Link>
-        <h1 className="text-2xl font-bold mt-1">Paketlerim</h1>
+        <h1 className="text-2xl heading-gradient mt-1">Paketlerim</h1>
       </div>
 
       {/* Aktif paket */}
       {activePackage ? (
-        <Card className="border-primary/20">
+        <Card glow>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-text-primary">{activePackage.total_lessons} Ders Paketi</h3>
             <Badge variant="success">Aktif</Badge>
@@ -83,14 +83,14 @@ export default async function PackagesPage() {
           </div>
         </Card>
       ) : (
-        <Card className="text-center py-6">
+        <Card glow className="text-center py-6">
           <p className="text-text-secondary">Aktif paketiniz bulunmuyor.</p>
         </Card>
       )}
 
       {/* Geçmiş paketler */}
       {pastPackages.length > 0 && (
-        <Card>
+        <Card glow>
           <CardHeader><CardTitle>Geçmiş Paketler</CardTitle></CardHeader>
           <div className="space-y-3">
             {pastPackages.map((pkg) => (

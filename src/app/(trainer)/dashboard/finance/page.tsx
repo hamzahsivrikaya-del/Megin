@@ -61,22 +61,22 @@ export default async function FinancePage() {
   return (
     <FeatureGate plan={plan} feature="finance" role="trainer">
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Finans</h1>
+        <h1 className="text-2xl heading-gradient">Finans</h1>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
+          <Card glow>
             <div className="text-text-secondary text-sm">Toplam Gelir</div>
             <div className="text-2xl font-bold mt-1">{formatPrice(totalRevenue) || '0 TL'}</div>
           </Card>
-          <Card>
+          <Card glow>
             <div className="text-text-secondary text-sm">Ödenen</div>
             <div className="text-2xl font-bold mt-1 text-success">{formatPrice(paidRevenue) || '0 TL'}</div>
           </Card>
-          <Card>
+          <Card glow>
             <div className="text-text-secondary text-sm">Bekleyen</div>
             <div className="text-2xl font-bold mt-1 text-warning">{formatPrice(pendingRevenue) || '0 TL'}</div>
           </Card>
-          <Card>
+          <Card glow>
             <div className="text-text-secondary text-sm">Aktif Danışanlar</div>
             <div className="text-2xl font-bold mt-1">{activeClients}</div>
           </Card>
@@ -136,7 +136,7 @@ async function DeferredFinance({ trainerId, plan }: { trainerId: string; plan: S
 
   return (
     <>
-      <Card>
+      <Card glow>
         <h3 className="text-lg font-semibold text-text-primary mb-4">Aylık Gelir</h3>
         {monthlyData.length === 0 ? (
           <p className="text-sm text-text-secondary">Henüz paket verisi yok.</p>
@@ -172,7 +172,7 @@ async function DeferredFinance({ trainerId, plan }: { trainerId: string; plan: S
         <>
           <h3 className="text-lg font-semibold text-text-primary">Finansal Tahmin</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card>
+            <Card glow>
               <div className="flex items-center justify-between mb-2">
                 <div className="text-text-secondary text-sm">Gelecek Ay Tahmini</div>
                 {forecast.trend !== 'stable' && (
@@ -199,7 +199,7 @@ async function DeferredFinance({ trainerId, plan }: { trainerId: string; plan: S
               </div>
             </Card>
 
-            <Card>
+            <Card glow>
               <div className="text-text-secondary text-sm mb-2">3 Aylık Tahmin</div>
               <div className="text-2xl font-bold text-text-primary">
                 {formatPrice(forecast.nextThreeMonths) || '0 TL'}
@@ -209,7 +209,7 @@ async function DeferredFinance({ trainerId, plan }: { trainerId: string; plan: S
               </div>
             </Card>
 
-            <Card>
+            <Card glow>
               <div className="text-text-secondary text-sm mb-2">Tahsilat Riski</div>
               <div className={`text-2xl font-bold ${
                 forecast.churnRisk > 30

@@ -255,7 +255,7 @@ export default function WorkoutManager({ initialWorkouts, clients, initialWeek, 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Antrenmanlar</h1>
+        <h1 className="text-2xl heading-gradient">Antrenmanlar</h1>
       </div>
 
       {/* Danışan seçimi */}

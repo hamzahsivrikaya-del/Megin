@@ -148,10 +148,10 @@ export default async function ClientDashboardPage() {
   const firstName = client.full_name?.split(' ')[0] || ''
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 panel-section-enter">
       {/* Hosgeldin karti */}
       <div data-tour="welcome-card">
-      <Card className="border-primary/20 gradient-border animate-fade-up">
+      <Card glow className="gradient-border animate-fade-up">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 rounded-full bg-surface-hover border-2 border-border overflow-hidden flex-shrink-0">
@@ -239,7 +239,7 @@ export default async function ClientDashboardPage() {
 
       {/* Bugünün Beslenmesi */}
       <Link href="/app/beslenme" className="block">
-        <Card className="border-primary/30 hover-lift card-glow animate-fade-up delay-100">
+        <Card glow className="hover-lift card-glow animate-fade-up delay-100">
           {clientMeals && clientMeals.length > 0 ? (() => {
             const compliantCount = todayMeals?.filter((m: { status: string }) => m.status === 'compliant').length || 0
             const total = clientMeals.length
@@ -361,7 +361,7 @@ export default async function ClientDashboardPage() {
 
       {/* Yaklaşan Dersler */}
       {upcomingLessons && upcomingLessons.length > 0 && (
-        <Card className="border-primary/30 animate-fade-up delay-150">
+        <Card glow className="animate-fade-up delay-150">
           <div className="flex items-center gap-2 mb-3">
             <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -425,38 +425,38 @@ export default async function ClientDashboardPage() {
       {/* Hizli linkler */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-tour="quick-links">
         <Link href="/app/program">
-          <Card className="border-primary/30 hover-lift card-glow text-center cursor-pointer animate-fade-up delay-200">
+          <Card className="panel-card panel-card-interactive group text-center cursor-pointer animate-fade-up delay-200">
             <svg className="w-6 h-6 mx-auto text-primary mb-2" fill="currentColor" viewBox="0 0 24 24">
               <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
             </svg>
-            <span className="text-sm font-medium">Programım</span>
+            <span className="text-sm font-display font-bold uppercase tracking-tight text-text-primary">Programım</span>
           </Card>
         </Link>
         <Link href="/app/progress">
-          <Card className="border-primary/30 hover-lift card-glow text-center cursor-pointer animate-fade-up delay-300">
+          <Card className="panel-card panel-card-interactive group text-center cursor-pointer animate-fade-up delay-300">
             <svg className="w-6 h-6 mx-auto text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            <span className="text-sm font-medium">İlerleme</span>
+            <span className="text-sm font-display font-bold uppercase tracking-tight text-text-primary">İlerleme</span>
           </Card>
         </Link>
         <Link href="/app/packages">
-          <Card className="border-primary/30 hover-lift card-glow text-center cursor-pointer animate-fade-up delay-400">
+          <Card className="panel-card panel-card-interactive group text-center cursor-pointer animate-fade-up delay-400">
             <svg className="w-6 h-6 mx-auto text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
-            <span className="text-sm font-medium">Paketlerim</span>
+            <span className="text-sm font-display font-bold uppercase tracking-tight text-text-primary">Paketlerim</span>
           </Card>
         </Link>
         <Link href="/app/haftalik-ozet">
-          <Card className="border-primary/30 hover-lift card-glow text-center cursor-pointer animate-fade-up delay-500">
+          <Card className="panel-card panel-card-interactive group text-center cursor-pointer animate-fade-up delay-500">
             <svg className="w-6 h-6 mx-auto text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            <span className="text-sm font-medium">Haftalık Özet</span>
+            <span className="text-sm font-display font-bold uppercase tracking-tight text-text-primary">Haftalık Özet</span>
           </Card>
         </Link>
       </div>
@@ -507,7 +507,7 @@ async function DeferredSections({ clientId }: { clientId: string }) {
     <>
       {/* Gecmis Paketler */}
       {pastPackages && pastPackages.length > 0 && (
-        <Card className="border-primary/30">
+        <Card glow>
           <CardHeader><CardTitle>Geçmiş Paketler</CardTitle></CardHeader>
           <div className="space-y-3 mt-2">
             {pastPackages.map((pkg) => (
@@ -546,7 +546,7 @@ async function DeferredSections({ clientId }: { clientId: string }) {
       )}
 
       {/* Son olcum */}
-      <Card className="border-primary/30">
+      <Card glow>
         <CardHeader><CardTitle>Son Ölçüm</CardTitle></CardHeader>
         {recentMeasurement ? (
           <>

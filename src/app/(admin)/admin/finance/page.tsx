@@ -47,25 +47,25 @@ export default async function FinancePage() {
 
       {/* Ozet Kartlari */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card glow>
           <div className="text-text-secondary text-sm">Toplam Gelir</div>
           <div className="text-2xl font-bold mt-1">
             {formatPrice(totalRevenue) || '0 TL'}
           </div>
         </Card>
-        <Card>
+        <Card glow>
           <div className="text-text-secondary text-sm">Ödenen</div>
           <div className="text-2xl font-bold mt-1 text-success">
             {formatPrice(paidRevenue) || '0 TL'}
           </div>
         </Card>
-        <Card>
+        <Card glow>
           <div className="text-text-secondary text-sm">Bekleyen</div>
           <div className="text-2xl font-bold mt-1 text-warning">
             {formatPrice(pendingRevenue) || '0 TL'}
           </div>
         </Card>
-        <Card>
+        <Card glow>
           <div className="text-text-secondary text-sm">Aktif Üyeler</div>
           <div className="text-2xl font-bold mt-1">{activeMembers}</div>
         </Card>

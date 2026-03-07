@@ -166,7 +166,7 @@ export default function NotificationsManager({ initialNotifications, members, ad
 
       {/* Bildirimlerim tab */}
       {activeTab === 'mine' && (
-        <Card>
+        <Card glow>
           <CardHeader>
             <CardTitle>Bildirimlerim</CardTitle>
           </CardHeader>
@@ -204,7 +204,7 @@ export default function NotificationsManager({ initialNotifications, members, ad
 
       {/* Gönder & Geçmiş tab -- existing notification log */}
       {activeTab === 'send' && (
-        <Card>
+        <Card glow>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Bildirim Geçmişi</CardTitle>

@@ -388,7 +388,7 @@ export default function WorkoutManager({ initialWorkouts, members, initialWeek }
         <button
           onClick={() => handleTabChange('public')}
           className={`flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-            tab === 'public' ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'
+            tab === 'public' ? 'bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'
           }`}
         >
           Haftalık Program
@@ -396,7 +396,7 @@ export default function WorkoutManager({ initialWorkouts, members, initialWeek }
         <button
           onClick={() => handleTabChange('member')}
           className={`flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-            tab === 'member' ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'
+            tab === 'member' ? 'bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'
           }`}
         >
           Üye Programları

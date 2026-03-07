@@ -120,7 +120,7 @@ export default function MembersList({ initialMembers }: { initialMembers: Member
               onClick={() => setFilter(f)}
               className={`px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer
                 ${filter === f
-                  ? 'bg-primary text-white'
+                  ? 'bg-gradient-to-r from-[#DC2626] to-[#F97316] text-white shadow-sm'
                   : 'bg-surface border border-border text-text-secondary hover:text-text-primary'
                 }`}
             >
@@ -133,7 +133,7 @@ export default function MembersList({ initialMembers }: { initialMembers: Member
       {/* Üye listesi */}
       <div className="grid gap-3">
         {filteredMembers.length === 0 ? (
-          <Card>
+          <Card glow>
             <p className="text-text-secondary text-center py-4">Üye bulunamadı</p>
           </Card>
         ) : (
@@ -165,7 +165,7 @@ export default function MembersList({ initialMembers }: { initialMembers: Member
             }
 
             return (
-              <Card key={member.id} className="hover:border-primary/30 transition-colors">
+              <Card glow key={member.id} className="transition-colors">
                 <div className="flex items-center justify-between">
                   <Link href={`/admin/members/${member.id}`} className="flex-1 cursor-pointer">
                     <div className="flex items-center gap-2">

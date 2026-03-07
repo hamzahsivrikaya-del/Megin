@@ -267,7 +267,7 @@ export default function TrainerProfilePage() {
 
   return (
     <div className="space-y-6 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold">Profilim</h1>
+      <h1 className="text-2xl heading-gradient">Profilim</h1>
 
       {/* Avatar */}
       <div className="flex flex-col items-center gap-3">
@@ -325,7 +325,7 @@ export default function TrainerProfilePage() {
       </div>
 
       {/* Profil Bilgileri */}
-      <Card>
+      <Card glow>
         <CardHeader><CardTitle>Profil Bilgileri</CardTitle></CardHeader>
         <form onSubmit={handleProfilSubmit} className="space-y-4">
           <Input
@@ -384,7 +384,7 @@ export default function TrainerProfilePage() {
       </Card>
 
       {/* Abonelik */}
-      <Card>
+      <Card glow>
         <CardHeader><CardTitle>Abonelik</CardTitle></CardHeader>
         <div className="space-y-4">
           {subscription ? (
@@ -450,7 +450,7 @@ export default function TrainerProfilePage() {
       </Card>
 
       {/* Şifre Değiştir */}
-      <Card>
+      <Card glow>
         <CardHeader><CardTitle>Şifre Değiştir</CardTitle></CardHeader>
         <form onSubmit={handleSifreSubmit} className="space-y-4">
           <Input
@@ -487,7 +487,7 @@ export default function TrainerProfilePage() {
 
       {/* Platform Rehberi */}
       {tourProgress && !tourProgress.dismissed && (
-        <Card>
+        <Card glow>
           <CardHeader><CardTitle>Platform Rehberi</CardTitle></CardHeader>
           <div className="space-y-1">
             {(() => {
@@ -544,7 +544,7 @@ export default function TrainerProfilePage() {
         </Card>
       )}
       {/* Bildirim Tercihleri */}
-      <Card>
+      <Card glow>
         <CardHeader>
           <CardTitle>Bildirim Tercihleri</CardTitle>
         </CardHeader>
