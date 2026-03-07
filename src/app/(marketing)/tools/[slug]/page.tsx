@@ -128,7 +128,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
             </p>
             <div className="mt-8">
               <Link href="/signup" className="cta-primary">
-                Try Megin Free
+                TRY MEGIN FREE
                 <svg
                   width="16"
                   height="16"

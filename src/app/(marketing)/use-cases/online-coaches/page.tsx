@@ -42,7 +42,7 @@ export default function OnlineCoachesPage() {
           </p>
           <div className="mt-8">
             <Link href="/signup" className="cta-gradient cta-glow">
-              Get Started Free <ArrowRight className="w-4 h-4" />
+              GET STARTED FREE <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>

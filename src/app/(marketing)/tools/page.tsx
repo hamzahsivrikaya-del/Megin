@@ -133,7 +133,7 @@ export default function ToolsPage() {
             </p>
             <div className="mt-8">
               <Link href="/signup" className="cta-gradient cta-glow">
-                Try Megin Free
+                TRY MEGIN FREE
                 <svg
                   width="16"
                   height="16"

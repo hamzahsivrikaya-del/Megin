@@ -199,7 +199,7 @@ export default async function MarketingBlogPostPage({
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup" className="cta-primary">
-              Get Started Free
+              GET STARTED FREE
               <svg
                 width="16"
                 height="16"
@@ -217,7 +217,7 @@ export default async function MarketingBlogPostPage({
               </svg>
             </Link>
             <Link href="/blog" className="cta-ghost border-[#374151] text-white hover:border-[#DC2626]">
-              More Articles
+              MORE ARTICLES
             </Link>
           </div>
           <p className="text-xs text-[#57534E] mt-4">No credit card required</p>
