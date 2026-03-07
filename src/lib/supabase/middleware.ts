@@ -39,13 +39,26 @@ export async function updateSession(request: NextRequest) {
     '/auth/callback',
   ]
 
-  const isPublicPath = publicPaths.some(
-    (path) =>
-      request.nextUrl.pathname === path ||
-      request.nextUrl.pathname.startsWith('/api/') ||
-      request.nextUrl.pathname.match(/^\/[a-z0-9_-]+$/) || // /<username> public profil
-      request.nextUrl.pathname.match(/^\/[a-z0-9_-]+\/davet\/[a-z0-9]+$/) // /<handle>/davet/<token>
-  )
+  const marketingPrefixes = [
+    '/features',
+    '/pricing',
+    '/use-cases',
+    '/blog',
+    '/tools',
+    '/contact',
+    '/legal',
+    '/tr',
+    '/araclar',
+    '/antrenmanlar',
+    '/yasal',
+  ]
+
+  const isPublicPath =
+    publicPaths.includes(request.nextUrl.pathname) ||
+    request.nextUrl.pathname.startsWith('/api/') ||
+    marketingPrefixes.some((p) => request.nextUrl.pathname.startsWith(p)) ||
+    request.nextUrl.pathname.match(/^\/[a-z0-9_-]+$/) !== null || // /<username> public profil
+    request.nextUrl.pathname.match(/^\/[a-z0-9_-]+\/davet\/[a-z0-9]+$/) !== null // /<handle>/davet/<token>
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone()
