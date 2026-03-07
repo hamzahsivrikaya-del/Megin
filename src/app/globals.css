@@ -1318,6 +1318,86 @@ input:-webkit-autofill {
   box-shadow: 0 8px 24px -4px rgba(255, 45, 45, 0.08), 0 4px 12px -2px rgba(249, 115, 22, 0.06);
 }
 
+/* Card with always-on subtle glow */
+.panel-card-glow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(255, 45, 45, 0.05);
+}
+.panel-card-glow:hover {
+  border-color: rgba(255, 45, 45, 0.25);
+  box-shadow: 0 8px 24px -4px rgba(255, 45, 45, 0.1), 0 4px 12px -2px rgba(249, 115, 22, 0.08);
+}
+
+/* Stat card — gradient bg + prominent value */
+.stat-card {
+  background: linear-gradient(135deg, rgba(255, 45, 45, 0.04), rgba(249, 115, 22, 0.04));
+  border: 1px solid rgba(255, 45, 45, 0.12);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.25s ease;
+}
+.stat-card:hover {
+  border-color: rgba(255, 45, 45, 0.25);
+  box-shadow: 0 8px 24px -4px rgba(255, 45, 45, 0.08), 0 4px 12px -2px rgba(249, 115, 22, 0.06);
+}
+
+/* Icon circle with warm gradient */
+.icon-circle {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #DC2626, #F97316);
+  box-shadow: 0 4px 12px -2px rgba(220, 38, 38, 0.2);
+}
+.icon-circle svg { color: white; }
+
+/* Icon circle — soft/muted variant */
+.icon-circle-soft {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 45, 45, 0.1), rgba(249, 115, 22, 0.08));
+}
+.icon-circle-soft svg { color: #FF2D2D; }
+
+/* Section divider — gradient line */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 45, 45, 0.15), rgba(249, 115, 22, 0.1), transparent);
+  border: none;
+  margin: 1.5rem 0;
+}
+
+/* List item with hover glow */
+.list-item-hover {
+  padding: 0.5rem 0.75rem;
+  margin: 0 -0.25rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+.list-item-hover:hover {
+  background: linear-gradient(135deg, rgba(255, 45, 45, 0.03), rgba(249, 115, 22, 0.02));
+}
+
+/* Progress bar with gradient fill */
+.progress-warm {
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: var(--color-border-light);
+  overflow: hidden;
+}
+.progress-warm > div {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #DC2626, #F97316);
+  transition: width 0.5s ease;
+}
+
 .panel-card-interactive { cursor: pointer; }
 .panel-card-interactive:hover { transform: translateY(-2px); }
 
