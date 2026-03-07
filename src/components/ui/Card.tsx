@@ -2,12 +2,13 @@ export interface CardProps {
   children: React.ReactNode
   className?: string
   onClick?: () => void
+  glow?: boolean
 }
 
-export default function Card({ children, className = '', onClick }: CardProps) {
+export default function Card({ children, className = '', onClick, glow }: CardProps) {
   return (
     <div
-      className={`panel-card ${onClick ? 'panel-card-interactive' : ''} ${className}`}
+      className={`panel-card ${glow ? 'panel-card-glow' : ''} ${onClick ? 'panel-card-interactive' : ''} ${className}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
     >
