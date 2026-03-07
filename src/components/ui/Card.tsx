@@ -7,7 +7,7 @@ export interface CardProps {
 export default function Card({ children, className = '', onClick }: CardProps) {
   return (
     <div
-      className={`bg-surface rounded-xl border border-border p-4 sm:p-6 ${className}`}
+      className={`panel-card ${onClick ? 'panel-card-interactive' : ''} ${className}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
     >
@@ -26,7 +26,7 @@ export function CardHeader({ children, className = '' }: CardProps) {
 
 export function CardTitle({ children, className = '' }: CardProps) {
   return (
-    <h3 className={`text-lg font-semibold text-text-primary ${className}`}>
+    <h3 className={`text-lg heading-display text-text-primary ${className}`}>
       {children}
     </h3>
   )
