@@ -123,7 +123,7 @@ export default function TodayAttendance({
       {/* Başlık */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Bugünkü Dersler</h1>
+          <h1 className="text-2xl heading-display">Bugünkü Dersler</h1>
           <p className="text-sm text-text-secondary mt-0.5">{formatDate(today)}</p>
         </div>
         <div className="text-right">

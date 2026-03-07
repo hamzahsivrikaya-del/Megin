@@ -116,7 +116,7 @@ export default function BlogManager({ initialPosts }: { initialPosts: BlogPost[]
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Blog Yönetimi</h1>
+        <h1 className="text-2xl heading-display">Blog Yönetimi</h1>
         <Button onClick={() => openEditor()}>Yeni Yazı</Button>
       </div>
 

@@ -330,7 +330,7 @@ export default function MemberDetail({ member, packages, measurements, lessons, 
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 sm:gap-3 mb-1">
-                <h1 className="text-lg sm:text-xl font-bold text-text-primary tracking-tight truncate">{member.full_name}</h1>
+                <h1 className="text-lg sm:text-xl heading-display text-text-primary tracking-tight truncate">{member.full_name}</h1>
                 <Badge variant={member.is_active ? 'success' : 'default'}>
                   {member.is_active ? 'Aktif' : 'Pasif'}
                 </Badge>

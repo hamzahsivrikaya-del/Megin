@@ -41,7 +41,7 @@ export default function Sidebar({ trainerName, plan = 'free' }: SidebarProps) {
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-border">
         <div>
-          <h1 className="font-display text-lg font-bold text-primary tracking-tight uppercase">
+          <h1 className="font-display text-lg font-bold sidebar-logo-gradient tracking-tight uppercase">
             {trainerName || 'MEGIN'}
           </h1>
           <span className="text-[10px] text-text-secondary">Kişisel Antrenör</span>
@@ -79,7 +79,7 @@ export default function Sidebar({ trainerName, plan = 'free' }: SidebarProps) {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg mb-0.5 text-sm transition-colors active:bg-surface-hover
                 ${isActive
-                  ? 'bg-primary/10 text-primary font-medium'
+                  ? 'sidebar-item-active'
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
                 }`}
             >
@@ -97,7 +97,7 @@ export default function Sidebar({ trainerName, plan = 'free' }: SidebarProps) {
         {plan !== 'elite' && (
           <Link
             href="/dashboard/upgrade"
-            className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg bg-primary/10 text-primary text-sm font-semibold hover:bg-primary/20 transition-colors"
+            className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg cta-gradient text-white text-sm font-semibold"
           >
             <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}

@@ -153,7 +153,7 @@ export default function MeasurementForm({ members }: { members: { id: string; fu
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Ölçüm Gir</h1>
+      <h1 className="text-2xl heading-display">Ölçüm Gir</h1>
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-4">

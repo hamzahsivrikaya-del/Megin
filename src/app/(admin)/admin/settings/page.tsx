@@ -4,7 +4,7 @@ import CronTrigger from './CronTrigger'
 export default function SettingsPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Ayarlar</h1>
+      <h1 className="text-2xl heading-display">Ayarlar</h1>
 
       <Card>
         <CardHeader><CardTitle>Genel Ayarlar</CardTitle></CardHeader>

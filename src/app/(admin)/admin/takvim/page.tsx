@@ -27,7 +27,7 @@ export default async function AdminCalendarPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Takvim</h1>
+      <h1 className="text-2xl heading-display">Takvim</h1>
       <CalendarClient members={members} />
     </div>
   )

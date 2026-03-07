@@ -43,7 +43,7 @@ export default async function FinancePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Finans</h1>
+      <h1 className="text-2xl heading-display">Finans</h1>
 
       {/* Ozet Kartlari */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

@@ -109,7 +109,7 @@ export default function PackageForm({ members }: { members: { id: string; full_n
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Paket Oluştur</h1>
+      <h1 className="text-2xl heading-display">Paket Oluştur</h1>
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-4">

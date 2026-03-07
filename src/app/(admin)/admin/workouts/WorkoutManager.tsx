@@ -380,7 +380,7 @@ export default function WorkoutManager({ initialWorkouts, members, initialWeek }
     <div className="space-y-6">
       {/* Başlık */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Antrenmanlar</h1>
+        <h1 className="text-2xl heading-display">Antrenmanlar</h1>
       </div>
 
       {/* Tabs */}

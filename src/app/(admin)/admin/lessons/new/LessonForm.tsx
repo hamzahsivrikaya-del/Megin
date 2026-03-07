@@ -103,7 +103,7 @@ export default function LessonForm({ activePackages }: { activePackages: ActiveP
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Ders Ekle</h1>
+      <h1 className="text-2xl heading-display">Ders Ekle</h1>
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-4">

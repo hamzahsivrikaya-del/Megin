@@ -125,7 +125,7 @@ export default function NotificationsManager({ initialNotifications, members, ad
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Bildirimler</h1>
+        <h1 className="text-2xl heading-display">Bildirimler</h1>
         <Button onClick={() => { setActiveTab('send'); setShowSendModal(true) }}>Bildirim Gönder</Button>
       </div>
 
